@@ -34,17 +34,120 @@ Returns a time to pay arrangement that can be submitted:
 
 Sets up a new time to pay arrangement based on the arrangement submitted. 
 
-Input/Output
+Input
+```
+{
+	"arrangement": {
+		"startDate": "2016-08-09",
+		"endDate": "2016-09-16",
+		"firstPaymentDate": "2016-08-09",
+		"firstPaymentAmount": "90000.00",
+		"regularPaymentAmount": "6000.00",
+		"regularPaymentFrequency": "Monthly",
+		"reviewDate": "2016-08-09",
+		"initials": "DOM",
+		"enforcementAction": "CCP",
+		"directDebit": true,
+		"debitDetails": [{
+			"debitType": "IN2",
+			"dueDate": "2004-07-31"
+		}],
+		"utr" : "1234567890",
+		"paymentPlanReference": "1234567890",
+		"directDebitReference": "1234567890"
+	}
+}
+```
 
-HeaderLocation xxxxx/arrangements/{arrangement-identifier}
+| Status Code | Description |
+|---|---|
+| 201 | TTP Arrangement created with header location  |
+| 401 | Not authorised to submit the TTP arrangement  |
+
 
 #### GET /ttparrangements?utr={utr}
 
 Returns a list of time to pay arrangements set up for given UTR
 
+```
+[
+  {
+    "ttparrangement": {
+      "identifier" : "XXX-XXX-XXX-XXX",
+      "startDate": "2016-08-09",
+      "endDate": "2016-09-16",
+      "firstPaymentDate": "2016-08-09",
+      "firstPaymentAmount": "90000.00",
+      "regularPaymentAmount": "6000.00",
+      "regularPaymentFrequency": "Monthly",
+      "reviewDate": "2016-08-09",
+      "initials": "DOM",
+      "enforcementAction": "CCP",
+      "directDebit": true,
+      "debitDetails": [{
+        "debitType": "IN2",
+        "dueDate": "2004-07-31"
+      }],
+      "utr" : "1234567890",
+      "paymentPlanReference": "1234567890",
+      "directDebitReference": "1234567890",
+      "createdOn" : "2016-08-09"
+    }
+  },
+  {
+    "ttparrangement": {
+      "identifier" : "XXX-XXX-XXX-XXX",
+      "startDate": "2016-08-09",
+      "endDate": "2016-09-16",
+      "firstPaymentDate": "2016-08-09",
+      "firstPaymentAmount": "90000.00",
+      "regularPaymentAmount": "6000.00",
+      "regularPaymentFrequency": "Monthly",
+      "reviewDate": "2016-08-09",
+      "initials": "DOM",
+      "enforcementAction": "CCP",
+      "directDebit": true,
+      "debitDetails": [{
+        "debitType": "IN2",
+        "dueDate": "2004-07-31"
+      }],
+      "utr" : "1234567890",
+      "paymentPlanReference": "1234567890",
+      "directDebitReference": "1234567890",
+      "createdOn" : "2016-08-09"
+    }
+  }
+]
+```
+
 #### GET /ttparrangements/{arrangement-identifier}
 
 Returns a specific arrangement based on the identifier
+
+```
+{
+    "ttparrangement": {
+      "identifier" : "XXX-XXX-XXX-XXX",
+      "startDate": "2016-08-09",
+      "endDate": "2016-09-16",
+      "firstPaymentDate": "2016-08-09",
+      "firstPaymentAmount": "90000.00",
+      "regularPaymentAmount": "6000.00",
+      "regularPaymentFrequency": "Monthly",
+      "reviewDate": "2016-08-09",
+      "initials": "DOM",
+      "enforcementAction": "CCP",
+      "directDebit": true,
+      "debitDetails": [{
+        "debitType": "IN2",
+        "dueDate": "2004-07-31"
+      }],
+      "utr" : "1234567890",
+      "paymentPlanReference": "1234567890",
+      "directDebitReference": "1234567890",
+      "createdOn" : "2016-08-09"
+    }
+```
 
 ### License
 
