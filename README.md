@@ -71,9 +71,10 @@ Input
 | Status Code | Description |
 |---|---|
 | 201 | TTP Arrangement created with header location  |
-| 401 | Not authorised to submit the TTP arrangement  |
+| 400 | Bad arrangement data  |
+| 500 | Failed to submit arrangement |
 
-#### GET /ttparrangements/{arrangement-identifier}
+#### GET /ttparrangements/{arrangement-identifier}  [Testing]
 
 Returns a specific arrangement based on the identifier
 
