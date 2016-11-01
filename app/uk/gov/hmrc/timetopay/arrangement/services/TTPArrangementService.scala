@@ -1,5 +1,7 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
+import java.util.UUID
+
 import uk.gov.hmrc.timetopay.arrangement.connectors.ArrangementDesApiConnector
 import uk.gov.hmrc.timetopay.arrangement.models.TTPArrangement
 
@@ -16,7 +18,7 @@ object TTPArrangementService extends TTPArrangementService {
 trait TTPArrangementService {
 
   def submit(arrangement: TTPArrangement) = {
-    Future.successful("test")
+    Future.successful(arrangement.copy(identifier = Some(UUID.randomUUID().toString)))
   }
 
 

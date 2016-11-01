@@ -13,12 +13,13 @@ class TTPArrangementControllerSpec extends UnitSpec with WithFakeApplication {
 
   "POST /ttparrangements" should {
     "return 201" in {
-      val source: String = Source.fromInputStream(getClass.getResourceAsStream("/test.json")).getLines.mkString
+      val source: String = Source.fromInputStream(getClass.getResourceAsStream("/ttparrangement-request.json")).getLines.mkString
       val json: JsValue = Json.parse(source)
 
       val fakeRequest = FakeRequest("POST", "/ttparrangements").withBody(json)
       val result = TTPArrangementController.create().apply(fakeRequest)
       status(result) shouldBe Status.CREATED
+      await(result).header.headers.get("Location") should not be null
     }
   }
 }

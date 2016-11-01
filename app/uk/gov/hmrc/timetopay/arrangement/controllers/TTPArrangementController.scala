@@ -23,8 +23,10 @@ trait TTPArrangementController extends BaseController {
   def create() = Action.async(parse.json) {
     implicit request =>
     withJsonBody[TTPArrangement] {
+      val scheme = if (request.secure) "https://" else "http://"
       arrangement =>
-        arrangementService.submit(arrangement).map(response => Created)
+        arrangementService.submit(arrangement).map(response =>
+          Created.withHeaders(LOCATION -> s"$scheme${request.host}/ttparrangements/${response.identifier.get}"))
     }
   }
 
