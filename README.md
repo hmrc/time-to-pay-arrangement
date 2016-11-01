@@ -13,17 +13,19 @@ Input
 		"paymentPlanReference": "1234567890",
 		"directDebitReference": "1234567890",
 		"taxpayer": {
-			"utr": "1234567890",
-			"debits": [{
-				"debitType": "IN2",
-				"dueDate": "2004-07-31"
-			}]
-		},
-		"communicationPreferences": {
-			"welshLanguageIndicator": true,
-			"audioIndicator": false,
-			"largePrintIndicator": false,
-			"brailleIndicator": false
+		    "self-assessment" : {
+		  	    "utr": "1234567890",
+			    "debits": [{
+				    "debitType": "IN2",
+				    "dueDate": "2004-07-31"
+			    }],
+                "communicationPreferences": {
+                    "welshLanguageIndicator": true,
+                    "audioIndicator": false,
+                    "largePrintIndicator": false,
+                    "brailleIndicator": false
+                }
+            }		
 		},
 		"schedule": {
 			"startDate": "2016-09-01",
@@ -68,18 +70,20 @@ Returns a specific arrangement based on the identifier
 		"paymentPlanReference": "1234567890",
 		"directDebitReference": "1234567890",
 		"taxpayer": {
-			"utr": "1234567890",
-			"debits": [{
-				"debitType": "IN2",
-				"dueDate": "2004-07-31"
-			}]
-		},
-		"communicationPreferences": {
-			"welshLanguageIndicator": true,
-			"audioIndicator": false,
-			"largePrintIndicator": false,
-			"brailleIndicator": false
-		},
+            "self-assessment" : {
+                "utr": "1234567890",
+                "debits": [{
+                    "debitType": "IN2",
+                    "dueDate": "2004-07-31"
+                }],
+                "communicationPreferences": {
+                    "welshLanguageIndicator": true,
+                    "audioIndicator": false,
+                    "largePrintIndicator": false,
+                    "brailleIndicator": false
+                }
+            }		
+        },
 		"schedule": {
 			"startDate": "2016-09-01",
 			"endDate": "2017-08-01",
