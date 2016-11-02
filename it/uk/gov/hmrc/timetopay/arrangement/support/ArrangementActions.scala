@@ -6,9 +6,9 @@ import play.api.Play.current
 
 trait ArrangementActions extends ActionsSupport {
 
-  def getArrangement(identifier: String): WSResponse =
+  def getArrangement(url: String): WSResponse =
     WS
-      .url(s"$url/ttparrangements/$identifier")
+      .url(url)
       .get()
       .futureValue
 
