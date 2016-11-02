@@ -21,5 +21,8 @@ package object modelsFormat {
   implicit val communicationPreferencesFormat = Json.format[CommunicationPreferences]
   implicit val selfAssessmentFormat = Json.format[SelfAssessment]
   implicit val taxPayerFormat = Json.format[Taxpayer]
+  implicit val letterAndControlFormat = Json.format[LetterAndControl]
+  implicit val desTTArrangementFormat = Json.format[DesTTPArrangement]
   implicit val ttpArrangementFormat = Json.format[TTPArrangement]
+
 }

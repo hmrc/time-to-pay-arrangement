@@ -16,12 +16,15 @@ object TTPArrangementService extends TTPArrangementService {
 
 
 trait TTPArrangementService {
-
-  def submit(arrangement: TTPArrangement) = {
-    Future.successful(arrangement.copy(identifier = Some(UUID.randomUUID().toString)))
+  def byId(id: String): Future[Option[TTPArrangement]] = {
+     Future.successful(None)
   }
 
 
   val arrangementDesApiConnector: ArrangementDesApiConnector
+
+  def submit(arrangement: TTPArrangement) = {
+    Future.successful(arrangement.copy(identifier = Some(UUID.randomUUID().toString)))
+  }
 
 }
