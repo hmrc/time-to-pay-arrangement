@@ -1,0 +1,27 @@
+{
+  "selfAssessment": {
+    "utr": "1234567890",
+    "addresses": [
+      {
+        "addressLine1": "",
+        "addressLine2": "",
+        "addressLine3": "",
+        "addressLine4": "",
+        "addressLine5": "",
+        "postCode": ""
+      }
+    ],
+    "communicationPreferences": {
+      "welshLanguageIndicator": false,
+      "audioIndicator": false,
+      "largePrintIndicator": false,
+      "brailleIndicator": false
+    },
+    "debits": [
+      {
+        "debitType": "IN2",
+        "dueDate": "2004-07-31"
+      }
+    ]
+  }
+}
