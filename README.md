@@ -73,7 +73,7 @@ Input
 | 201 | TTP Arrangement created with header location  |
 | 401 | Not authorised to submit the TTP arrangement  |
 
-#### GET /ttparrangements/{arrangement-identifier}
+#### GET /test-only/ttparrangements/{arrangement-identifier}
 
 Returns a specific arrangement based on the identifier
 
