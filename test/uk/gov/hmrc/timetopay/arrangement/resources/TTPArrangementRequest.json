@@ -2,6 +2,7 @@
   "paymentPlanReference": "1234567890",
   "directDebitReference": "1234567890",
   "taxpayer": {
+    "customerName" : "Customer Name",
     "selfAssessment": {
       "utr": "1234567890",
       "addresses": [

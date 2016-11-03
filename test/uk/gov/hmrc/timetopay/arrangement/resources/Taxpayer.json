@@ -1,4 +1,5 @@
 {
+  "customerName" : "Customer Name",
   "selfAssessment": {
     "utr": "1234567890",
     "addresses": [

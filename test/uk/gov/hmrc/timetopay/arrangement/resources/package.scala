@@ -1,9 +1,10 @@
 package uk.gov.hmrc.timetopay.arrangement
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.timetopay.arrangement.models.{DesTTPArrangement, LetterAndControl, Taxpayer}
-import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
+import uk.gov.hmrc.timetopay.arrangement.models.{Taxpayer, LetterAndControl, DesTTPArrangement}
+
 import scala.io.Source
+import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
 
 package object resources {
 
@@ -15,6 +16,5 @@ package object resources {
     Json.parse(Source.fromFile(s"test/uk/gov/hmrc/timetopay/arrangement/resources/LetterAndControl.json").getLines.mkString).as[LetterAndControl]
   val taxpayer: Taxpayer =
     Json.parse(Source.fromFile(s"test/uk/gov/hmrc/timetopay/arrangement/resources/Taxpayer.json").getLines.mkString).as[Taxpayer]
-
 
 }

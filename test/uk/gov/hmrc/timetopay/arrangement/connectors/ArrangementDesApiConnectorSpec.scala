@@ -10,7 +10,7 @@ import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.ws.WSHttp
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpPost, HttpResponse}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
-import uk.gov.hmrc.timetopay.arrangement.models.{DesTTPArrangement, LetterAndControl}
+import uk.gov.hmrc.timetopay.arrangement.models.{DesSubmissionRequest, DesTTPArrangement, LetterAndControl}
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -30,11 +30,11 @@ class ArrangementDesApiConnectorSpec extends UnitSpec with MockitoSugar with Ser
       when(TestArrangementDesApiConnector.http.POST[JsValue, HttpResponse](any[String], any[JsValue], any())(any(), any(), any()))
         .thenReturn(Future(response))
 
-      val result = TestArrangementDesApiConnector.submitArrangement(taxpayer, submitArrangementTTPArrangement, submitArrangementLetterAndControl)
+      val result = TestArrangementDesApiConnector.submitArrangement(taxpayer,
+        DesSubmissionRequest(submitArrangementTTPArrangement,submitArrangementLetterAndControl))
 
       ScalaFutures.whenReady(result) { r =>
-        r shouldBe a[HttpResponse]
-        r.status shouldBe Status.ACCEPTED
+        r shouldBe true
       }
     }
   }

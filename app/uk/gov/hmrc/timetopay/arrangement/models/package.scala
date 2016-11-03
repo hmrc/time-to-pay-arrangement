@@ -3,7 +3,6 @@ package uk.gov.hmrc.timetopay.arrangement
 import java.time.LocalDate
 
 import play.api.libs.json.{Format, JsResult, JsValue, Json}
-import uk.gov.hmrc.timetopay.arrangement.connectors.DesSubmissionRequest
 import uk.gov.hmrc.timetopay.arrangement.models._
 
 package object modelsFormat {
@@ -22,8 +21,8 @@ package object modelsFormat {
   implicit val communicationPreferencesFormat = Json.format[CommunicationPreferences]
   implicit val selfAssessmentFormat = Json.format[SelfAssessment]
   implicit val taxPayerFormat = Json.format[Taxpayer]
-  implicit val letterAndControlFormat = Json.format[LetterAndControl]
   implicit val desTTArrangementFormat = Json.format[DesTTPArrangement]
-  implicit val ttpArrangementFormat = Json.format[TTPArrangement]
+  implicit val letterAndControlFormat = Json.format[LetterAndControl]
   implicit val desSubmissionRequestFormat = Json.format[DesSubmissionRequest]
+  implicit val ttpArrangementFormat = Json.format[TTPArrangement]
 }

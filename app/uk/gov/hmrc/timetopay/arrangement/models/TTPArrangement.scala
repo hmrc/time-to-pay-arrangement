@@ -8,16 +8,15 @@ case class TTPArrangement(identifier: Option[String],
                           directDebitReference: String,
                           taxpayer: Taxpayer,
                           schedule: Schedule,
-                          ttpArrangement: Option[DesTTPArrangement],
-                          letterAndControl: Option[LetterAndControl]) {
+                          desArrangement : Option[DesSubmissionRequest]) {
 
 }
 
 case class DesTTPArrangement(startDate: LocalDate,
                                endDate: LocalDate,
                                firstPaymentDate: LocalDate,
-                               firstPaymentAmount: BigDecimal,
-                               regularPaymentAmount: BigDecimal,
+                               firstPaymentAmount: String,
+                               regularPaymentAmount: String,
                                regularPaymentFrequency: String,
                                reviewDate: LocalDate,
                                initials: String,
@@ -46,8 +45,10 @@ case class LetterAndControl(customerName: String,
                             officeFax: String,
                             officeOpeningHours: String,
                             template: String,
-                            exceptionType: String,
-                            exceptionReason: String
+                            exceptionType: Option[String] = None,
+                            exceptionReason: Option[String] = None
                            ) {
 
 }
+
+case class DesSubmissionRequest(ttpArrangement: DesTTPArrangement, letterAndControl: LetterAndControl) {}
