@@ -1,6 +1,7 @@
 package uk.gov.hmrc.timetopay.arrangement.controllers
 
 import play.api.http.Status
+import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
@@ -59,6 +60,50 @@ class TTPArrangementControllerSpec extends UnitSpec with WithFakeApplication {
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
     }
 
+  }
+
+  "GET /ttparrangements" should {
+    "return 200 for arrangement" in {
+
+      object StubbedTTPArrangementService extends TTPArrangementService {
+        override def byId(id: String) = {
+          Future.successful(Some(ttparrangementResponse.as[TTPArrangement]))
+        }
+        override val arrangementDesApiConnector = ArrangementDesApiConnector
+        override val desTTPArrangementFactory = DesTTPArrangementService
+        override val letterAndControlFactory = LetterAndControlService
+      }
+
+      object TestController extends TTPArrangementController {
+        override val arrangementService = StubbedTTPArrangementService
+      }
+
+      val fakeRequest = FakeRequest("GET", "/ttparrangements/XXX-XXX-XXX")
+      val result = await(TestController.arrangement("XXX-XXX-XXX").apply(fakeRequest))
+      status(result) shouldBe Status.OK
+      Json.parse(bodyOf(result)).as[TTPArrangement].desArrangement.get.ttpArrangement.saNote shouldBe "SA Note Text Here"
+    }
+
+
+    "return 404 for non existent arrangement" in {
+      object StubbedTTPArrangementService extends TTPArrangementService {
+        override val desTTPArrangementFactory = DesTTPArrangementService
+        override val letterAndControlFactory = LetterAndControlService
+        override val arrangementDesApiConnector = ArrangementDesApiConnector
+        override def byId(id: String) = {
+          Future.successful(None)
+        }
+
+      }
+      object TestController extends TTPArrangementController {
+        override val arrangementService = StubbedTTPArrangementService
+      }
+
+      val fakeRequest = FakeRequest("GET", "/ttparrangements/XXX-XXX-XXX")
+      val result = await(TestController.arrangement("XXX-XXX-XXX").apply(fakeRequest))
+      status(result) shouldBe Status.NOT_FOUND
+
+    }
   }
 
 

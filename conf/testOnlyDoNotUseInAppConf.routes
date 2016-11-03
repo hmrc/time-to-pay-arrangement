@@ -11,4 +11,3 @@
 
 # Add all the application routes to the prod.routes file
 ->         /                                   prod.Routes
-GET        /test-only/ttparrangements/:id      uk.gov.hmrc.timetopay.arrangement.controllers.TestGetTTPArrangementController.arrangement(id: String)

@@ -74,9 +74,9 @@ Input
 | 201 | TTP Arrangement created with header location  |
 | 401 | Not authorised to submit the TTP arrangement  |
 
-#### GET /test-only/ttparrangements/{arrangement-identifier}
+#### GET /ttparrangements/{arrangement-identifier}
 
-Returns a specific arrangement based on the identifier
+Returns a specific arrangement based on the identifier. This api is for internal use only and the data lives for 30 days
 
 ```    
 {

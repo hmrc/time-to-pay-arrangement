@@ -36,6 +36,13 @@ trait TTPArrangementController extends BaseController {
       }
   }
 
+  def arrangement(id: String) = Action.async {
+    implicit request =>
+      Logger.debug(s"Requested arrangement $id")
+      val future: Future[Option[TTPArrangement]] = arrangementService.byId(id)
+      future.flatMap(x => x.map(arrangement => successful(Ok(Json.toJson(arrangement)))).getOrElse(successful(NotFound)))
+  }
+
 
 
 }
