@@ -2,6 +2,7 @@ package uk.gov.hmrc.timetopay.arrangement.support
 
 import play.api.libs.ws.{WS, WSResponse}
 import play.api.Play.current
+import play.api.libs.json.JsValue
 
 
 trait ArrangementActions extends ActionsSupport {
@@ -12,9 +13,9 @@ trait ArrangementActions extends ActionsSupport {
       .get()
       .futureValue
 
-  def postArrangements(data: String): WSResponse = postArrangements(data.getBytes())
+//  def postArrangements(data: Json): WSResponse = postArrangements(data.getBytes())
 
-  def postArrangements(data: Array[Byte]): WSResponse =
+  def postArrangements(data: JsValue): WSResponse =
     WS
       .url(s"$url/ttparrangements")
       .withHeaders("Content-Type" -> "application/json")

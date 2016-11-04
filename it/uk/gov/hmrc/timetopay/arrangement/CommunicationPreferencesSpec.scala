@@ -1,6 +1,7 @@
 package uk.gov.hmrc.timetopay.arrangement
 
-import uk.gov.hmrc.timetopay.arrangement.support.{ArrangementActions, IntegrationSpec, TestData}
+import uk.gov.hmrc.timetopay.arrangement.itresources._
+import uk.gov.hmrc.timetopay.arrangement.support.{ArrangementActions, IntegrationSpec}
 
 /**
   * Integration tests for SSTTP-364
@@ -16,7 +17,7 @@ class CommunicationPreferencesSpec extends IntegrationSpec with ArrangementActio
 
     scenario("A Welsh user is creating an arrangement with Welsh communication preference") {
       When("I call POST /ttparrangements")
-      val getArrangementPostResponse = postArrangements(TestData.welshPreferenceJson)
+      val getArrangementPostResponse = postArrangements(welshPreferenceRequest)
 
       Then("I should receive a 201 CREATED response")
       getArrangementPostResponse.status shouldBe CREATED
@@ -33,7 +34,7 @@ class CommunicationPreferencesSpec extends IntegrationSpec with ArrangementActio
 
     scenario("A Welsh user is creating an arrangement with Welsh communication preference") {
       When("I call POST /ttparrangements")
-      val getArrangementPostResponse = postArrangements(TestData.welshPreferenceLargePrintJson)
+      val getArrangementPostResponse = postArrangements(welshPreferenceLargePrintRequest)
 
       Then("I should receive a 201 CREATED response")
       getArrangementPostResponse.status shouldBe CREATED
@@ -50,7 +51,7 @@ class CommunicationPreferencesSpec extends IntegrationSpec with ArrangementActio
 
     scenario("An English user is creating an arrangement with audio indicator communication preference") {
       When("I call POST /ttparrangements")
-      val getArrangementPostResponse = postArrangements(TestData.englishAudioIndicatorJson)
+      val getArrangementPostResponse = postArrangements(englishAudioIndicatorRequest)
 
       Then("I should receive a 201 CREATED response")
       getArrangementPostResponse.status shouldBe CREATED
@@ -67,7 +68,7 @@ class CommunicationPreferencesSpec extends IntegrationSpec with ArrangementActio
 
     scenario("An English user is creating an arrangement with large print communication preference") {
       When("I call POST /ttparrangements")
-      val getArrangementPostResponse = postArrangements(TestData.englishLargePrintJson)
+      val getArrangementPostResponse = postArrangements(englishLargePrintRequest)
 
       Then("I should receive a 201 CREATED response")
       getArrangementPostResponse.status shouldBe CREATED
@@ -84,7 +85,7 @@ class CommunicationPreferencesSpec extends IntegrationSpec with ArrangementActio
 
     scenario("An English user is creating an arrangement with large print communication preference") {
       When("I call POST /ttparrangements")
-      val getArrangementPostResponse = postArrangements(TestData.englishBrailleJson)
+      val getArrangementPostResponse = postArrangements(englishBrailleRequest)
 
       Then("I should receive a 201 CREATED response")
       getArrangementPostResponse.status shouldBe CREATED
