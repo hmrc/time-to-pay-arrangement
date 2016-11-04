@@ -3,9 +3,12 @@ package uk.gov.hmrc.timetopay.arrangement.services
 import java.time.LocalDate
 import java.util.UUID
 
+import play.api.Logger
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.timetopay.arrangement.connectors.ArrangementDesApiConnector
-import uk.gov.hmrc.timetopay.arrangement.models.{DesTTPArrangement, DesSubmissionRequest, TTPArrangement}
+import uk.gov.hmrc.timetopay.arrangement.models.{DesSubmissionRequest, TTPArrangement}
+import uk.gov.hmrc.timetopay.arrangement.repositories.TTPArrangementRepository
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -15,6 +18,7 @@ object TTPArrangementService extends TTPArrangementService {
   override val arrangementDesApiConnector = ArrangementDesApiConnector
   override val desTTPArrangementFactory: DesTTPArrangementService = DesTTPArrangementService
   override val letterAndControlFactory: LetterAndControlService = LetterAndControlService
+  override val ttpArrangementRepository: TTPArrangementRepository = TTPArrangementRepository
 }
 
 
@@ -23,27 +27,36 @@ trait TTPArrangementService {
   val arrangementDesApiConnector: ArrangementDesApiConnector
   val desTTPArrangementFactory: DesTTPArrangementService
   val letterAndControlFactory: LetterAndControlService
+  val ttpArrangementRepository: TTPArrangementRepository
 
 
   def byId(id: String): Future[Option[TTPArrangement]] = {
-    throw new NotImplementedError("Yet to be implemented")
+    ttpArrangementRepository.findById(id)
   }
 
-  private def createResponse(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): TTPArrangement = {
-    arrangement.copy(identifier = Some(UUID.randomUUID().toString),
+  private def createResponse(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[TTPArrangement]] = {
+    val toSave = arrangement.copy(id = Some(UUID.randomUUID().toString),
       createdOn = Some(LocalDate.now()),
       desArrangement = Some(desSubmissionRequest))
+    ttpArrangementRepository.save(toSave)
   }
 
-  def submit(arrangement: TTPArrangement)(implicit hc: HeaderCarrier): Future[TTPArrangement] = {
+  def submit(arrangement: TTPArrangement)(implicit hc: HeaderCarrier): Future[Option[TTPArrangement]] = {
+    Logger.info(s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' and PP '${arrangement.paymentPlanReference}'")
+    val requestFuture = for {
+      letterAndControl <- letterAndControlFactory.create(arrangement)
+      desTTPArrangement <- desTTPArrangementFactory.create(arrangement)
+    } yield DesSubmissionRequest(desTTPArrangement, letterAndControl)
 
-    val letterAndControl = letterAndControlFactory.create(arrangement)
-    val desTTPArrangement = desTTPArrangementFactory.create(arrangement)
-    val desSubmissionRequest = DesSubmissionRequest(desTTPArrangement, letterAndControl)
-
-    arrangementDesApiConnector.submitArrangement(arrangement.taxpayer, desSubmissionRequest).map {
-      r => if (r) createResponse(arrangement, desSubmissionRequest) else throw new RuntimeException("Unable to submit arrangement")
+    requestFuture.flatMap {
+      request => {
+        arrangementDesApiConnector.submitArrangement(arrangement.taxpayer, request).flatMap {
+          r => if (r) createResponse(arrangement, request).map(identity) else throw new RuntimeException("Unable to submit arrangement")
+        }
+      }
     }
+
+
   }
 
 }
