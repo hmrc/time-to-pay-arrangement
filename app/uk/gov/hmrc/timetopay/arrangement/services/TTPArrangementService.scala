@@ -18,6 +18,7 @@ object TTPArrangementService extends TTPArrangementService {
   override val arrangementDesApiConnector = ArrangementDesApiConnector
   override val desTTPArrangementFactory: DesTTPArrangementService = DesTTPArrangementService
   override val letterAndControlFactory: LetterAndControlService = LetterAndControlService
+  override val ttpArrangementRepository: TTPArrangementRepository = TTPArrangementRepository
 }
 
 
@@ -26,21 +27,21 @@ trait TTPArrangementService {
   val arrangementDesApiConnector: ArrangementDesApiConnector
   val desTTPArrangementFactory: DesTTPArrangementService
   val letterAndControlFactory: LetterAndControlService
+  val ttpArrangementRepository: TTPArrangementRepository
 
 
   def byId(id: String): Future[Option[TTPArrangement]] = {
-    throw new NotImplementedError("Yet to be implemented")
-
+    ttpArrangementRepository.findById(id)
   }
 
-  private def createResponse(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): TTPArrangement = {
-    arrangement.copy(identifier = Some(UUID.randomUUID().toString),
+  private def createResponse(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[TTPArrangement]] = {
+    val toSave = arrangement.copy(id = Some(UUID.randomUUID().toString),
       createdOn = Some(LocalDate.now()),
       desArrangement = Some(desSubmissionRequest))
-
+    ttpArrangementRepository.save(toSave)
   }
 
-  def submit(arrangement: TTPArrangement)(implicit hc: HeaderCarrier): Future[TTPArrangement] = {
+  def submit(arrangement: TTPArrangement)(implicit hc: HeaderCarrier): Future[Option[TTPArrangement]] = {
     Logger.info(s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' and PP '${arrangement.paymentPlanReference}'")
     val requestFuture = for {
       letterAndControl <- letterAndControlFactory.create(arrangement)
@@ -49,8 +50,8 @@ trait TTPArrangementService {
 
     requestFuture.flatMap {
       request => {
-        arrangementDesApiConnector.submitArrangement(arrangement.taxpayer, request).map {
-          r => if (r) createResponse(arrangement, request) else throw new RuntimeException("Unable to submit arrangement")
+        arrangementDesApiConnector.submitArrangement(arrangement.taxpayer, request).flatMap {
+          r => if (r) createResponse(arrangement, request).map(identity) else throw new RuntimeException("Unable to submit arrangement")
         }
       }
     }

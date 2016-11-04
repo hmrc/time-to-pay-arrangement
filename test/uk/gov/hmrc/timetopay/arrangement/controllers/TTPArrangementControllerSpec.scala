@@ -1,5 +1,6 @@
 package uk.gov.hmrc.timetopay.arrangement.controllers
 
+import org.scalatest.mock.MockitoSugar
 import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
@@ -9,11 +10,12 @@ import uk.gov.hmrc.timetopay.arrangement.connectors.ArrangementDesApiConnector
 import uk.gov.hmrc.timetopay.arrangement.models.TTPArrangement
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
+import uk.gov.hmrc.timetopay.arrangement.repositories.TTPArrangementRepository
 import uk.gov.hmrc.timetopay.arrangement.services.{DesTTPArrangementService, LetterAndControlService, TTPArrangementService}
 
 import scala.concurrent.Future
 
-class TTPArrangementControllerSpec extends UnitSpec with WithFakeApplication {
+class TTPArrangementControllerSpec extends UnitSpec with MockitoSugar with WithFakeApplication {
 
 
   "POST /ttparrangements" should {
@@ -22,9 +24,11 @@ class TTPArrangementControllerSpec extends UnitSpec with WithFakeApplication {
         override val arrangementDesApiConnector = ArrangementDesApiConnector
         override val desTTPArrangementFactory = DesTTPArrangementService
         override val letterAndControlFactory = LetterAndControlService
+        override val ttpArrangementRepository: TTPArrangementRepository = mock[TTPArrangementRepository]
+
 
         override def submit(arrangement: TTPArrangement)(implicit hc: HeaderCarrier) = {
-          Future.successful(ttparrangementResponse.as[TTPArrangement])
+          Future.successful(Some(ttparrangementResponse.as[TTPArrangement]))
         }
 
       }
@@ -44,6 +48,7 @@ class TTPArrangementControllerSpec extends UnitSpec with WithFakeApplication {
         override val arrangementDesApiConnector = ArrangementDesApiConnector
         override val desTTPArrangementFactory = DesTTPArrangementService
         override val letterAndControlFactory = LetterAndControlService
+        override val ttpArrangementRepository: TTPArrangementRepository = mock[TTPArrangementRepository]
 
         override def submit(arrangement: TTPArrangement)(implicit hc: HeaderCarrier) = {
           Future.failed(new RuntimeException("DES API Submission Failed"))
@@ -72,6 +77,8 @@ class TTPArrangementControllerSpec extends UnitSpec with WithFakeApplication {
         override val arrangementDesApiConnector = ArrangementDesApiConnector
         override val desTTPArrangementFactory = DesTTPArrangementService
         override val letterAndControlFactory = LetterAndControlService
+        override val ttpArrangementRepository: TTPArrangementRepository = mock[TTPArrangementRepository]
+
       }
 
       object TestController extends TTPArrangementController {
@@ -90,6 +97,8 @@ class TTPArrangementControllerSpec extends UnitSpec with WithFakeApplication {
         override val desTTPArrangementFactory = DesTTPArrangementService
         override val letterAndControlFactory = LetterAndControlService
         override val arrangementDesApiConnector = ArrangementDesApiConnector
+        override val ttpArrangementRepository: TTPArrangementRepository = mock[TTPArrangementRepository]
+
         override def byId(id: String) = {
           Future.successful(None)
         }

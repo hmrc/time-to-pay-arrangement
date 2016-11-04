@@ -32,7 +32,7 @@ class TTPArrangementRepositoryISpec extends FunSpec with BeforeAndAfter with Giv
   }
 
   def clear(): Unit = {
-    repository.removeAll().waitFor()
+   repository.removeAll().waitFor()
   }
 
   it("should add save a TTPArrangement") {
@@ -45,6 +45,11 @@ class TTPArrangementRepositoryISpec extends FunSpec with BeforeAndAfter with Giv
   }
 
   it("should get a TTPArrangement for given id") {
+    val arrangement = Json.parse(Source.fromFile(s"test/uk/gov/hmrc/timetopay/arrangement/resources/TTPArrangementResponse.json").getLines.mkString).as[TTPArrangement]
+    repository.save(arrangement).waitFor()
+
+    val loaded = repository.findById(arrangement.id.get).waitFor().get
+    loaded.id.get mustBe arrangement.id.get
 
   }
 
