@@ -2,33 +2,36 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import uk.gov.hmrc.timetopay.arrangement.models.{DesTTPArrangement, Instalment, Schedule, TTPArrangement}
 
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 object DesTTPArrangementService extends DesTTPArrangementService {
 
 }
 
 trait DesTTPArrangementService {
 
-  def create(ttpArrangement: TTPArrangement): DesTTPArrangement = {
+  def create(ttpArrangement: TTPArrangement): Future[DesTTPArrangement] = {
+    Future {
+      val saNote = s"Direct Debit Reference ${ttpArrangement.directDebitReference} Payment Plan Reference ${ttpArrangement.paymentPlanReference}"
 
-    val saNote = s"Direct Debit Reference ${ttpArrangement.directDebitReference} Payment Plan Reference ${ttpArrangement.paymentPlanReference}"
+      val schedule: Schedule = ttpArrangement.schedule
+      val firstPayment: Instalment = schedule.instalments.head
 
-    val schedule: Schedule = ttpArrangement.schedule
-    val firstPayment: Instalment = schedule.instalments.head
-
-    DesTTPArrangement(
-      schedule.startDate,
-      schedule.endDate,
-      firstPayment.paymentDate,
-      firstPayment.amount.toString(),
-      firstPayment.amount.toString(),
-      "Monthly",
-      schedule.endDate.plusWeeks(3),
-      "DOM",
-      "Distraint",
-      directDebit = true,
-      ttpArrangement.taxpayer.selfAssessment.debits,
-      saNote
-    )
+      DesTTPArrangement(
+        schedule.startDate,
+        schedule.endDate,
+        firstPayment.paymentDate,
+        firstPayment.amount.toString(),
+        firstPayment.amount.toString(),
+        "Monthly",
+        schedule.endDate.plusWeeks(3),
+        "DOM",
+        "Distraint",
+        directDebit = true,
+        ttpArrangement.taxpayer.selfAssessment.debits,
+        saNote
+      )
+    }
   }
 
   private def enforcementFlag(tTPArrangement: TTPArrangement) =  {
