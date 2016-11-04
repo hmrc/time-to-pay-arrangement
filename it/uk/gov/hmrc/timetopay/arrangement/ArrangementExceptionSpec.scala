@@ -27,7 +27,8 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
 
       Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
       getArrangementGetResponse.status shouldBe OK
-//      getArrangementGetResponse.json \ "exceptionReason" should include regex "Bad Address"
+      val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
+      exceptionReason should include regex "Bad Address"
     }
 
     scenario("A Scottish user is creating an arrangement with a bad address") {
@@ -43,7 +44,8 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
 
       Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
       getArrangementGetResponse.status shouldBe OK
-//      getArrangementGetResponse.json \ "exceptionReason" should include regex "Bad Address"
+      val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
+      exceptionReason should include regex "Bad Address"
     }
 
     scenario("A Welsh user is creating an arrangement with a bad address") {
@@ -59,7 +61,8 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
 
       Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
       getArrangementGetResponse.status shouldBe OK
-//      getArrangementGetResponse.json \ "exceptionReason" should include regex "Bad Address"
+      val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
+      exceptionReason should include regex "Bad Address"
     }
 
     scenario("An English user is creating an arrangement with multiple addresses") {
@@ -75,7 +78,8 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
 
       Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
       getArrangementGetResponse.status shouldBe OK
-//      getArrangementGetResponse.json \ "exceptionReason" should include regex "Multiple Address"
+      val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
+      exceptionReason should include regex "Multiple Address"
     }
 
     scenario("A Scottish user is creating an arrangement with multiple addresses") {
@@ -91,7 +95,8 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
 
       Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
       getArrangementGetResponse.status shouldBe OK
-//      getArrangementGetResponse.json \ "exceptionReason" should include regex "Multiple Address"
+      val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
+      exceptionReason should include regex "Multiple Address"
     }
 
     scenario("A Welsh user is creating an arrangement with a multiple addresses") {
@@ -107,7 +112,8 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
 
       Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
       getArrangementGetResponse.status shouldBe OK
-//      getArrangementGetResponse.json \ "exceptionReason" should include regex "Multiple Address"
+      val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
+      exceptionReason should include regex "Multiple Address"
     }
 
     scenario("An English user is creating an arrangement with no address") {
@@ -123,7 +129,9 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
 
       Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
       getArrangementGetResponse.status shouldBe OK
-//      getArrangementGetResponse.json \ "exceptionReason" should include regex "No Address"
+      print(getArrangementGetResponse.body)
+      val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
+      exceptionReason should include regex "No Address"
     }
 
     //may not be able to test, unable to tell if a Scottish user is using the system if no address is entered
@@ -140,7 +148,8 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
 
       Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
       getArrangementGetResponse.status shouldBe OK
-//      getArrangementGetResponse.json \ "exceptionReason" should include regex "No Address"
+      val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
+      exceptionReason should include regex "No Address"
     }
 
     //may not be able to test, unable to tell if a Welsh user is using the system if no address is entered
@@ -157,7 +166,8 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
 
       Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
       getArrangementGetResponse.status shouldBe OK
-//      getArrangementGetResponse.json \ "exceptionReason" should include regex "No Address"
+      val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
+      exceptionReason should include regex "No Address"
     }
   }
 }
