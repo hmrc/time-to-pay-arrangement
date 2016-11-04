@@ -3,6 +3,7 @@ package uk.gov.hmrc.timetopay.arrangement.models
 import java.time.LocalDate
 
 
+
 case class Taxpayer(customerName: String, selfAssessment: SelfAssessment) {
 
 }

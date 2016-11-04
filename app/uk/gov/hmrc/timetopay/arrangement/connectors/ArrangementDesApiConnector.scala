@@ -27,4 +27,3 @@ trait ArrangementDesApiConnector extends ServicesConfig {
       .map (_.status == Status.ACCEPTED)
   }
 }
-
