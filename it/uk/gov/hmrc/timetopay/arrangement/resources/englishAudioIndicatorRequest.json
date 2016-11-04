@@ -1,0 +1,59 @@
+{
+  "paymentPlanReference": "1234567890",
+  "directDebitReference": "1234567890",
+  "taxpayer": {
+    "customerName": "Customer name",
+    "selfAssessment": {
+      "utr": "1234567890",
+      "addresses": [
+        {
+          "addressLine1": "Apartment 40, Jet Centro",
+          "addressLine2": "79 St Marys Road",
+          "addressLine3": "Sheffield",
+          "addressLine4": "South Yorkshire",
+          "addressLine5": "",
+          "postCode": "S2 4AH"
+        }
+      ],
+      "communicationPreferences": {
+        "welshLanguageIndicator": false,
+        "audioIndicator": true,
+        "largePrintIndicator": false,
+        "brailleIndicator": false
+      },
+      "debits": [
+        {
+          "debitType": "IN2",
+          "dueDate": "2004-07-31"
+        }
+      ]
+    }
+  },
+  "schedule": {
+    "startDate": "2016-09-01",
+    "endDate": "2017-08-01",
+    "initialPayment": 50,
+    "amountToPay": 5000,
+    "instalmentBalance": 4950,
+    "totalInterestCharged": 45.83,
+    "totalPayable": 5045.83,
+    "instalments": [
+      {
+        "paymentDate": "2016-10-01",
+        "amount": 1248.95
+      },
+      {
+        "paymentDate": "2016-11-01",
+        "amount": 1248.95
+      },
+      {
+        "paymentDate": "2016-12-01",
+        "amount": 1248.95
+      },
+      {
+        "paymentDate": "2017-01-01",
+        "amount": 1248.95
+      }
+    ]
+  }
+}
