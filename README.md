@@ -124,7 +124,7 @@ Returns a specific arrangement based on the identifier. This api is for internal
 
 ```    
 {
-  "identifier" : "XXX-XXX-XXX",
+  "id" : "XXX-XXX-XXX",
   "createdOn" : "2016-08-09",
   "paymentPlanReference": "1234567890",
   "directDebitReference": "1234567890",
@@ -188,12 +188,12 @@ Returns a specific arrangement based on the identifier. This api is for internal
       "startDate": "2016-08-09",
       "endDate": "2016-09-16",
       "firstPaymentDate": "2016-08-09",
-      "firstPaymentAmount": "90000.00",
-      "regularPaymentAmount": "6000.00",
+      "firstPaymentAmount": "1248.95",
+      "regularPaymentAmount": "1248.95",
       "regularPaymentFrequency": "Monthly",
       "reviewDate": "2016-08-09",
       "initials": "DOM",
-      "enforcementAction": "CCP",
+      "enforcementAction": "Distraint",
       "directDebit": true,
       "debitDetails": [
         {
@@ -214,7 +214,7 @@ Returns a specific arrangement based on the identifier. This api is for internal
       "postCode": "TF3 4NA",
       "totalAll": "50000",
       "clmIndicateInt": "Interest is due",
-      "clmPymtString": "1 payment of x.xx then 11 payments of x.xx",
+      "clmPymtString": "Initial payment of 50 then 3 payments of 1248.95 and final payment of 1248.95",
       "officeName1": "office name 1",
       "officeName2": "office name 2",
       "officePostcode": "TF2 8JU",

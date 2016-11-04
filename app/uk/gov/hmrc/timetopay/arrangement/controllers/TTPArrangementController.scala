@@ -14,9 +14,7 @@ import scala.concurrent.Future
 import scala.concurrent.Future.successful
 
 object TTPArrangementController extends TTPArrangementController {
-
   override val arrangementService = TTPArrangementService
-
 }
 
 trait TTPArrangementController extends BaseController {
@@ -28,11 +26,12 @@ trait TTPArrangementController extends BaseController {
       withJsonBody[TTPArrangement] {
         val scheme = if (request.secure) "https://" else "http://"
         arrangement =>
-          arrangementService.submit(arrangement).map(response =>
-            Created.withHeaders(LOCATION -> s"$scheme${request.host}/ttparrangements/${response.identifier.get}"))
-            .recover {
-              case failure => InternalServerError(s"A server error occurred: $failure")
-            }
+          arrangementService.submit(arrangement).map {
+            case Some(t) => Created.withHeaders(LOCATION -> s"$scheme${request.host}/ttparrangements/${t.id.get}")
+            case None => Created
+          }.recover {
+            case failure => InternalServerError(s"A server error occurred: $failure")
+          }
       }
   }
 
@@ -42,7 +41,4 @@ trait TTPArrangementController extends BaseController {
       val future: Future[Option[TTPArrangement]] = arrangementService.byId(id)
       future.flatMap(x => x.map(arrangement => successful(Ok(Json.toJson(arrangement)))).getOrElse(successful(NotFound)))
   }
-
-
-
 }

@@ -2,7 +2,7 @@ package uk.gov.hmrc.timetopay.arrangement.models
 
 import java.time.LocalDate
 
-case class TTPArrangement(identifier: Option[String],
+case class TTPArrangement(id: Option[String],
                           createdOn: Option[LocalDate],
                           paymentPlanReference: String,
                           directDebitReference: String,
