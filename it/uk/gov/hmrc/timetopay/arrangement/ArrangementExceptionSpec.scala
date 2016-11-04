@@ -29,7 +29,7 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
       Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
       getArrangementGetResponse.status shouldBe OK
       val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
-      exceptionReason should include regex "Bad Address"
+      exceptionReason should include ("Bad Address")
     }
 
     scenario("A Scottish user is creating an arrangement with a bad address") {
@@ -46,7 +46,7 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
       Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
       getArrangementGetResponse.status shouldBe OK
       val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
-      exceptionReason should include regex "Bad Address"
+      exceptionReason should include ("Bad Address")
     }
 
     scenario("A Welsh user is creating an arrangement with a bad address") {
@@ -63,59 +63,59 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
       Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
       getArrangementGetResponse.status shouldBe OK
       val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
-      exceptionReason should include regex "Bad Address"
+      exceptionReason should include ("Bad Address")
     }
 
-//    scenario("An English user is creating an arrangement with multiple addresses") {
-//      When("I call POST /ttparrangements")
-//      val getArrangementPostResponse = postArrangements(englishMultipleAddressRequest)
-//
-//      Then("I should receive a 201 CREATED response")
-//      getArrangementPostResponse.status shouldBe CREATED
-//      val locationHeader = getArrangementPostResponse.header("LOCATION").get
-//
-//      When("I call GET /ttparrangements/{arrangement-identifier")
-//      val getArrangementGetResponse = getArrangement(locationHeader)
-//
-//      Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
-//      getArrangementGetResponse.status shouldBe OK
-//      val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
-//      exceptionReason should include regex "Multiple Address"
-//    }
-//
-//    scenario("A Scottish user is creating an arrangement with multiple addresses") {
-//      When("I call POST /ttparrangements")
-//      val getArrangementPostResponse = postArrangements(scottishMultipleAddressRequest)
-//
-//      Then("I should receive a 201 CREATED response")
-//      getArrangementPostResponse.status shouldBe CREATED
-//      val locationHeader = getArrangementPostResponse.header("LOCATION").get
-//
-//      When("I call GET /ttparrangements/{arrangement-identifier")
-//      val getArrangementGetResponse = getArrangement(locationHeader)
-//
-//      Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
-//      getArrangementGetResponse.status shouldBe OK
-//      val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
-//      exceptionReason should include regex "Multiple Address"
-//    }
-//
-//    scenario("A Welsh user is creating an arrangement with a multiple addresses") {
-//      When("I call POST /ttparrangements")
-//      val getArrangementPostResponse = postArrangements(welshMultipleAddressRequest)
-//
-//      Then("I should receive a 201 CREATED response")
-//      getArrangementPostResponse.status shouldBe CREATED
-//      val locationHeader = getArrangementPostResponse.header("LOCATION").get
-//
-//      When("I call GET /ttparrangements/{arrangement-identifier")
-//      val getArrangementGetResponse = getArrangement(locationHeader)
-//
-//      Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
-//      getArrangementGetResponse.status shouldBe OK
-//      val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
-//      exceptionReason should include regex "Multiple Address"
-//    }
+    scenario("An English user is creating an arrangement with multiple addresses") {
+      When("I call POST /ttparrangements")
+      val getArrangementPostResponse = postArrangements(englishMultipleAddressRequest)
+
+      Then("I should receive a 201 CREATED response")
+      getArrangementPostResponse.status shouldBe CREATED
+      val locationHeader = getArrangementPostResponse.header("LOCATION").get
+
+      When("I call GET /ttparrangements/{arrangement-identifier")
+      val getArrangementGetResponse = getArrangement(locationHeader)
+
+      Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
+      getArrangementGetResponse.status shouldBe OK
+      val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
+      exceptionReason should include ("Multiple Address")
+    }
+
+    scenario("A Scottish user is creating an arrangement with multiple addresses") {
+      When("I call POST /ttparrangements")
+      val getArrangementPostResponse = postArrangements(scottishMultipleAddressRequest)
+
+      Then("I should receive a 201 CREATED response")
+      getArrangementPostResponse.status shouldBe CREATED
+      val locationHeader = getArrangementPostResponse.header("LOCATION").get
+
+      When("I call GET /ttparrangements/{arrangement-identifier")
+      val getArrangementGetResponse = getArrangement(locationHeader)
+
+      Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
+      getArrangementGetResponse.status shouldBe OK
+      val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
+      exceptionReason should include ("Multiple Address")
+    }
+
+    scenario("A Welsh user is creating an arrangement with a multiple addresses") {
+      When("I call POST /ttparrangements")
+      val getArrangementPostResponse = postArrangements(welshMultipleAddressRequest)
+
+      Then("I should receive a 201 CREATED response")
+      getArrangementPostResponse.status shouldBe CREATED
+      val locationHeader = getArrangementPostResponse.header("LOCATION").get
+
+      When("I call GET /ttparrangements/{arrangement-identifier")
+      val getArrangementGetResponse = getArrangement(locationHeader)
+
+      Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
+      getArrangementGetResponse.status shouldBe OK
+      val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
+      exceptionReason should include regex "Multiple Address"
+    }
 
     scenario("An English user is creating an arrangement with no address") {
       When("I call POST /ttparrangements")
@@ -132,7 +132,7 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
       getArrangementGetResponse.status shouldBe OK
       print(getArrangementGetResponse.body)
       val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
-      exceptionReason should include regex "No Address"
+      exceptionReason should include ("No Address")
     }
 
     //may not be able to test, unable to tell if a Scottish user is using the system if no address is entered
@@ -150,7 +150,7 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
 //      Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
 //      getArrangementGetResponse.status shouldBe OK
 //      val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
-//      exceptionReason should include regex "No Address"
+//      exceptionReason should include ("No Address")
 //    }
 
     //may not be able to test, unable to tell if a Welsh user is using the system if no address is entered
@@ -168,7 +168,7 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
 //      Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
 //      getArrangementGetResponse.status shouldBe OK
 //      val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
-//      exceptionReason should include regex "No Address"
+//      exceptionReason should include ("No Address")
 //    }
   }
 }

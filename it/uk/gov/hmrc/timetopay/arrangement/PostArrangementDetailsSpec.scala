@@ -23,14 +23,14 @@ class PostArrangementDetailsSpec extends IntegrationSpec with ArrangementActions
       Then("I should receive a 201 CREATED response")
       getArrangementPostResponse.status shouldBe CREATED
       val locationHeader = getArrangementPostResponse.header("LOCATION").get
-//
-//      When("I call GET /ttparrangements/{arrangement-identifier}")
-//      val getArrangementGetResponse = getArrangement(locationHeader)
-//
-//      Then("I should receive a 200 OK response")
-//      getArrangementGetResponse.status shouldBe OK
-//      val enforcementAction = (getArrangementGetResponse.json \ "desArrangement" \ "ttpArrangement" \ "enforcementAction").as[String]
-//      enforcementAction shouldBe "Distraint"
+
+      When("I call GET /ttparrangements/{arrangement-identifier}")
+      val getArrangementGetResponse = getArrangement(locationHeader)
+
+      Then("I should receive a 200 OK response")
+      getArrangementGetResponse.status shouldBe OK
+      val enforcementAction = (getArrangementGetResponse.json \ "desArrangement" \ "ttpArrangement" \ "enforcementAction").as[String]
+      enforcementAction shouldBe "Distraint"
     }
 
     scenario("A Scottish user is creating an arrangement") {

@@ -29,7 +29,7 @@ class CommunicationPreferencesSpec extends IntegrationSpec with ArrangementActio
       Then("I should receive a 200 OK response and the JSON values should be correct")
       getArrangementGetResponse.status shouldBe OK
       val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
-      exceptionReason should include regex "Welsh Preference"
+      exceptionReason should include ("Welsh Preference")
     }
 
     scenario("A Welsh user is creating an arrangement with Welsh communication preference") {
@@ -46,7 +46,7 @@ class CommunicationPreferencesSpec extends IntegrationSpec with ArrangementActio
       Then("I should receive a 200 OK response and the JSON values should be correct")
       getArrangementGetResponse.status shouldBe OK
       val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
-      exceptionReason should include regex "Welsh Preference Large Print"
+      exceptionReason should include ("Welsh Preference Large Print")
     }
 
     scenario("An English user is creating an arrangement with audio indicator communication preference") {
@@ -63,7 +63,7 @@ class CommunicationPreferencesSpec extends IntegrationSpec with ArrangementActio
       Then("I should receive a 200 OK response and the JSON values should be correct")
       getArrangementGetResponse.status shouldBe OK
       val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
-      exceptionReason should include regex "Audio Indicator"
+      exceptionReason should include ("Audio Indicator")
     }
 
     scenario("An English user is creating an arrangement with large print communication preference") {
@@ -80,7 +80,7 @@ class CommunicationPreferencesSpec extends IntegrationSpec with ArrangementActio
       Then("I should receive a 200 OK response and the JSON values should be correct")
       getArrangementGetResponse.status shouldBe OK
       val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
-      exceptionReason should include regex "Large Print"
+      exceptionReason should include ("Large Print")
     }
 
     scenario("An English user is creating an arrangement with large print communication preference") {
@@ -97,7 +97,7 @@ class CommunicationPreferencesSpec extends IntegrationSpec with ArrangementActio
       Then("I should receive a 200 OK response and the JSON values should be correct")
       getArrangementGetResponse.status shouldBe OK
       val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
-      exceptionReason should include regex "Braille"
+      exceptionReason should include ("Braille")
     }
   }
 }
