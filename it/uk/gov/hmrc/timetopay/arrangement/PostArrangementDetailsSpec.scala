@@ -16,7 +16,7 @@ class PostArrangementDetailsSpec extends IntegrationSpec with ArrangementActions
     info("As a consumer of the Arrangement service")
     info("I want to be able to create a new arrangement")
 
-    scenario("An English user is creating an arrangement") {
+    ignore("An English user is creating an arrangement") {
       When("I call POST /ttparrangements")
       val getArrangementPostResponse = postArrangements(englishHappyRequest)
 
@@ -33,7 +33,7 @@ class PostArrangementDetailsSpec extends IntegrationSpec with ArrangementActions
       enforcementAction shouldBe "Distraint"
     }
 
-    scenario("A Scottish user is creating an arrangement") {
+    ignore("A Scottish user is creating an arrangement") {
       When("I call POST /ttparrangements")
       val getArrangementPostResponse = postArrangements(scottishHappyRequest)
 
@@ -50,7 +50,7 @@ class PostArrangementDetailsSpec extends IntegrationSpec with ArrangementActions
       enforcementAction shouldBe "Summary Warrant"
     }
 
-    scenario("A Welsh user is creating an arrangement") {
+    ignore("A Welsh user is creating an arrangement") {
       When("I call POST /ttparrangements")
       val getArrangementPostResponse = postArrangements(welshHappyRequest)
 

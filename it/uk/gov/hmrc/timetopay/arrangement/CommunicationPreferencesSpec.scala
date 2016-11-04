@@ -15,7 +15,7 @@ class CommunicationPreferencesSpec extends IntegrationSpec with ArrangementActio
     info("As a consumer of the Arrangement service")
     info("I want to be able to create a new arrangement")
 
-    scenario("A Welsh user is creating an arrangement with Welsh communication preference") {
+    ignore("A Welsh user is creating an arrangement with Welsh communication preference") {
       When("I call POST /ttparrangements")
       val getArrangementPostResponse = postArrangements(welshPreferenceRequest)
 
@@ -32,7 +32,7 @@ class CommunicationPreferencesSpec extends IntegrationSpec with ArrangementActio
       exceptionReason should include ("Welsh Preference")
     }
 
-    scenario("A Welsh user is creating an arrangement with Welsh communication preference") {
+    ignore("A Welsh user is creating an arrangement with Welsh communication preference") {
       When("I call POST /ttparrangements")
       val getArrangementPostResponse = postArrangements(welshPreferenceLargePrintRequest)
 
@@ -49,7 +49,7 @@ class CommunicationPreferencesSpec extends IntegrationSpec with ArrangementActio
       exceptionReason should include ("Welsh Preference Large Print")
     }
 
-    scenario("An English user is creating an arrangement with audio indicator communication preference") {
+    ignore("An English user is creating an arrangement with audio indicator communication preference") {
       When("I call POST /ttparrangements")
       val getArrangementPostResponse = postArrangements(englishAudioIndicatorRequest)
 
@@ -66,7 +66,7 @@ class CommunicationPreferencesSpec extends IntegrationSpec with ArrangementActio
       exceptionReason should include ("Audio Indicator")
     }
 
-    scenario("An English user is creating an arrangement with large print communication preference") {
+    ignore("An English user is creating an arrangement with large print communication preference") {
       When("I call POST /ttparrangements")
       val getArrangementPostResponse = postArrangements(englishLargePrintRequest)
 
@@ -83,7 +83,7 @@ class CommunicationPreferencesSpec extends IntegrationSpec with ArrangementActio
       exceptionReason should include ("Large Print")
     }
 
-    scenario("An English user is creating an arrangement with large print communication preference") {
+    ignore("An English user is creating an arrangement with large print communication preference") {
       When("I call POST /ttparrangements")
       val getArrangementPostResponse = postArrangements(englishBrailleRequest)
 
