@@ -21,14 +21,17 @@ class PostArrangementDetailsSpec extends IntegrationSpec with ArrangementActions
 
       Then("I should receive a 201 CREATED response")
       getArrangementPostResponse.status shouldBe CREATED
+      println("Response status: " + getArrangementPostResponse.status) //DEBUG
       val locationHeader = getArrangementPostResponse.header("LOCATION").get
 
       When("I call GET /ttparrangements/{arrangement-identifier")
       val getArrangementGetResponse = getArrangement(locationHeader)
+      println("Location content: " + locationHeader) //DEBUG
 
       Then("I should receive a 200 OK response")
       getArrangementGetResponse.status shouldBe OK
-//      getArrangementGetResponse.json \ "enforcementAction" should include regex "Distraint" //Not sure if this works, if it doesn't try the next method
+      println(getArrangementGetResponse.json \ "enforcementAction") //DEBUG
+      getArrangementGetResponse.json \ "enforcementAction" shouldBe "Distraint" //Not sure if this works, if not try the next one
     }
 
     scenario("A Scottish user is creating an arrangement") {
@@ -61,7 +64,7 @@ class PostArrangementDetailsSpec extends IntegrationSpec with ArrangementActions
 
       Then("I should receive a 200 OK response")
       getArrangementGetResponse.status shouldBe OK
-//      getArrangementGetResponse.json \ "enforcementAction" should include regex "Distraint"
+      getArrangementGetResponse.json \ "enforcementAction" shouldBe "Distraint"
     }
   }
 }

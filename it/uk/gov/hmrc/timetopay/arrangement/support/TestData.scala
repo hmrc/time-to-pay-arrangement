@@ -2,24 +2,23 @@ package uk.gov.hmrc.timetopay.arrangement.support
 
 object TestData {
 
-
-  //TODO Fill in valid addresss details
   val englishHappyJson =
     s"""
        |{
        |  "paymentPlanReference": "1234567890",
        |  "directDebitReference": "1234567890",
        |  "taxpayer": {
+       |   "customerName": "Customer name",
        |    "selfAssessment": {
        |      "utr": "1234567890",
        |      "addresses": [
        |        {
-       |          "addressLine1": "",
-       |          "addressLine2": "",
-       |          "addressLine3": "",
-       |          "addressLine4": "",
+       |          "addressLine1": "Apartment 40, Jet Centro",
+       |          "addressLine2": "79 St Marys Road",
+       |          "addressLine3": "Sheffield",
+       |          "addressLine4": "South Yorkshire",
        |          "addressLine5": "",
-       |          "postCode": ""
+       |          "postCode": "S2 4AH"
        |        }
        |      ],
        |      "communicationPreferences": {
@@ -73,16 +72,17 @@ object TestData {
        |  "paymentPlanReference": "1234567890",
        |  "directDebitReference": "1234567890",
        |  "taxpayer": {
+       |   "customerName": "Customer name",
        |    "selfAssessment": {
        |      "utr": "1234567890",
        |      "addresses": [
        |        {
-       |          "addressLine1": "",
-       |          "addressLine2": "",
-       |          "addressLine3": "",
-       |          "addressLine4": "",
+       |          "addressLine1": "Apartment 40, Jet Centro",
+       |          "addressLine2": "79 St Marys Road",
+       |          "addressLine3": "Sheffield",
+       |          "addressLine4": "South Yorkshire",
        |          "addressLine5": "",
-       |          "postCode": ""
+       |          "postCode": "S2 4AH"
        |        }
        |      ],
        |      "communicationPreferences": {
@@ -136,16 +136,17 @@ object TestData {
        |  "paymentPlanReference": "1234567890",
        |  "directDebitReference": "1234567890",
        |  "taxpayer": {
+       |   "customerName": "Customer name",
        |    "selfAssessment": {
        |      "utr": "1234567890",
        |      "addresses": [
        |        {
-       |          "addressLine1": "",
-       |          "addressLine2": "",
-       |          "addressLine3": "",
-       |          "addressLine4": "",
+       |          "addressLine1": "Apartment 40, Jet Centro",
+       |          "addressLine2": "79 St Marys Road",
+       |          "addressLine3": "Sheffield",
+       |          "addressLine4": "South Yorkshire",
        |          "addressLine5": "",
-       |          "postCode": ""
+       |          "postCode": "S2 4AH"
        |        }
        |      ],
        |      "communicationPreferences": {
@@ -192,23 +193,23 @@ object TestData {
        |}
     """.stripMargin
 
-  //TODO Fill in valid addresss details
   val englishBadAddressJson =
     s"""
        |{
        |  "paymentPlanReference": "1234567890",
        |  "directDebitReference": "1234567890",
        |  "taxpayer": {
+       |   "customerName": "Customer name",
        |    "selfAssessment": {
        |      "utr": "1234567890",
        |      "addresses": [
        |        {
        |          "addressLine1": "",
        |          "addressLine2": "",
-       |          "addressLine3": "",
-       |          "addressLine4": "",
+       |          "addressLine3": "Sheffield",
+       |          "addressLine4": "South Yorkshire",
        |          "addressLine5": "",
-       |          "postCode": ""
+       |          "postCode": "S1 1AB"
        |        }
        |      ],
        |      "communicationPreferences": {
@@ -262,16 +263,17 @@ object TestData {
        |  "paymentPlanReference": "1234567890",
        |  "directDebitReference": "1234567890",
        |  "taxpayer": {
+       |   "customerName": "Customer name",
        |    "selfAssessment": {
        |      "utr": "1234567890",
        |      "addresses": [
        |        {
-       |          "addressLine1": "",
-       |          "addressLine2": "",
-       |          "addressLine3": "",
-       |          "addressLine4": "",
+       |          "addressLine1": "Apartment 40, Jet Centro",
+       |          "addressLine2": "79 St Marys Road",
+       |          "addressLine3": "Sheffield",
+       |          "addressLine4": "South Yorkshire",
        |          "addressLine5": "",
-       |          "postCode": ""
+       |          "postCode": "S2 4AH"
        |        }
        |      ],
        |      "communicationPreferences": {
@@ -325,16 +327,17 @@ object TestData {
        |  "paymentPlanReference": "1234567890",
        |  "directDebitReference": "1234567890",
        |  "taxpayer": {
+       |   "customerName": "Customer name",
        |    "selfAssessment": {
        |      "utr": "1234567890",
        |      "addresses": [
        |        {
-       |          "addressLine1": "",
-       |          "addressLine2": "",
-       |          "addressLine3": "",
-       |          "addressLine4": "",
+       |          "addressLine1": "Apartment 40, Jet Centro",
+       |          "addressLine2": "79 St Marys Road",
+       |          "addressLine3": "Sheffield",
+       |          "addressLine4": "South Yorkshire",
        |          "addressLine5": "",
-       |          "postCode": ""
+       |          "postCode": "S2 4AH"
        |        }
        |      ],
        |      "communicationPreferences": {
@@ -388,25 +391,26 @@ object TestData {
        |  "paymentPlanReference": "1234567890",
        |  "directDebitReference": "1234567890",
        |  "taxpayer": {
+       |   "customerName": "Customer name",
        |    "selfAssessment": {
        |      "utr": "1234567890",
        |      "addresses": [
        |        {
-       |          "addressLine1": "",
-       |          "addressLine2": "",
-       |          "addressLine3": "",
-       |          "addressLine4": "",
+       |          "addressLine1": "Apartment 40, Jet Centro",
+       |          "addressLine2": "79 St Marys Road",
+       |          "addressLine3": "Sheffield",
+       |          "addressLine4": "South Yorkshire",
        |          "addressLine5": "",
-       |          "postCode": ""
+       |          "postCode": "S2 4AH"
        |        },
        |        {
-       |          "addressLine1": "",
-       |          "addressLine2": "",
-       |          "addressLine3": "",
-       |          "addressLine4": "",
+       |          "addressLine1": "Apartment 40, Jet Centro",
+       |          "addressLine2": "79 St Marys Road",
+       |          "addressLine3": "Sheffield",
+       |          "addressLine4": "South Yorkshire",
        |          "addressLine5": "",
-       |          "postCode": ""
-       |        }
+       |          "postCode": "S2 4AH"
+       |        },
        |      ],
        |      "communicationPreferences": {
        |        "welshLanguageIndicator": false,
@@ -459,25 +463,26 @@ object TestData {
        |  "paymentPlanReference": "1234567890",
        |  "directDebitReference": "1234567890",
        |  "taxpayer": {
+       |   "customerName": "Customer name",
        |    "selfAssessment": {
        |      "utr": "1234567890",
        |      "addresses": [
        |        {
-       |          "addressLine1": "",
-       |          "addressLine2": "",
-       |          "addressLine3": "",
-       |          "addressLine4": "",
+       |          "addressLine1": "Apartment 40, Jet Centro",
+       |          "addressLine2": "79 St Marys Road",
+       |          "addressLine3": "Sheffield",
+       |          "addressLine4": "South Yorkshire",
        |          "addressLine5": "",
-       |          "postCode": ""
+       |          "postCode": "S2 4AH"
        |        },
        |        {
-       |          "addressLine1": "",
-       |          "addressLine2": "",
-       |          "addressLine3": "",
-       |          "addressLine4": "",
+       |          "addressLine1": "Apartment 40, Jet Centro",
+       |          "addressLine2": "79 St Marys Road",
+       |          "addressLine3": "Sheffield",
+       |          "addressLine4": "South Yorkshire",
        |          "addressLine5": "",
-       |          "postCode": ""
-       |        }
+       |          "postCode": "S2 4AH"
+       |        },
        |      ],
        |      "communicationPreferences": {
        |        "welshLanguageIndicator": false,
@@ -530,25 +535,26 @@ object TestData {
        |  "paymentPlanReference": "1234567890",
        |  "directDebitReference": "1234567890",
        |  "taxpayer": {
+       |   "customerName": "Customer name",
        |    "selfAssessment": {
        |      "utr": "1234567890",
        |      "addresses": [
        |        {
-       |          "addressLine1": "",
-       |          "addressLine2": "",
-       |          "addressLine3": "",
-       |          "addressLine4": "",
+       |          "addressLine1": "Apartment 40, Jet Centro",
+       |          "addressLine2": "79 St Marys Road",
+       |          "addressLine3": "Sheffield",
+       |          "addressLine4": "South Yorkshire",
        |          "addressLine5": "",
-       |          "postCode": ""
+       |          "postCode": "S2 4AH"
        |        },
        |        {
-       |          "addressLine1": "",
-       |          "addressLine2": "",
-       |          "addressLine3": "",
-       |          "addressLine4": "",
+       |          "addressLine1": "Apartment 40, Jet Centro",
+       |          "addressLine2": "79 St Marys Road",
+       |          "addressLine3": "Sheffield",
+       |          "addressLine4": "South Yorkshire",
        |          "addressLine5": "",
-       |          "postCode": ""
-       |        }
+       |          "postCode": "S2 4AH"
+       |        },
        |      ],
        |      "communicationPreferences": {
        |        "welshLanguageIndicator": false,
@@ -600,6 +606,7 @@ object TestData {
        |  "paymentPlanReference": "1234567890",
        |  "directDebitReference": "1234567890",
        |  "taxpayer": {
+       |   "customerName": "Customer name",
        |    "selfAssessment": {
        |      "utr": "1234567890",
        |      "addresses": [
@@ -663,6 +670,7 @@ object TestData {
        |  "paymentPlanReference": "1234567890",
        |  "directDebitReference": "1234567890",
        |  "taxpayer": {
+       |   "customerName": "Customer name",
        |    "selfAssessment": {
        |      "utr": "1234567890",
        |      "addresses": [
@@ -725,6 +733,7 @@ object TestData {
        |  "paymentPlanReference": "1234567890",
        |  "directDebitReference": "1234567890",
        |  "taxpayer": {
+       |   "customerName": "Customer name",
        |    "selfAssessment": {
        |      "utr": "1234567890",
        |      "addresses": [
@@ -788,16 +797,17 @@ object TestData {
        |  "paymentPlanReference": "1234567890",
        |  "directDebitReference": "1234567890",
        |  "taxpayer": {
+       |   "customerName": "Customer name",
        |    "selfAssessment": {
        |      "utr": "1234567890",
        |      "addresses": [
        |        {
-       |          "addressLine1": "",
-       |          "addressLine2": "",
-       |          "addressLine3": "",
-       |          "addressLine4": "",
+       |          "addressLine1": "Apartment 40, Jet Centro",
+       |          "addressLine2": "79 St Marys Road",
+       |          "addressLine3": "Sheffield",
+       |          "addressLine4": "South Yorkshire",
        |          "addressLine5": "",
-       |          "postCode": ""
+       |          "postCode": "S2 4AH"
        |        }
        |      ],
        |      "communicationPreferences": {
@@ -851,16 +861,17 @@ object TestData {
      |  "paymentPlanReference": "1234567890",
      |  "directDebitReference": "1234567890",
      |  "taxpayer": {
+     |   "customerName": "Customer name",
      |    "selfAssessment": {
      |      "utr": "1234567890",
      |      "addresses": [
      |        {
-     |          "addressLine1": "",
-     |          "addressLine2": "",
-     |          "addressLine3": "",
-     |          "addressLine4": "",
+     |          "addressLine1": "Apartment 40, Jet Centro",
+     |          "addressLine2": "79 St Marys Road",
+     |          "addressLine3": "Sheffield",
+     |          "addressLine4": "South Yorkshire",
      |          "addressLine5": "",
-     |          "postCode": ""
+     |          "postCode": "S2 4AH"
      |        }
      |      ],
      |      "communicationPreferences": {
@@ -914,16 +925,17 @@ object TestData {
      |  "paymentPlanReference": "1234567890",
      |  "directDebitReference": "1234567890",
      |  "taxpayer": {
+     |   "customerName": "Customer name",
      |    "selfAssessment": {
      |      "utr": "1234567890",
      |      "addresses": [
      |        {
-     |          "addressLine1": "",
-     |          "addressLine2": "",
-     |          "addressLine3": "",
-     |          "addressLine4": "",
+     |          "addressLine1": "Apartment 40, Jet Centro",
+     |          "addressLine2": "79 St Marys Road",
+     |          "addressLine3": "Sheffield",
+     |          "addressLine4": "South Yorkshire",
      |          "addressLine5": "",
-     |          "postCode": ""
+     |          "postCode": "S2 4AH"
      |        }
      |      ],
      |      "communicationPreferences": {
@@ -977,16 +989,17 @@ object TestData {
      |  "paymentPlanReference": "1234567890",
      |  "directDebitReference": "1234567890",
      |  "taxpayer": {
+     |   "customerName": "Customer name",
      |    "selfAssessment": {
      |      "utr": "1234567890",
      |      "addresses": [
      |        {
-     |          "addressLine1": "",
-     |          "addressLine2": "",
-     |          "addressLine3": "",
-     |          "addressLine4": "",
+     |          "addressLine1": "Apartment 40, Jet Centro",
+     |          "addressLine2": "79 St Marys Road",
+     |          "addressLine3": "Sheffield",
+     |          "addressLine4": "South Yorkshire",
      |          "addressLine5": "",
-     |          "postCode": ""
+     |          "postCode": "S2 4AH"
      |        }
      |      ],
      |      "communicationPreferences": {
@@ -1040,23 +1053,24 @@ object TestData {
      |  "paymentPlanReference": "1234567890",
      |  "directDebitReference": "1234567890",
      |  "taxpayer": {
+     |   "customerName": "Customer name",
      |    "selfAssessment": {
      |      "utr": "1234567890",
      |      "addresses": [
      |        {
-     |          "addressLine1": "",
-     |          "addressLine2": "",
-     |          "addressLine3": "",
-     |          "addressLine4": "",
+     |          "addressLine1": "Apartment 40, Jet Centro",
+     |          "addressLine2": "79 St Marys Road",
+     |          "addressLine3": "Sheffield",
+     |          "addressLine4": "South Yorkshire",
      |          "addressLine5": "",
-     |          "postCode": ""
+     |          "postCode": "S2 4AH"
      |        }
      |      ],
      |      "communicationPreferences": {
      |        "welshLanguageIndicator": false,
      |        "audioIndicator": false,
      |        "largePrintIndicator": false,
-     |        "brailleIndicator": true,
+     |        "brailleIndicator": true
      |      },
      |      "debits": [
      |        {

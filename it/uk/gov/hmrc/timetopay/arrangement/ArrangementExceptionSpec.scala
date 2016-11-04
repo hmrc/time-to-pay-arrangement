@@ -126,6 +126,7 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
 //      getArrangementGetResponse.json \ "exceptionReason" should include regex "No Address"
     }
 
+    //may not be able to test, unable to tell if a Scottish user is using the system if no address is entered
     scenario("A Scottish user is creating an arrangement with no address") {
       When("I call POST /ttparrangements")
       val getArrangementPostResponse = postArrangements(TestData.scottishNoAddressJson)
@@ -142,6 +143,7 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
 //      getArrangementGetResponse.json \ "exceptionReason" should include regex "No Address"
     }
 
+    //may not be able to test, unable to tell if a Welsh user is using the system if no address is entered
     scenario("A Welsh user is creating an arrangement with no address") {
       When("I call POST /ttparrangements")
       val getArrangementPostResponse = postArrangements(TestData.welshNoAddressJson)
