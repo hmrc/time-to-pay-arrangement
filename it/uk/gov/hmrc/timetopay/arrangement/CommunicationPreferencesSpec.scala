@@ -1,5 +1,6 @@
 package uk.gov.hmrc.timetopay.arrangement
 
+import org.scalatest.Ignore
 import uk.gov.hmrc.timetopay.arrangement.itresources._
 import uk.gov.hmrc.timetopay.arrangement.support.{ArrangementActions, IntegrationSpec}
 
@@ -7,7 +8,6 @@ import uk.gov.hmrc.timetopay.arrangement.support.{ArrangementActions, Integratio
   * Integration tests for SSTTP-364
   * POST /ttparrangements
   */
-
 class CommunicationPreferencesSpec extends IntegrationSpec with ArrangementActions {
 
   feature("Post Arrangement Details with communication preferences") {

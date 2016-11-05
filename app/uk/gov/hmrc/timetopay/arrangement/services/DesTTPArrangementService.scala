@@ -12,24 +12,25 @@ trait DesTTPArrangementService {
 
   def create(ttpArrangement: TTPArrangement): Future[DesTTPArrangement] = {
     Future {
-      val saNote = s"Direct Debit Reference ${ttpArrangement.directDebitReference} Payment Plan Reference ${ttpArrangement.paymentPlanReference}"
 
       val schedule: Schedule = ttpArrangement.schedule
       val firstPayment: Instalment = schedule.instalments.head
 
+      val initialPayment = Option(schedule.initialPayment).getOrElse(BigDecimal(0.0))
+      val firstPaymentAmount = firstPayment.amount.+(initialPayment)
+
       DesTTPArrangement(
-        schedule.startDate,
-        schedule.endDate,
-        firstPayment.paymentDate,
-        firstPayment.amount.toString(),
-        firstPayment.amount.toString(),
-        "Monthly",
-        schedule.endDate.plusWeeks(3),
-        "DOM",
-        "Distraint",
+        startDate =schedule.startDate,
+        endDate = schedule.endDate,
+        firstPaymentDate = firstPayment.paymentDate,
+        firstPaymentAmount = firstPaymentAmount.toString(),
+        regularPaymentAmount = firstPayment.amount.toString(),
+        regularPaymentFrequency = "Monthly",
+        reviewDate = schedule.endDate.plusWeeks(3),
+        enforcementAction = enforcementFlag(ttpArrangement),
         directDebit = true,
-        ttpArrangement.taxpayer.selfAssessment.debits,
-        saNote
+        debitDetails = ttpArrangement.taxpayer.selfAssessment.debits,
+        saNote = saNote(ttpArrangement)
       )
     }
   }
@@ -39,6 +40,10 @@ trait DesTTPArrangementService {
     "Distraint"
   }
 
+  private def saNote(ttpArrangement: TTPArrangement)  = {
+    val saNote = s"Direct Debit Reference ${ttpArrangement.directDebitReference} Payment Plan Reference ${ttpArrangement.paymentPlanReference}"
+    saNote
+  }
 
 }
 

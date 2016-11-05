@@ -3,14 +3,13 @@ package uk.gov.hmrc.timetopay.arrangement.controllers
 
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.Action
+import play.api.mvc.{RequestHeader, Action}
 import uk.gov.hmrc.play.microservice.controller.BaseController
 import uk.gov.hmrc.timetopay.arrangement.models.TTPArrangement
 import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
 import uk.gov.hmrc.timetopay.arrangement.services.TTPArrangementService
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.concurrent.Future.successful
 
 object TTPArrangementController extends TTPArrangementController {
@@ -24,11 +23,9 @@ trait TTPArrangementController extends BaseController {
   def create() = Action.async(parse.json) {
     implicit request =>
       withJsonBody[TTPArrangement] {
-        val scheme = if (request.secure) "https://" else "http://"
         arrangement =>
           arrangementService.submit(arrangement).map {
-            case Some(t) => Created.withHeaders(LOCATION -> s"$scheme${request.host}/ttparrangements/${t.id.get}")
-            case None => Created
+             o => o.map(a => Created.withHeaders(LOCATION -> s"$protocol://${request.host}/ttparrangements/${a.id.get}")).getOrElse(Created)
           }.recover {
             case failure => InternalServerError(s"A server error occurred: $failure")
           }
@@ -38,7 +35,11 @@ trait TTPArrangementController extends BaseController {
   def arrangement(id: String) = Action.async {
     implicit request =>
       Logger.debug(s"Requested arrangement $id")
-      val future: Future[Option[TTPArrangement]] = arrangementService.byId(id)
-      future.flatMap(x => x.map(arrangement => successful(Ok(Json.toJson(arrangement)))).getOrElse(successful(NotFound)))
+      arrangementService.byId(id)
+        .flatMap(x => x.map(arrangement => successful(Ok(Json.toJson(arrangement))))
+          .getOrElse(successful(NotFound)))
   }
+
+  def protocol(implicit reqHead: RequestHeader) = if (reqHead.secure) "https" else "http"
+
 }

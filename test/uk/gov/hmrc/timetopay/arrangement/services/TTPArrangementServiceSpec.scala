@@ -21,8 +21,8 @@ class TTPArrangementServiceSpec extends UnitSpec with MockitoSugar with WithFake
     "return Future[Success]" in {
       object TestArrangementService extends TTPArrangementService {
         override val arrangementDesApiConnector = mock[ArrangementDesApiConnector]
-        override val desTTPArrangementFactory = DesTTPArrangementService
-        override val letterAndControlFactory = LetterAndControlService
+        override val desTTPArrangementService = DesTTPArrangementService
+        override val letterAndControlService = LetterAndControlService
         override val ttpArrangementRepository: TTPArrangementRepository = mock[TTPArrangementRepository]
       }
 
@@ -49,18 +49,19 @@ class TTPArrangementServiceSpec extends UnitSpec with MockitoSugar with WithFake
     "return Future[Failed]" in {
       object TestArrangementService extends TTPArrangementService {
         override val arrangementDesApiConnector = mock[ArrangementDesApiConnector]
-        override val desTTPArrangementFactory = DesTTPArrangementService
-        override val letterAndControlFactory = LetterAndControlService
+        override val desTTPArrangementService = DesTTPArrangementService
+        override val letterAndControlService = LetterAndControlService
         override val ttpArrangementRepository: TTPArrangementRepository = mock[TTPArrangementRepository]
       }
 
       val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement]
 
-      when(TestArrangementService.arrangementDesApiConnector.submitArrangement(any(), any())(any())).thenReturn(Future.failed(new RuntimeException("Failed")))
+      when(TestArrangementService.arrangementDesApiConnector.submitArrangement(any(), any())(any())).thenReturn(Future.successful(false))
       val headerCarrier = new HeaderCarrier
       val response = TestArrangementService.submit(arrangement)(headerCarrier)
       ScalaFutures.whenReady(response.failed) { e =>
         e shouldBe a [RuntimeException]
+        e.getMessage shouldBe "Unable to submit arrangement"
       }
 
     }

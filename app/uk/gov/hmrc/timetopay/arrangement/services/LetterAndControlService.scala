@@ -13,7 +13,7 @@ trait LetterAndControlService {
   def create(ttpArrangement: TTPArrangement): Future[LetterAndControl] = {
     Future {
       val taxpayer = ttpArrangement.taxpayer
-      val letterAndControls: List[LetterAndControl] = taxpayer.selfAssessment.addresses.map {
+      val letterAndControls: List[LetterAndControl] = taxpayer.addresses.map {
         address => {
           LetterAndControl(
             taxpayer.customerName,

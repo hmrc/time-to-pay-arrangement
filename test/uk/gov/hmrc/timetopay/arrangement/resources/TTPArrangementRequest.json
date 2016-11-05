@@ -2,19 +2,19 @@
   "paymentPlanReference": "1234567890",
   "directDebitReference": "1234567890",
   "taxpayer": {
-    "customerName" : "Customer Name",
+    "addresses": [
+      {
+        "addressLine1": "",
+        "addressLine2": "",
+        "addressLine3": "",
+        "addressLine4": "",
+        "addressLine5": "",
+        "postCode": ""
+      }
+    ],
+    "customerName": "Customer Name",
     "selfAssessment": {
       "utr": "1234567890",
-      "addresses": [
-        {
-          "addressLine1": "",
-          "addressLine2": "",
-          "addressLine3": "",
-          "addressLine4": "",
-          "addressLine5": "",
-          "postCode": ""
-        }
-      ],
       "communicationPreferences": {
         "welshLanguageIndicator": false,
         "audioIndicator": false,

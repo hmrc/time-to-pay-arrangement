@@ -13,18 +13,18 @@ Input
   "directDebitReference": "1234567890",
   "taxpayer": {
    "customerName": "Customer name",
+   "addresses": [
+           {
+             "addressLine1": "",
+             "addressLine2": "",
+             "addressLine3": "",
+             "addressLine4": "",
+             "addressLine5": "",
+             "postCode": ""
+           }
+         ],
     "selfAssessment": {
       "utr": "1234567890",
-      "addresses": [
-        {
-          "addressLine1": "",
-          "addressLine2": "",
-          "addressLine3": "",
-          "addressLine4": "",
-          "addressLine5": "",
-          "postCode": ""
-        }
-      ],
       "communicationPreferences": {
         "welshLanguageIndicator": false,
         "audioIndicator": false,
@@ -86,18 +86,19 @@ Returns a specific arrangement based on the identifier. This api is for internal
   "directDebitReference": "1234567890",
   "taxpayer": {
     "customerName": "Customer name",
+    "addresses": [
+            {
+              "addressLine1": "",
+              "addressLine2": "",
+              "addressLine3": "",
+              "addressLine4": "",
+              "addressLine5": "",
+              "postCode": ""
+            }
+    ],
     "selfAssessment": {
       "utr": "1234567890",
-      "addresses": [
-        {
-          "addressLine1": "",
-          "addressLine2": "",
-          "addressLine3": "",
-          "addressLine4": "",
-          "addressLine5": "",
-          "postCode": ""
-        }
-      ],
+      
       "communicationPreferences": {
         "welshLanguageIndicator": false,
         "audioIndicator": false,

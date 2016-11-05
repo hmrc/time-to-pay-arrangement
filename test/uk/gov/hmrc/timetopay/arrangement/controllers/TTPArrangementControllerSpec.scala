@@ -22,8 +22,8 @@ class TTPArrangementControllerSpec extends UnitSpec with MockitoSugar with WithF
     "return 201" in {
       object StubbedTTPArrangementService extends TTPArrangementService {
         override val arrangementDesApiConnector = ArrangementDesApiConnector
-        override val desTTPArrangementFactory = DesTTPArrangementService
-        override val letterAndControlFactory = LetterAndControlService
+        override val desTTPArrangementService = DesTTPArrangementService
+        override val letterAndControlService = LetterAndControlService
         override val ttpArrangementRepository: TTPArrangementRepository = mock[TTPArrangementRepository]
 
 
@@ -46,8 +46,8 @@ class TTPArrangementControllerSpec extends UnitSpec with MockitoSugar with WithF
     "return 500 if arrangement service fails" in {
       object StubbedTTPArrangementService extends TTPArrangementService {
         override val arrangementDesApiConnector = ArrangementDesApiConnector
-        override val desTTPArrangementFactory = DesTTPArrangementService
-        override val letterAndControlFactory = LetterAndControlService
+        override val desTTPArrangementService = DesTTPArrangementService
+        override val letterAndControlService = LetterAndControlService
         override val ttpArrangementRepository: TTPArrangementRepository = mock[TTPArrangementRepository]
 
         override def submit(arrangement: TTPArrangement)(implicit hc: HeaderCarrier) = {
@@ -75,8 +75,8 @@ class TTPArrangementControllerSpec extends UnitSpec with MockitoSugar with WithF
           Future.successful(Some(ttparrangementResponse.as[TTPArrangement]))
         }
         override val arrangementDesApiConnector = ArrangementDesApiConnector
-        override val desTTPArrangementFactory = DesTTPArrangementService
-        override val letterAndControlFactory = LetterAndControlService
+        override val desTTPArrangementService = DesTTPArrangementService
+        override val letterAndControlService = LetterAndControlService
         override val ttpArrangementRepository: TTPArrangementRepository = mock[TTPArrangementRepository]
 
       }
@@ -94,8 +94,8 @@ class TTPArrangementControllerSpec extends UnitSpec with MockitoSugar with WithF
 
     "return 404 for non existent arrangement" in {
       object StubbedTTPArrangementService extends TTPArrangementService {
-        override val desTTPArrangementFactory = DesTTPArrangementService
-        override val letterAndControlFactory = LetterAndControlService
+        override val desTTPArrangementService = DesTTPArrangementService
+        override val letterAndControlService = LetterAndControlService
         override val arrangementDesApiConnector = ArrangementDesApiConnector
         override val ttpArrangementRepository: TTPArrangementRepository = mock[TTPArrangementRepository]
 

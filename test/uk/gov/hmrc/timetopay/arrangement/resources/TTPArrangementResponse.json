@@ -5,18 +5,19 @@
   "directDebitReference": "1234567890",
   "taxpayer": {
     "customerName" : "Customer Name",
+    "addresses": [
+      {
+        "addressLine1": "",
+        "addressLine2": "",
+        "addressLine3": "",
+        "addressLine4": "",
+        "addressLine5": "",
+        "postCode": ""
+      }
+    ],
     "selfAssessment": {
       "utr": "1234567890",
-      "addresses": [
-        {
-          "addressLine1": "",
-          "addressLine2": "",
-          "addressLine3": "",
-          "addressLine4": "",
-          "addressLine5": "",
-          "postCode": ""
-        }
-      ],
+
       "communicationPreferences": {
         "welshLanguageIndicator": false,
         "audioIndicator": false,

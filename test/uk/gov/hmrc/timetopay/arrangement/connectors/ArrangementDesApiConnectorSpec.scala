@@ -37,5 +37,17 @@ class ArrangementDesApiConnectorSpec extends UnitSpec with MockitoSugar with Ser
         r shouldBe true
       }
     }
+    "return 400 accepted response" in {
+      val response = HttpResponse(responseStatus = Status.BAD_REQUEST, responseString= Some("JSON Not valid"))
+      when(TestArrangementDesApiConnector.http.POST[JsValue, HttpResponse](any[String], any[JsValue], any())(any(), any(), any()))
+        .thenReturn(Future(response))
+
+      val result = TestArrangementDesApiConnector.submitArrangement(taxpayer,
+        DesSubmissionRequest(submitArrangementTTPArrangement,submitArrangementLetterAndControl))
+
+      ScalaFutures.whenReady(result) { r =>
+        r shouldBe false
+      }
+    }
   }
 }

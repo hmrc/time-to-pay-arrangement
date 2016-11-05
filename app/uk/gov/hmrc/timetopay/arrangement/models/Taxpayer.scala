@@ -4,12 +4,13 @@ import java.time.LocalDate
 
 
 
-case class Taxpayer(customerName: String, selfAssessment: SelfAssessment) {
+case class Taxpayer(customerName: String,
+                    addresses: List[Address],
+                    selfAssessment: SelfAssessment) {
 
 }
 
 case class SelfAssessment(utr: String,
-                          addresses: List[Address],
                           communicationPreferences: CommunicationPreferences,
                           debits: List[Debit]) {
 }

@@ -16,8 +16,8 @@ import scala.concurrent.Future
 object TTPArrangementService extends TTPArrangementService {
 
   override val arrangementDesApiConnector = ArrangementDesApiConnector
-  override val desTTPArrangementFactory: DesTTPArrangementService = DesTTPArrangementService
-  override val letterAndControlFactory: LetterAndControlService = LetterAndControlService
+  override val desTTPArrangementService: DesTTPArrangementService = DesTTPArrangementService
+  override val letterAndControlService: LetterAndControlService = LetterAndControlService
   override val ttpArrangementRepository: TTPArrangementRepository = TTPArrangementRepository
 }
 
@@ -25,8 +25,8 @@ object TTPArrangementService extends TTPArrangementService {
 trait TTPArrangementService {
 
   val arrangementDesApiConnector: ArrangementDesApiConnector
-  val desTTPArrangementFactory: DesTTPArrangementService
-  val letterAndControlFactory: LetterAndControlService
+  val desTTPArrangementService: DesTTPArrangementService
+  val letterAndControlService: LetterAndControlService
   val ttpArrangementRepository: TTPArrangementRepository
 
 
@@ -43,19 +43,17 @@ trait TTPArrangementService {
 
   def submit(arrangement: TTPArrangement)(implicit hc: HeaderCarrier): Future[Option[TTPArrangement]] = {
     Logger.info(s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' and PP '${arrangement.paymentPlanReference}'")
-    val requestFuture = for {
-      letterAndControl <- letterAndControlFactory.create(arrangement)
-      desTTPArrangement <- desTTPArrangementFactory.create(arrangement)
-    } yield DesSubmissionRequest(desTTPArrangement, letterAndControl)
 
-    requestFuture.flatMap {
-      request => {
-        arrangementDesApiConnector.submitArrangement(arrangement.taxpayer, request).flatMap {
-          r => if (r) createResponse(arrangement, request).map(identity) else throw new RuntimeException("Unable to submit arrangement")
-        }
-      }
+    val result = for {
+      letterAndControl <- letterAndControlService.create(arrangement)
+      desTTPArrangement <- desTTPArrangementService.create(arrangement)
+      request = DesSubmissionRequest(desTTPArrangement, letterAndControl)
+      response <- arrangementDesApiConnector.submitArrangement(arrangement.taxpayer, request)
+    } yield request -> response
+
+    result.flatMap {
+      r => if (r._2) createResponse(arrangement, r._1).map(identity) else Future.failed(new RuntimeException("Unable to submit arrangement"))
     }
-
 
   }
 

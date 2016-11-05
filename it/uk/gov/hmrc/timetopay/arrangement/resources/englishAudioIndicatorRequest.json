@@ -3,18 +3,18 @@
   "directDebitReference": "1234567890",
   "taxpayer": {
     "customerName": "Customer name",
+    "addresses": [
+      {
+        "addressLine1": "Apartment 40, Jet Centro",
+        "addressLine2": "79 St Marys Road",
+        "addressLine3": "Sheffield",
+        "addressLine4": "South Yorkshire",
+        "addressLine5": "",
+        "postCode": "S2 4AH"
+      }
+    ],
     "selfAssessment": {
       "utr": "1234567890",
-      "addresses": [
-        {
-          "addressLine1": "Apartment 40, Jet Centro",
-          "addressLine2": "79 St Marys Road",
-          "addressLine3": "Sheffield",
-          "addressLine4": "South Yorkshire",
-          "addressLine5": "",
-          "postCode": "S2 4AH"
-        }
-      ],
       "communicationPreferences": {
         "welshLanguageIndicator": false,
         "audioIndicator": true,
