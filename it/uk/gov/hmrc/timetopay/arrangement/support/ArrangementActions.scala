@@ -15,7 +15,7 @@ trait ArrangementActions extends ActionsSupport {
 
 //  def postArrangements(data: Json): WSResponse = postArrangements(data.getBytes())
 
-  def postArrangements(data: JsValue): WSResponse =
+  def postArrangements(url: String, data: JsValue): WSResponse =
     WS
       .url(s"$url/ttparrangements")
       .withHeaders("Content-Type" -> "application/json")

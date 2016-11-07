@@ -12,5 +12,5 @@ trait IntegrationSpec
     with Matchers
     {
 
-
+    val url = s"http://localhost:$port"
 }

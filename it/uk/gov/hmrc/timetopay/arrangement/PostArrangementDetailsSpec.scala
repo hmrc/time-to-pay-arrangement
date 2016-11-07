@@ -1,6 +1,5 @@
 package uk.gov.hmrc.timetopay.arrangement
 
-import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.timetopay.arrangement.itresources._
 import uk.gov.hmrc.timetopay.arrangement.support.{ArrangementActions, IntegrationSpec}
 
@@ -16,9 +15,9 @@ class PostArrangementDetailsSpec extends IntegrationSpec with ArrangementActions
     info("As a consumer of the Arrangement service")
     info("I want to be able to create a new arrangement")
 
-    ignore("An English user is creating an arrangement") {
+    scenario("An English user is creating an arrangement") {
       When("I call POST /ttparrangements")
-      val getArrangementPostResponse = postArrangements(englishHappyRequest)
+      val getArrangementPostResponse = postArrangements(url, englishHappyRequest)
 
       Then("I should receive a 201 CREATED response")
       getArrangementPostResponse.status shouldBe CREATED
@@ -35,7 +34,7 @@ class PostArrangementDetailsSpec extends IntegrationSpec with ArrangementActions
 
     ignore("A Scottish user is creating an arrangement") {
       When("I call POST /ttparrangements")
-      val getArrangementPostResponse = postArrangements(scottishHappyRequest)
+      val getArrangementPostResponse = postArrangements(url, scottishHappyRequest)
 
       Then("I should receive a 201 CREATED response")
       getArrangementPostResponse.status shouldBe CREATED
@@ -52,7 +51,7 @@ class PostArrangementDetailsSpec extends IntegrationSpec with ArrangementActions
 
     ignore("A Welsh user is creating an arrangement") {
       When("I call POST /ttparrangements")
-      val getArrangementPostResponse = postArrangements(welshHappyRequest)
+      val getArrangementPostResponse = postArrangements(url, welshHappyRequest)
 
       Then("I should receive a 201 CREATED response")
       getArrangementPostResponse.status shouldBe CREATED

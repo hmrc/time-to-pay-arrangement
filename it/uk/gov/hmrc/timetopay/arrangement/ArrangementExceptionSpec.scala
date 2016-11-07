@@ -19,7 +19,7 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
 
     ignore("An English user is creating an arrangement with a bad address") {
       When("I call POST /ttparrangements")
-      val getArrangementPostResponse = postArrangements(englishBadAddressRequest)
+      val getArrangementPostResponse = postArrangements(url, englishBadAddressRequest)
 
       Then("I should receive a 201 CREATED response")
       getArrangementPostResponse.status shouldBe CREATED
@@ -34,43 +34,45 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
       exceptionReason should include ("Bad Address")
     }
 
-    ignore("A Scottish user is creating an arrangement with a bad address") {
-      When("I call POST /ttparrangements")
-      val getArrangementPostResponse = postArrangements(scottishBadAddressRequest)
+    //Can't use this test, bad address is first line and postcode missing, unable tell user is Scottish without a postcode being provided
+//    ignore("A Scottish user is creating an arrangement with a bad address") {
+//      When("I call POST /ttparrangements")
+//      val getArrangementPostResponse = postArrangements(url, scottishBadAddressRequest)
+//
+//      Then("I should receive a 201 CREATED response")
+//      getArrangementPostResponse.status shouldBe CREATED
+//      val locationHeader = getArrangementPostResponse.header("LOCATION").get
+//
+//      When("I call GET /ttparrangements/{arrangement-identifier")
+//      val getArrangementGetResponse = getArrangement(locationHeader)
+//
+//      Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
+//      getArrangementGetResponse.status shouldBe OK
+//      val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
+//      exceptionReason should include ("Bad Address")
+//    }
 
-      Then("I should receive a 201 CREATED response")
-      getArrangementPostResponse.status shouldBe CREATED
-      val locationHeader = getArrangementPostResponse.header("LOCATION").get
-
-      When("I call GET /ttparrangements/{arrangement-identifier")
-      val getArrangementGetResponse = getArrangement(locationHeader)
-
-      Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
-      getArrangementGetResponse.status shouldBe OK
-      val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
-      exceptionReason should include ("Bad Address")
-    }
-
-    ignore("A Welsh user is creating an arrangement with a bad address") {
-      When("I call POST /ttparrangements")
-      val getArrangementPostResponse = postArrangements(welshBadAddressRequest)
-
-      Then("I should receive a 201 CREATED response")
-      getArrangementPostResponse.status shouldBe CREATED
-      val locationHeader = getArrangementPostResponse.header("LOCATION").get
-
-      When("I call GET /ttparrangements/{arrangement-identifier")
-      val getArrangementGetResponse = getArrangement(locationHeader)
-
-      Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
-      getArrangementGetResponse.status shouldBe OK
-      val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
-      exceptionReason should include ("Bad Address")
-    }
+    //Can't use this test, bad address is first line and postcode missing, unable tell user is Welsh without a postcode being provided
+//    ignore("A Welsh user is creating an arrangement with a bad address") {
+//      When("I call POST /ttparrangements")
+//      val getArrangementPostResponse = postArrangements(url, welshBadAddressRequest)
+//
+//      Then("I should receive a 201 CREATED response")
+//      getArrangementPostResponse.status shouldBe CREATED
+//      val locationHeader = getArrangementPostResponse.header("LOCATION").get
+//
+//      When("I call GET /ttparrangements/{arrangement-identifier")
+//      val getArrangementGetResponse = getArrangement(locationHeader)
+//
+//      Then("I should receive a 200 OK response and the exceptionReason shall include the correct value")
+//      getArrangementGetResponse.status shouldBe OK
+//      val exceptionReason = (getArrangementGetResponse.json \ "letterAndControl" \ "exceptionReason").as[String]
+//      exceptionReason should include ("Bad Address")
+//    }
 
     ignore("An English user is creating an arrangement with multiple addresses") {
       When("I call POST /ttparrangements")
-      val getArrangementPostResponse = postArrangements(englishMultipleAddressRequest)
+      val getArrangementPostResponse = postArrangements(url, englishMultipleAddressRequest)
 
       Then("I should receive a 201 CREATED response")
       getArrangementPostResponse.status shouldBe CREATED
@@ -87,7 +89,7 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
 
     ignore("A Scottish user is creating an arrangement with multiple addresses") {
       When("I call POST /ttparrangements")
-      val getArrangementPostResponse = postArrangements(scottishMultipleAddressRequest)
+      val getArrangementPostResponse = postArrangements(url, scottishMultipleAddressRequest)
 
       Then("I should receive a 201 CREATED response")
       getArrangementPostResponse.status shouldBe CREATED
@@ -104,7 +106,7 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
 
     ignore("A Welsh user is creating an arrangement with a multiple addresses") {
       When("I call POST /ttparrangements")
-      val getArrangementPostResponse = postArrangements(welshMultipleAddressRequest)
+      val getArrangementPostResponse = postArrangements(url, welshMultipleAddressRequest)
 
       Then("I should receive a 201 CREATED response")
       getArrangementPostResponse.status shouldBe CREATED
@@ -121,7 +123,7 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
 
     ignore("An English user is creating an arrangement with no address") {
       When("I call POST /ttparrangements")
-      val getArrangementPostResponse = postArrangements(englishNoAddressRequest)
+      val getArrangementPostResponse = postArrangements(url, englishNoAddressRequest)
 
       Then("I should receive a 201 CREATED response")
       getArrangementPostResponse.status shouldBe CREATED
@@ -140,7 +142,7 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
     //may not be able to test, unable to tell if a Scottish user is using the system if no address is entered
 //    ignore("A Scottish user is creating an arrangement with no address") {
 //      When("I call POST /ttparrangements")
-//      val getArrangementPostResponse = postArrangements(scottishNoAddressRequest)
+//      val getArrangementPostResponse = postArrangements(url, scottishNoAddressRequest)
 //
 //      Then("I should receive a 201 CREATED response")
 //      getArrangementPostResponse.status shouldBe CREATED
@@ -158,7 +160,7 @@ class ArrangementExceptionSpec extends IntegrationSpec with ArrangementActions {
     //may not be able to test, unable to tell if a Welsh user is using the system if no address is entered
 //    ignore("A Welsh user is creating an arrangement with no address") {
 //      When("I call POST /ttparrangements")
-//      val getArrangementPostResponse = postArrangements(welshNoAddressRequest)
+//      val getArrangementPostResponse = postArrangements(url, welshNoAddressRequest)
 //
 //      Then("I should receive a 201 CREATED response")
 //      getArrangementPostResponse.status shouldBe CREATED

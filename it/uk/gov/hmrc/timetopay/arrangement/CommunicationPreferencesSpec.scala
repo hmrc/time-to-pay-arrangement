@@ -17,7 +17,7 @@ class CommunicationPreferencesSpec extends IntegrationSpec with ArrangementActio
 
     ignore("A Welsh user is creating an arrangement with Welsh communication preference") {
       When("I call POST /ttparrangements")
-      val getArrangementPostResponse = postArrangements(welshPreferenceRequest)
+      val getArrangementPostResponse = postArrangements(url, welshPreferenceRequest)
 
       Then("I should receive a 201 CREATED response")
       getArrangementPostResponse.status shouldBe CREATED
@@ -32,9 +32,9 @@ class CommunicationPreferencesSpec extends IntegrationSpec with ArrangementActio
       exceptionReason should include ("Welsh Preference")
     }
 
-    ignore("A Welsh user is creating an arrangement with Welsh communication preference") {
+    ignore("A Welsh user is creating an arrangement with Welsh communication preference and large print") {
       When("I call POST /ttparrangements")
-      val getArrangementPostResponse = postArrangements(welshPreferenceLargePrintRequest)
+      val getArrangementPostResponse = postArrangements(url, welshPreferenceLargePrintRequest)
 
       Then("I should receive a 201 CREATED response")
       getArrangementPostResponse.status shouldBe CREATED
@@ -51,7 +51,7 @@ class CommunicationPreferencesSpec extends IntegrationSpec with ArrangementActio
 
     ignore("An English user is creating an arrangement with audio indicator communication preference") {
       When("I call POST /ttparrangements")
-      val getArrangementPostResponse = postArrangements(englishAudioIndicatorRequest)
+      val getArrangementPostResponse = postArrangements(url, englishAudioIndicatorRequest)
 
       Then("I should receive a 201 CREATED response")
       getArrangementPostResponse.status shouldBe CREATED
@@ -68,7 +68,7 @@ class CommunicationPreferencesSpec extends IntegrationSpec with ArrangementActio
 
     ignore("An English user is creating an arrangement with large print communication preference") {
       When("I call POST /ttparrangements")
-      val getArrangementPostResponse = postArrangements(englishLargePrintRequest)
+      val getArrangementPostResponse = postArrangements(url, englishLargePrintRequest)
 
       Then("I should receive a 201 CREATED response")
       getArrangementPostResponse.status shouldBe CREATED
@@ -83,9 +83,9 @@ class CommunicationPreferencesSpec extends IntegrationSpec with ArrangementActio
       exceptionReason should include ("Large Print")
     }
 
-    ignore("An English user is creating an arrangement with large print communication preference") {
+    ignore("An English user is creating an arrangement with braille preference") {
       When("I call POST /ttparrangements")
-      val getArrangementPostResponse = postArrangements(englishBrailleRequest)
+      val getArrangementPostResponse = postArrangements(url, englishBrailleRequest)
 
       Then("I should receive a 201 CREATED response")
       getArrangementPostResponse.status shouldBe CREATED
