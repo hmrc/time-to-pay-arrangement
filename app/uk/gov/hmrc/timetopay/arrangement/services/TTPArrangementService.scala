@@ -5,7 +5,8 @@ import java.util.UUID
 
 import play.api.Logger
 import uk.gov.hmrc.play.http.HeaderCarrier
-import uk.gov.hmrc.timetopay.arrangement.connectors.ArrangementDesApiConnector
+import uk.gov.hmrc.timetopay.arrangement.connectors.ArrangementDesApiConnector.SubmissionResult
+import uk.gov.hmrc.timetopay.arrangement.connectors.{SubmissionSuccess, SubmissionError, ArrangementDesApiConnector}
 import uk.gov.hmrc.timetopay.arrangement.models.{DesSubmissionRequest, TTPArrangement}
 import uk.gov.hmrc.timetopay.arrangement.repositories.TTPArrangementRepository
 
@@ -34,7 +35,7 @@ trait TTPArrangementService {
     ttpArrangementRepository.findById(id)
   }
 
-  private def createResponse(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[TTPArrangement]] = {
+  private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[TTPArrangement]] = {
     val toSave = arrangement.copy(id = Some(UUID.randomUUID().toString),
       createdOn = Some(LocalDate.now()),
       desArrangement = Some(desSubmissionRequest))
@@ -44,17 +45,17 @@ trait TTPArrangementService {
   def submit(arrangement: TTPArrangement)(implicit hc: HeaderCarrier): Future[Option[TTPArrangement]] = {
     Logger.info(s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' and PP '${arrangement.paymentPlanReference}'")
 
-    val result = for {
+    val result: Future[SubmissionResult] = for {
       letterAndControl <- letterAndControlService.create(arrangement)
       desTTPArrangement <- desTTPArrangementService.create(arrangement)
-      request = DesSubmissionRequest(desTTPArrangement, letterAndControl)
-      response <- arrangementDesApiConnector.submitArrangement(arrangement.taxpayer, request)
-    } yield request -> response
+      response <- arrangementDesApiConnector.submitArrangement(arrangement.taxpayer,
+        DesSubmissionRequest(desTTPArrangement, letterAndControl))
+    } yield response
 
     result.flatMap {
-      r => if (r._2) createResponse(arrangement, r._1).map(identity) else Future.failed(new RuntimeException("Unable to submit arrangement"))
+       _.fold(error => Future.failed(new RuntimeException(error.message)),
+         success => saveArrangement(arrangement, success.requestSent))
     }
-
   }
 
 }
