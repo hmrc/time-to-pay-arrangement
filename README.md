@@ -98,7 +98,6 @@ Returns a specific arrangement based on the identifier. This api is for internal
     ],
     "selfAssessment": {
       "utr": "1234567890",
-      
       "communicationPreferences": {
         "welshLanguageIndicator": false,
         "audioIndicator": false,
