@@ -36,12 +36,6 @@ trait DesTTPArrangementService {
     }
   }
 
-  private def firstPaymentAmount(schedule: Schedule): BigDecimal = {
-    val firstPayment: Instalment = schedule.instalments.head
-    val initialPayment = Option(schedule.initialPayment).getOrElse(BigDecimal(0.0))
-    firstPayment.amount.+(initialPayment)
-  }
-
   def enforcementFlag(taxpayer: Taxpayer) : Option[String]= {
     val addressTypes: Set[JurisdictionType] = taxpayer.addresses.map {
       JurisdictionChecker.addressType
@@ -53,9 +47,15 @@ trait DesTTPArrangementService {
         case _ => Some("Distraint")
       }
       case _ =>
-        Logger.info(s"Unable to determine enforcement flag as multiple jurisdiction detected $addressTypes")
+        Logger.info(s"Unable to determine enforcement flag as multiple mixed jurisdictions detected $addressTypes")
         None
     }
+  }
+
+  private def firstPaymentAmount(schedule: Schedule): BigDecimal = {
+    val firstPayment: Instalment = schedule.instalments.head
+    val initialPayment = Option(schedule.initialPayment).getOrElse(BigDecimal(0.0))
+    firstPayment.amount.+(initialPayment)
   }
 
   private def saNote(ttpArrangement: TTPArrangement) = {

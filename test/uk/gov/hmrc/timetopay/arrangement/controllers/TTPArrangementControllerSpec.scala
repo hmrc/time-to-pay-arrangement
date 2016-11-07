@@ -1,5 +1,7 @@
 package uk.gov.hmrc.timetopay.arrangement.controllers
 
+import java.time.LocalDateTime
+
 import org.scalatest.mock.MockitoSugar
 import play.api.http.Status
 import play.api.libs.json.Json
@@ -69,7 +71,7 @@ class TTPArrangementControllerSpec extends UnitSpec with MockitoSugar with WithF
 
   "GET /ttparrangements" should {
     "return 200 for arrangement" in {
-
+      println("***" + LocalDateTime.now())
       object StubbedTTPArrangementService extends TTPArrangementService {
         override def byId(id: String) = {
           Future.successful(Some(ttparrangementResponse.as[TTPArrangement]))

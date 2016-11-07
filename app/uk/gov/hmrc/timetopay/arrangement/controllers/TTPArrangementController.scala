@@ -25,7 +25,7 @@ trait TTPArrangementController extends BaseController {
       withJsonBody[TTPArrangement] {
         arrangement =>
           arrangementService.submit(arrangement).map {
-             o => o.map(a => Created.withHeaders(LOCATION -> s"$protocol://${request.host}/ttparrangements/${a.id.get}")).getOrElse(Created)
+            _.map(a => Created.withHeaders(LOCATION -> s"$protocol://${request.host}/ttparrangements/${a.id.get}")).getOrElse(Created)
           }.recover {
             case failure => InternalServerError(s"A server error occurred: $failure")
           }
@@ -36,7 +36,7 @@ trait TTPArrangementController extends BaseController {
     implicit request =>
       Logger.debug(s"Requested arrangement $id")
       arrangementService.byId(id)
-        .flatMap(x => x.map(arrangement => successful(Ok(Json.toJson(arrangement))))
+        .flatMap(_.map(arrangement => successful(Ok(Json.toJson(arrangement))))
           .getOrElse(successful(NotFound)))
   }
 

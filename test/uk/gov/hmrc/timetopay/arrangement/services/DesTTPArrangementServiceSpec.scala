@@ -64,6 +64,14 @@ class DesTTPArrangementServiceSpec extends UnitSpec with WithFakeApplication wit
       enforcementFlag shouldBe None
 
     }
+
+    "return empty enforcement flag for no address" in {
+      val taxPayer = Taxpayer("CustomerName", List(), null)
+
+      val enforcementFlag = DesTTPArrangementService.enforcementFlag(taxPayer)
+      enforcementFlag shouldBe None
+
+    }
   }
 
 }

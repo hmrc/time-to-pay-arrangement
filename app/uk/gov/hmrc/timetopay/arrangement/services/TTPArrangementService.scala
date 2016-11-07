@@ -1,6 +1,6 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import java.time.LocalDate
+import java.time.{LocalDateTime, LocalDate}
 import java.util.UUID
 
 import play.api.Logger
@@ -37,7 +37,7 @@ trait TTPArrangementService {
 
   private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[TTPArrangement]] = {
     val toSave = arrangement.copy(id = Some(UUID.randomUUID().toString),
-      createdOn = Some(LocalDate.now()),
+      createdOn = Some(LocalDateTime.now()),
       desArrangement = Some(desSubmissionRequest))
     ttpArrangementRepository.save(toSave)
   }
@@ -45,14 +45,12 @@ trait TTPArrangementService {
   def submit(arrangement: TTPArrangement)(implicit hc: HeaderCarrier): Future[Option[TTPArrangement]] = {
     Logger.info(s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' and PP '${arrangement.paymentPlanReference}'")
 
-    val result: Future[SubmissionResult] = for {
+    (for {
       letterAndControl <- letterAndControlService.create(arrangement)
       desTTPArrangement <- desTTPArrangementService.create(arrangement)
       response <- arrangementDesApiConnector.submitArrangement(arrangement.taxpayer,
         DesSubmissionRequest(desTTPArrangement, letterAndControl))
-    } yield response
-
-    result.flatMap {
+    } yield response).flatMap {
        _.fold(error => Future.failed(new RuntimeException(error.message)),
          success => saveArrangement(arrangement, success.requestSent))
     }
