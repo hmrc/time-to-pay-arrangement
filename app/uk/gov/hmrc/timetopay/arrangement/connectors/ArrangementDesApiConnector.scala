@@ -21,6 +21,8 @@ object ArrangementDesApiConnector extends ArrangementDesApiConnector {
 
   override val desArrangementUrl = baseUrl("des-arrangement-api")
   override val http: HttpGet with HttpPost = WSHttp
+  override val authorisationToken = getConfString("des-arrangement-api.authorization-token", "not-found")
+  override val serviceEnvironment = getConfString("des-arrangement-api.environment", "unknown")
 }
 
 
@@ -28,11 +30,10 @@ trait ArrangementDesApiConnector extends ServicesConfig {
 
   type SubmissionResult = Either[SubmissionError, SubmissionSuccess]
 
+  val authorisationToken: String
+  val serviceEnvironment: String
   val desArrangementUrl: String
   val http: HttpGet with HttpPost
-
-  val authorisationToken = getConfString("des-arrangement-api.authorization-token", "not-found")
-  val serviceEnvironment = getConfString("des-arrangement-api.environment", "unknown")
 
   val desHeaderCarrier: HeaderCarrier = HeaderCarrier(authorization = Some(Authorization(s"Bearer $authorisationToken")),
     otherHeaders = Seq("Environment" -> serviceEnvironment))
