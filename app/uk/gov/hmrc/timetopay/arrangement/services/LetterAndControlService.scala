@@ -28,7 +28,7 @@ trait LetterAndControlService {
           )
         case 1 =>
          letterAndControl
-        case _ => multipleAddresses(ttpArrangement)
+        case _ => multipleAddresses
       }
     }
 
