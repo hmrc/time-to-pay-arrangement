@@ -33,7 +33,7 @@ Input
       },
       "debits": [
         {
-          "debitType": "IN2",
+          "originCode": "IN2",
           "dueDate": "2004-07-31"
         }
       ]
@@ -106,7 +106,7 @@ Returns a specific arrangement based on the identifier. This api is for internal
       },
       "debits": [
         {
-          "debitType": "IN2",
+          "originCode": "IN2",
           "dueDate": "2004-07-31"
         }
       ]
@@ -153,7 +153,7 @@ Returns a specific arrangement based on the identifier. This api is for internal
       "directDebit": true,
       "debitDetails": [
         {
-          "debitType": "IN2",
+          "originCode": "IN2",
           "dueDate": "2004-07-31"
         }
       ],

@@ -22,7 +22,6 @@ object TTPArrangementService extends TTPArrangementService {
   override val ttpArrangementRepository: TTPArrangementRepository = TTPArrangementRepository
 }
 
-
 trait TTPArrangementService {
 
   val arrangementDesApiConnector: ArrangementDesApiConnector

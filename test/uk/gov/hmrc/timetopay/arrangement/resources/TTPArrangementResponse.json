@@ -26,7 +26,7 @@
       },
       "debits": [
         {
-          "debitType": "IN2",
+          "originCode": "IN2",
           "dueDate": "2004-07-31"
         }
       ]
@@ -73,7 +73,7 @@
       "directDebit": true,
       "debitDetails": [
         {
-          "debitType": "IN2",
+          "originCode": "IN2",
           "dueDate": "2004-07-31"
         }
       ],
