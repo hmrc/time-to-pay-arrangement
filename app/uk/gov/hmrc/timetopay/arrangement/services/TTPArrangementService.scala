@@ -5,29 +5,17 @@ import java.util.UUID
 
 import play.api.Logger
 import uk.gov.hmrc.play.http.HeaderCarrier
-import uk.gov.hmrc.timetopay.arrangement.connectors.ArrangementDesApiConnector.SubmissionResult
-import uk.gov.hmrc.timetopay.arrangement.connectors.{SubmissionSuccess, SubmissionError, ArrangementDesApiConnector}
+import uk.gov.hmrc.timetopay.arrangement.connectors.{ArrangementDesApiConnector}
 import uk.gov.hmrc.timetopay.arrangement.models.{DesSubmissionRequest, TTPArrangement}
 import uk.gov.hmrc.timetopay.arrangement.repositories.TTPArrangementRepository
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-
-object TTPArrangementService extends TTPArrangementService {
-
-  override val arrangementDesApiConnector = ArrangementDesApiConnector
-  override val desTTPArrangementService: DesTTPArrangementService = DesTTPArrangementService
-  override val letterAndControlService: LetterAndControlService = LetterAndControlService
-  override val ttpArrangementRepository: TTPArrangementRepository = TTPArrangementRepository
-}
-
-trait TTPArrangementService {
-
-  val arrangementDesApiConnector: ArrangementDesApiConnector
-  val desTTPArrangementService: DesTTPArrangementService
-  val letterAndControlService: LetterAndControlService
-  val ttpArrangementRepository: TTPArrangementRepository
+class TTPArrangementService(arrangementDesApiConnector: ArrangementDesApiConnector,
+                            desTTPArrangementService: DesTTPArrangementService,
+                            letterAndControlService: LetterAndControlService,
+                            ttpArrangementRepository: TTPArrangementRepository) {
 
   def byId(id: String): Future[Option[TTPArrangement]] = ttpArrangementRepository.findById(id)
 

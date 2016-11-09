@@ -12,13 +12,7 @@ import uk.gov.hmrc.timetopay.arrangement.services.TTPArrangementService
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future.successful
 
-object TTPArrangementController extends TTPArrangementController {
-  override val arrangementService = TTPArrangementService
-}
-
-trait TTPArrangementController extends BaseController {
-
-  val arrangementService: TTPArrangementService
+class TTPArrangementController(arrangementService: TTPArrangementService) extends BaseController {
 
   def create() = Action.async(parse.json) {
     implicit request =>

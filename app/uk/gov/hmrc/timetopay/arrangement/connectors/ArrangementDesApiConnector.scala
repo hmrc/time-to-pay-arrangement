@@ -6,7 +6,6 @@ import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.logging.Authorization
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpPost, HttpResponse}
-import uk.gov.hmrc.timetopay.arrangement.WSHttp
 import uk.gov.hmrc.timetopay.arrangement.models.{DesSubmissionRequest, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
 
@@ -17,16 +16,7 @@ case class SubmissionSuccess(requestSent: DesSubmissionRequest) {}
 
 case class SubmissionError(message: String) {}
 
-object ArrangementDesApiConnector extends ArrangementDesApiConnector {
-
-  override val desArrangementUrl = baseUrl("des-arrangement-api")
-  override val http: HttpGet with HttpPost = WSHttp
-  override val authorisationToken = getConfString("des-arrangement-api.authorization-token", "not-found")
-  override val serviceEnvironment = getConfString("des-arrangement-api.environment", "unknown")
-}
-
-
-trait ArrangementDesApiConnector extends ServicesConfig {
+trait ArrangementDesApiConnector {
 
   type SubmissionResult = Either[SubmissionError, SubmissionSuccess]
 

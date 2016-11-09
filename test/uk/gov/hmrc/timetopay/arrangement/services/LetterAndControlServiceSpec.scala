@@ -7,7 +7,7 @@ import uk.gov.hmrc.timetopay.arrangement.resources._
 
 class LetterAndControlServiceSpec extends UnitSpec with WithFakeApplication with ScalaFutures {
 
-  val letterAndControlService = LetterAndControlService
+  val letterAndControlService = new LetterAndControlService
 
   "LetterAndControlService" should {
     "return no exception code when 1 English address" in {

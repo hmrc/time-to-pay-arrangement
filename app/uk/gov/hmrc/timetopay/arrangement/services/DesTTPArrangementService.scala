@@ -9,13 +9,11 @@ import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType.{Jurisdiction
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object DesTTPArrangementService extends DesTTPArrangementService {
-}
 
-trait DesTTPArrangementService {
+class DesTTPArrangementService {
   val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
-  def create(ttpArrangement: TTPArrangement): Future[DesTTPArrangement] = {
+  def create(implicit ttpArrangement: TTPArrangement): Future[DesTTPArrangement] = {
     Future {
       val schedule: Schedule = ttpArrangement.schedule
       val firstPaymentInstalment: Instalment = schedule.instalments.head

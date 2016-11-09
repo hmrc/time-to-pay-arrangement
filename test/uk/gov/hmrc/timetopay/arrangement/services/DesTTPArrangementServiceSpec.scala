@@ -6,12 +6,15 @@ import uk.gov.hmrc.timetopay.arrangement.models.{Address, Taxpayer}
 
 class DesTTPArrangementServiceSpec extends UnitSpec with WithFakeApplication with ScalaFutures {
 
+
+  val desTTPArrangementService = new DesTTPArrangementService
+
   "DesTTPArrangementService" should {
     "return summary warrant for single scottish postcode" in {
       val scottishAddress = Address(addressLine1 = "XXX", addressLine2 = "XXX",addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postCode = "G3 8NW")
       val taxPayer = Taxpayer("CustomerName", List(scottishAddress), null)
 
-      val enforcementFlag = DesTTPArrangementService.enforcementFlag(taxPayer)
+      val enforcementFlag = desTTPArrangementService.enforcementFlag(taxPayer)
       enforcementFlag.get shouldBe "Summary Warrant"
 
     }
@@ -20,7 +23,7 @@ class DesTTPArrangementServiceSpec extends UnitSpec with WithFakeApplication wit
       val welshAddress = Address(addressLine1 = "XXX", addressLine2 = "XXX",addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postCode = "CF23 8PF")
       val taxPayer = Taxpayer("CustomerName", List(welshAddress), null)
 
-      val enforcementFlag = DesTTPArrangementService.enforcementFlag(taxPayer)
+      val enforcementFlag = desTTPArrangementService.enforcementFlag(taxPayer)
       enforcementFlag.get shouldBe "Distraint"
 
     }
@@ -29,7 +32,7 @@ class DesTTPArrangementServiceSpec extends UnitSpec with WithFakeApplication wit
       val englishPostCode = Address(addressLine1 = "XXX", addressLine2 = "XXX",addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postCode = "B45 0HY")
       val taxPayer = Taxpayer("CustomerName", List(englishPostCode), null)
 
-      val enforcementFlag = DesTTPArrangementService.enforcementFlag(taxPayer)
+      val enforcementFlag = desTTPArrangementService.enforcementFlag(taxPayer)
       enforcementFlag.get shouldBe "Distraint"
 
     }
@@ -40,7 +43,7 @@ class DesTTPArrangementServiceSpec extends UnitSpec with WithFakeApplication wit
 
       val taxPayer = Taxpayer("CustomerName", List(scottishAddress1, scottishAddress2), null)
 
-      val enforcementFlag = DesTTPArrangementService.enforcementFlag(taxPayer)
+      val enforcementFlag = desTTPArrangementService.enforcementFlag(taxPayer)
       enforcementFlag.get shouldBe "Summary Warrant"
     }
 
@@ -50,7 +53,7 @@ class DesTTPArrangementServiceSpec extends UnitSpec with WithFakeApplication wit
 
       val taxPayer = Taxpayer("CustomerName", List(welshAddress1, welshAddress2), null)
 
-      val enforcementFlag = DesTTPArrangementService.enforcementFlag(taxPayer)
+      val enforcementFlag = desTTPArrangementService.enforcementFlag(taxPayer)
       enforcementFlag.get shouldBe "Distraint"
 
     }
@@ -60,7 +63,7 @@ class DesTTPArrangementServiceSpec extends UnitSpec with WithFakeApplication wit
       val scottishAddress = Address(addressLine1 = "XXX", addressLine2 = "XXX",addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postCode = "EH14 8NW")
       val taxPayer = Taxpayer("CustomerName", List(welshAddress, scottishAddress), null)
 
-      val enforcementFlag = DesTTPArrangementService.enforcementFlag(taxPayer)
+      val enforcementFlag = desTTPArrangementService.enforcementFlag(taxPayer)
       enforcementFlag shouldBe None
 
     }
@@ -68,7 +71,7 @@ class DesTTPArrangementServiceSpec extends UnitSpec with WithFakeApplication wit
     "return empty enforcement flag for no address" in {
       val taxPayer = Taxpayer("CustomerName", List(), null)
 
-      val enforcementFlag = DesTTPArrangementService.enforcementFlag(taxPayer)
+      val enforcementFlag = desTTPArrangementService.enforcementFlag(taxPayer)
       enforcementFlag shouldBe None
 
     }

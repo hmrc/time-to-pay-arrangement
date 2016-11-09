@@ -7,11 +7,7 @@ import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType.JurisdictionT
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object LetterAndControlService extends LetterAndControlService {
-
-}
-
-trait LetterAndControlService {
+class LetterAndControlService {
 
   type AddressResult = (Address, Option[LetterError])
 
