@@ -25,14 +25,19 @@ trait LetterAndControlService {
     val address: Address = correspondence._1
     val addressException:Option[LetterError] = correspondence._2
 
-    val exception = addressException match {
-      case Some(e) => Some(e.code.toString) -> Some(e.message)
-      case _ =>
-        resolveCommsPrefs(ttpArrangement.taxpayer.selfAssessment.communicationPreferences) match {
-          case Some(e) => Some(e.code.toString) -> Some(e.message)
-          case _ => None -> None
-        }
+    def exceptionCodeAndMessage(letter: LetterError) = {
+      Some(letter.code.toString) -> Some(letter.message)
     }
+
+    val exception = addressException.map {
+      exceptionCodeAndMessage
+    }.getOrElse {
+      val preferences = taxpayer.selfAssessment.communicationPreferences
+      resolveCommsPrefs(preferences).map {
+        exceptionCodeAndMessage
+      }.getOrElse(None -> None)
+    }
+
 
     LetterAndControl(
       customerName = taxpayer.customerName,

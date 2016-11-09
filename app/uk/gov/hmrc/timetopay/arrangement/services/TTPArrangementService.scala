@@ -34,12 +34,6 @@ trait TTPArrangementService {
     ttpArrangementRepository.findById(id)
   }
 
-  private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[TTPArrangement]] = {
-    val toSave = arrangement.copy(id = Some(UUID.randomUUID().toString),
-      createdOn = Some(LocalDateTime.now()),
-      desArrangement = Some(desSubmissionRequest))
-    ttpArrangementRepository.save(toSave)
-  }
 
   def submit(arrangement: TTPArrangement)(implicit hc: HeaderCarrier): Future[Option[TTPArrangement]] = {
     Logger.info(s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' and PP '${arrangement.paymentPlanReference}'")
@@ -54,5 +48,13 @@ trait TTPArrangementService {
          success => saveArrangement(arrangement, success.requestSent))
     }
   }
+
+  private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[TTPArrangement]] = {
+    val toSave = arrangement.copy(id = Some(UUID.randomUUID().toString),
+      createdOn = Some(LocalDateTime.now()),
+      desArrangement = Some(desSubmissionRequest))
+    ttpArrangementRepository.save(toSave)
+  }
+
 
 }
