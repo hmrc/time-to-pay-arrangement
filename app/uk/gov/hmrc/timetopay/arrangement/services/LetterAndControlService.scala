@@ -25,10 +25,6 @@ trait LetterAndControlService {
     val address: Address = correspondence._1
     val addressException:Option[LetterError] = correspondence._2
 
-    def exceptionCodeAndMessage(letter: LetterError) = {
-      Some(letter.code.toString) -> Some(letter.message)
-    }
-
     val exception = addressException.map {
       exceptionCodeAndMessage
     }.getOrElse {
@@ -37,7 +33,6 @@ trait LetterAndControlService {
         exceptionCodeAndMessage
       }.getOrElse(None -> None)
     }
-
 
     LetterAndControl(
       customerName = taxpayer.customerName,
@@ -93,31 +88,32 @@ trait LetterAndControlService {
     }
   }
 
-  private def singleAddress(address: Address): AddressResult = {
-    address match {
-      case Address(_, _, _, _, _, "") | Address("", _, _, _, _, _) =>
-        address -> Some(LetterError(9, "incomplete-address"))
-      case _ =>
-        address -> None
-    }
+  private def singleAddress(address: Address): AddressResult = address match {
+    case Address(_, _, _, _, _, "") | Address("", _, _, _, _, _) =>
+      address -> Some(LetterError(9, "incomplete-address"))
+    case _ =>
+      address -> None
   }
 
-  private def resolveCommsPrefs(commsPrefs: CommunicationPreferences): Option[LetterError] = {
-    commsPrefs match {
-      case CommunicationPreferences(true, _, true, _) => //Welsh and large print
+
+  private def resolveCommsPrefs(commsPrefs: CommunicationPreferences): Option[LetterError] = commsPrefs match {
+      case CommunicationPreferences(true, _, true, _) =>
         Some(LetterError(5, "welsh-large-print-required"))
-      case CommunicationPreferences(true, true, _, _) => //welsh audio
+      case CommunicationPreferences(true, true, _, _) =>
         Some(LetterError(7,"audio-welsh-required"))
-      case CommunicationPreferences(true, _, _, _) => //Welsh
+      case CommunicationPreferences(true, _, _, _) =>
         Some(LetterError(4,"welsh-required"))
-      case CommunicationPreferences(_, _, _, true) => //Braille
+      case CommunicationPreferences(_, _, _, true) =>
         Some(LetterError(2,"braille-required"))
-      case CommunicationPreferences(_, true, _, _) => //audio
+      case CommunicationPreferences(_, true, _, _) =>
         Some(LetterError(6,"audio-required"))
-      case CommunicationPreferences(_, _, true, _) => //large print
+      case CommunicationPreferences(_, _, true, _) =>
         Some(LetterError(3, "large-print-required"))
       case _ => None
-
     }
+
+  private def exceptionCodeAndMessage(letter: LetterError) = {
+    Some(letter.code.toString) -> Some(letter.message)
   }
+
 }

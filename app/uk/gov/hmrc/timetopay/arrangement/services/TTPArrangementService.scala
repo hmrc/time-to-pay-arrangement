@@ -29,10 +29,7 @@ trait TTPArrangementService {
   val letterAndControlService: LetterAndControlService
   val ttpArrangementRepository: TTPArrangementRepository
 
-
-  def byId(id: String): Future[Option[TTPArrangement]] = {
-    ttpArrangementRepository.findById(id)
-  }
+  def byId(id: String): Future[Option[TTPArrangement]] = ttpArrangementRepository.findById(id)
 
 
   def submit(arrangement: TTPArrangement)(implicit hc: HeaderCarrier): Future[Option[TTPArrangement]] = {
