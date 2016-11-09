@@ -11,49 +11,55 @@ object LetterAndControlService extends LetterAndControlService {
 
 }
 
+
 trait LetterAndControlService {
 
-  def create(implicit ttpArrangement: TTPArrangement): Future[LetterAndControl] = {
-    Future {
-      val taxpayer = ttpArrangement.taxpayer
-      taxpayer.addresses.size match {
-        case 0 =>
-          Logger.info("Customer does not have an address listed in Digital")
-          LetterAndControl(
-            customerName = taxpayer.customerName,
-            totalAll = ttpArrangement.schedule.amountToPay.toString(),
-            clmPymtString = paymentMessage(ttpArrangement.schedule),
-            exceptionType = Some("8"),
-            exceptionReason = Some("no-address")
-          )
-        case 1 =>
-         letterAndControl
-        case _ => multipleAddresses
-      }
-    }
+  type AddressResult = (Address, Option[LetterError])
 
-  }
+  case class LetterError (code: Int, message: String)
 
-  private def multipleAddresses(implicit ttpArrangement: TTPArrangement) = {
+
+  def create(implicit ttpArrangement: TTPArrangement): Future[LetterAndControl] = Future {
     val taxpayer = ttpArrangement.taxpayer
-    val addressTypes: Set[JurisdictionType] = taxpayer.addresses.map {
-      JurisdictionChecker.addressType
-    }.toSet
 
-    addressTypes.size match {
+    val correspondence : AddressResult = resolveCorrespondence
+    val address : Address = correspondence._1
+    val exception = correspondence._2 match {
+      case Some(l) => Some(l.code.toString) -> Some(l.message)
+      case _ => None -> None
+    }
+
+    LetterAndControl(
+
+      customerName = taxpayer.customerName,
+      addressLine1 = address.addressLine1,
+      addressLine2 = address.addressLine2,
+      addressLine3 = address.addressLine3,
+      addressLine4 = address.addressLine4,
+      addressLine5 = address.addressLine5,
+      postCode = address.postCode,
+      totalAll = ttpArrangement.schedule.amountToPay.toString(),
+      clmPymtString = paymentMessage(ttpArrangement.schedule),
+      exceptionType = exception._1,
+      exceptionReason = exception._2
+    )
+
+  }
+
+
+  private def resolveCorrespondence(implicit ttpArrangement: TTPArrangement) : AddressResult = {
+    val taxpayer: Taxpayer = ttpArrangement.taxpayer
+    taxpayer.addresses.size match {
+      case 0 =>
+        Logger.info("No address found in Digital")
+        Address() -> Some(LetterError(8, "no-address"))
       case 1 =>
-        letterAndControl
+        singleAddress(taxpayer.addresses.head)
       case _ =>
-        Logger.info(s"Customer has addresses in ${addressTypes.mkString(" and")} jurisdictions")
-        LetterAndControl(
-          customerName = taxpayer.customerName,
-          totalAll = ttpArrangement.schedule.amountToPay.toString(),
-          clmPymtString = paymentMessage(ttpArrangement.schedule),
-          exceptionType = Some("1"),
-          exceptionReason = Some(s"address-jurisdiction-conflict")
-        )
+        multipleAddresses(taxpayer)
     }
   }
+
 
   private def paymentMessage(schedule: Schedule) = {
     val instalmentSize = schedule.instalments.size - 1
@@ -66,33 +72,27 @@ trait LetterAndControlService {
       s"$lastPaymentAmount"
   }
 
-  private def letterAndControl(implicit ttpArrangement: TTPArrangement): LetterAndControl = {
-    val taxpayer = ttpArrangement.taxpayer
-    val address = taxpayer.addresses.head
+  private def multipleAddresses(implicit taxpayer: Taxpayer) = {
+    val uniqueAddressTypes: Set[JurisdictionType] = taxpayer.addresses.map {
+      JurisdictionChecker.addressType
+    }.toSet
 
-    address match {
-      case Address(_, _, _, _, _, "") | Address("", _, _, _, _, _) =>
-        LetterAndControl(
-          customerName = taxpayer.customerName,
-          totalAll= ttpArrangement.schedule.amountToPay.toString(),
-          clmPymtString = paymentMessage(ttpArrangement.schedule),
-          exceptionType = Some("9"),
-          exceptionReason = Some("incomplete-address")
-        )
+    uniqueAddressTypes.size match {
+      case 1 =>
+        singleAddress(taxpayer.addresses.head)
       case _ =>
-        LetterAndControl(
-          customerName = taxpayer.customerName,
-          addressLine1 = address.addressLine1,
-          addressLine2 = address.addressLine2,
-          addressLine3 = address.addressLine3,
-          addressLine4 = address.addressLine4,
-          addressLine5 = address.addressLine5,
-          postCode = address.postCode,
-          totalAll = ttpArrangement.schedule.amountToPay.toString(),
-          clmPymtString = paymentMessage(ttpArrangement.schedule)
-        )
+        Logger.info(s"Customer has addresses in ${uniqueAddressTypes.mkString(" and")} jurisdictions")
+        Address() -> Some(LetterError(1, "address-jurisdiction-conflict"))
     }
   }
 
+  private def singleAddress(address: Address) : AddressResult ={
+    address match {
+      case Address(_, _, _, _, _, "") | Address("", _, _, _, _, _) =>
+        address -> Some(LetterError(9, "incomplete-address"))
+      case _ =>
+        address -> None
+    }
+  }
 
 }

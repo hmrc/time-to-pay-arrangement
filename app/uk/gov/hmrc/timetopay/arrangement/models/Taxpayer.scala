@@ -15,12 +15,12 @@ case class SelfAssessment(utr: String,
                           debits: List[Debit]) {
 }
 
-case class Address(addressLine1: String,
+case class Address(addressLine1: String = "",
                    addressLine2: String = "",
                    addressLine3: String = "",
                    addressLine4: String = "",
                    addressLine5: String = "",
-                   postCode: String) {
+                   postCode: String = "") {
 
 }
 
