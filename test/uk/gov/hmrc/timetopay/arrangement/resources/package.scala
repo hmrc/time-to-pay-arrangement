@@ -3,7 +3,7 @@ package uk.gov.hmrc.timetopay.arrangement
 import java.time.LocalDate
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.timetopay.arrangement.models._
+import uk.gov.hmrc.timetopay.arrangement.models.{SelfAssessment, _}
 
 import scala.io.Source
 import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
@@ -29,5 +29,8 @@ package object resources {
   val foreignAddress = Address(addressLine1 = "XXX", postCode = "400089")
   val englishAddressMissingPostCodeAndLine1 = Address(addressLine1 = "", postCode = "")
   val englishAddressMissingPostCode = Address(addressLine1 = "XXXX", postCode = "")
+
+  val happyCommsPref = CommunicationPreferences(false, false, false, false)
+  val selfAssessment = SelfAssessment("XXX", happyCommsPref, null)
 
 }

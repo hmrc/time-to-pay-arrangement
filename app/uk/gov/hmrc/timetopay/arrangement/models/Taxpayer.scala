@@ -2,8 +2,6 @@ package uk.gov.hmrc.timetopay.arrangement.models
 
 import java.time.LocalDate
 
-
-
 case class Taxpayer(customerName: String,
                     addresses: List[Address],
                     selfAssessment: SelfAssessment) {
@@ -24,7 +22,7 @@ case class Address(addressLine1: String = "",
 
 }
 
-case class CommunicationPreferences( welshLanguageIndicator: Boolean,
+case class CommunicationPreferences(welshLanguageIndicator: Boolean,
                                     audioIndicator: Boolean,
                                     largePrintIndicator: Boolean,
                                     brailleIndicator: Boolean) {

@@ -11,26 +11,30 @@ object LetterAndControlService extends LetterAndControlService {
 
 }
 
-
 trait LetterAndControlService {
 
   type AddressResult = (Address, Option[LetterError])
 
   case class LetterError (code: Int, message: String)
 
-
   def create(implicit ttpArrangement: TTPArrangement): Future[LetterAndControl] = Future {
     val taxpayer = ttpArrangement.taxpayer
 
-    val correspondence : AddressResult = resolveCorrespondence
-    val address : Address = correspondence._1
-    val exception = correspondence._2 match {
-      case Some(l) => Some(l.code.toString) -> Some(l.message)
-      case _ => None -> None
+    val correspondence: AddressResult = resolveAddress
+
+    val address: Address = correspondence._1
+    val addressException:Option[LetterError] = correspondence._2
+
+    val exception = addressException match {
+      case Some(e) => Some(e.code.toString) -> Some(e.message)
+      case _ =>
+        resolveCommsPrefs(ttpArrangement.taxpayer.selfAssessment.communicationPreferences) match {
+          case Some(e) => Some(e.code.toString) -> Some(e.message)
+          case _ => None -> None
+        }
     }
 
     LetterAndControl(
-
       customerName = taxpayer.customerName,
       addressLine1 = address.addressLine1,
       addressLine2 = address.addressLine2,
@@ -46,8 +50,7 @@ trait LetterAndControlService {
 
   }
 
-
-  private def resolveCorrespondence(implicit ttpArrangement: TTPArrangement) : AddressResult = {
+  private def resolveAddress(implicit ttpArrangement: TTPArrangement): AddressResult = {
     val taxpayer: Taxpayer = ttpArrangement.taxpayer
     taxpayer.addresses.size match {
       case 0 =>
@@ -59,7 +62,6 @@ trait LetterAndControlService {
         multipleAddresses(taxpayer)
     }
   }
-
 
   private def paymentMessage(schedule: Schedule) = {
     val instalmentSize = schedule.instalments.size - 1
@@ -86,7 +88,7 @@ trait LetterAndControlService {
     }
   }
 
-  private def singleAddress(address: Address) : AddressResult ={
+  private def singleAddress(address: Address): AddressResult = {
     address match {
       case Address(_, _, _, _, _, "") | Address("", _, _, _, _, _) =>
         address -> Some(LetterError(9, "incomplete-address"))
@@ -95,4 +97,22 @@ trait LetterAndControlService {
     }
   }
 
+  private def resolveCommsPrefs(commsPrefs: CommunicationPreferences): Option[LetterError] = {
+    commsPrefs match {
+      case CommunicationPreferences(true, _, true, _) => //Welsh and large print
+        Some(LetterError(5, "welsh-large-print-required"))
+      case CommunicationPreferences(true, true, _, _) => //welsh audio
+        Some(LetterError(7,"audio-welsh-required"))
+      case CommunicationPreferences(true, _, _, _) => //Welsh
+        Some(LetterError(4,"welsh-required"))
+      case CommunicationPreferences(_, _, _, true) => //Braille
+        Some(LetterError(2,"braille-required"))
+      case CommunicationPreferences(_, true, _, _) => //audio
+        Some(LetterError(6,"audio-required"))
+      case CommunicationPreferences(_, _, true, _) => //large print
+        Some(LetterError(3, "large-print-required"))
+      case _ => None
+
+    }
+  }
 }
