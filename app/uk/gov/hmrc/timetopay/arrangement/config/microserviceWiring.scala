@@ -30,9 +30,10 @@ object MicroserviceAuthConnector extends AuthConnector with ServicesConfig {
 
 object ArrangementDesApiConnector extends ArrangementDesApiConnector with ServicesConfig {
 
+  override val desArrangementUrl: String =  baseUrl("des-arrangement-api")
+  override val serviceEnvironment: String = getConfString("des-arrangement-api.environment", "unknown")
   override val authorisationToken: String =getConfString("des-arrangement-api.authorization-token", "not-found")
-  override val desArrangementUrl: String =  getConfString("des-arrangement-api.environment", "unknown")
-  override val serviceEnvironment: String = baseUrl("des-arrangement-api")
+
   override val http: HttpGet with HttpPost = WSHttp
 }
 

@@ -21,7 +21,9 @@ class TTPArrangementController(arrangementService: TTPArrangementService) extend
           arrangementService.submit(arrangement).map {
             _.map(a => Created.withHeaders(LOCATION -> s"$protocol://${request.host}/ttparrangements/${a.id.get}")).getOrElse(Created)
           }.recover {
-            case failure => InternalServerError(s"A server error occurred: $failure")
+            case failure =>
+              Logger.error("An exception occurred ", failure)
+              InternalServerError(s"A server error occurred: $failure")
           }
       }
   }
