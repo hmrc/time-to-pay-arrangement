@@ -2,13 +2,10 @@ package uk.gov.hmrc.timetopay.arrangement.connectors
 
 import play.api.Logger
 import play.api.http.Status._
-import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.logging.Authorization
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpPost, HttpResponse}
 import uk.gov.hmrc.timetopay.arrangement.models.{DesSubmissionRequest, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
-
 import scala.concurrent.{ExecutionContext, Future}
 
 
