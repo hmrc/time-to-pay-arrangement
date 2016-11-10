@@ -9,7 +9,7 @@ case class Taxpayer(customerName: String,
 }
 
 case class SelfAssessment(utr: String,
-                          communicationPreferences: CommunicationPreferences,
+                          communicationPreferences: Option[CommunicationPreferences],
                           debits: List[Debit]) {
 }
 

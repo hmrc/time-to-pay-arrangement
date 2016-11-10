@@ -31,6 +31,6 @@ package object resources {
   val englishAddressMissingPostCode = Address(addressLine1 = "XXXX", postCode = "")
 
   val happyCommsPref = CommunicationPreferences(false, false, false, false)
-  val selfAssessment = SelfAssessment("XXX", happyCommsPref, null)
+  val selfAssessment = SelfAssessment("XXX", Some(happyCommsPref), List())
 
 }

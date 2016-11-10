@@ -11,7 +11,7 @@ class LetterAndControlServiceSpec extends UnitSpec with WithFakeApplication with
 
   "LetterAndControlService" should {
     "return no exception code when 1 English address" in {
-      val selfAssessment = SelfAssessment("XXX", happyCommsPref, null)
+      val selfAssessment = SelfAssessment("XXX", Some(happyCommsPref), List())
       val taxPayer = Taxpayer("CustomerName", List(englishAddress1), selfAssessment)
       val ttpArrangement = TTPArrangement(None, None, "XXX", "XXX", taxPayer, schedule, None)
       val result = letterAndControlService.create(ttpArrangement).futureValue
@@ -21,7 +21,8 @@ class LetterAndControlServiceSpec extends UnitSpec with WithFakeApplication with
     }
 
     "return no exception code when 1 Welsh address" in {
-      val selfAssessment = SelfAssessment("XXX", happyCommsPref, null)
+      val selfAssessment = SelfAssessment("XXX", Some(happyCommsPref), List())
+
       val taxPayer = Taxpayer("CustomerName", List(welshAddress), selfAssessment)
       val ttpArrangement = TTPArrangement(None, None, "XXX", "XXX", taxPayer, schedule, None)
       val result = letterAndControlService.create(ttpArrangement).futureValue
@@ -31,7 +32,8 @@ class LetterAndControlServiceSpec extends UnitSpec with WithFakeApplication with
     }
 
     "return no exception code when 1 Northern Ireland address" in {
-      val selfAssessment = SelfAssessment("XXX", happyCommsPref, null)
+      val selfAssessment = SelfAssessment("XXX", Some(happyCommsPref), List())
+
       val taxPayer = Taxpayer("CustomerName", List(northernIrelandAddress), selfAssessment)
       val ttpArrangement = TTPArrangement(None, None, "XXX", "XXX", taxPayer, schedule, None)
       val result = letterAndControlService.create(ttpArrangement).futureValue
@@ -50,7 +52,8 @@ class LetterAndControlServiceSpec extends UnitSpec with WithFakeApplication with
     }
 
     "return exception code 9 and reason incomplete-address for missing postcode" in {
-      val selfAssessment = SelfAssessment("XXX", happyCommsPref, null)
+      val selfAssessment = SelfAssessment("XXX", Some(happyCommsPref), List())
+
       val taxPayer = Taxpayer("CustomerName", List(englishAddressMissingPostCode), selfAssessment)
       val ttpArrangement = TTPArrangement(None, None, "XXX", "XXX", taxPayer, schedule, None)
       val result = letterAndControlService.create(ttpArrangement).futureValue
@@ -60,7 +63,8 @@ class LetterAndControlServiceSpec extends UnitSpec with WithFakeApplication with
     }
 
     "return no exception code for multiple English addresses" in {
-      val selfAssessment = SelfAssessment("XXX", happyCommsPref, null)
+      val selfAssessment = SelfAssessment("XXX", Some(happyCommsPref), List())
+
       val taxPayer = Taxpayer("CustomerName", List(englishAddress1, englishAddress2), selfAssessment)
       val ttpArrangement = TTPArrangement(None, None, "XXX", "XXX", taxPayer, schedule, None)
       val result = letterAndControlService.create(ttpArrangement)
@@ -70,7 +74,8 @@ class LetterAndControlServiceSpec extends UnitSpec with WithFakeApplication with
     }
 
     "return exception code 1 and reason address-jurisdiction-conflict for an English and Scottish address" in {
-      val selfAssessment = SelfAssessment("XXX", happyCommsPref, null)
+      val selfAssessment = SelfAssessment("XXX", Some(happyCommsPref), List())
+
       val taxPayer = Taxpayer("CustomerName", List(englishAddress1, scottishAddress), selfAssessment)
       val ttpArrangement = TTPArrangement(None, None, "XXX", "XXX", taxPayer, schedule, None)
       val result = letterAndControlService.create(ttpArrangement).futureValue
@@ -80,7 +85,8 @@ class LetterAndControlServiceSpec extends UnitSpec with WithFakeApplication with
     }
 
     "return no exception code and for an English and Foreign address" in {
-      val selfAssessment = SelfAssessment("XXX", happyCommsPref, null)
+      val selfAssessment = SelfAssessment("XXX", Some(happyCommsPref), List())
+
       val taxPayer = Taxpayer("CustomerName", List(englishAddress1, foreignAddress), selfAssessment)
       val ttpArrangement = TTPArrangement(None, None, "XXX", "XXX", taxPayer, schedule, None)
       val result = letterAndControlService.create(ttpArrangement).futureValue
@@ -117,7 +123,7 @@ class LetterAndControlServiceSpec extends UnitSpec with WithFakeApplication with
     }
 
     "return exception code 5 and reason welsh-large-print-required for Welsh Language and Large Print" in {
-      val unhappySelfAssessment = SelfAssessment("XXX", happyCommsPref.copy(welshLanguageIndicator = true, largePrintIndicator = true), null)
+      val unhappySelfAssessment = SelfAssessment("XXX", Some(happyCommsPref.copy(welshLanguageIndicator = true, largePrintIndicator = true)), null)
       val taxPayer = Taxpayer("CustomerName", List(englishAddress1), unhappySelfAssessment)
       val ttpArrangement = TTPArrangement(None, None, "XXX", "XXX", taxPayer, schedule, None)
       val result = letterAndControlService.create(ttpArrangement).futureValue

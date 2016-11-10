@@ -33,9 +33,10 @@ class LetterAndControlService {
     val exception = addressException.map {
       exceptionCodeAndMessage
     }.getOrElse {
-      val preferences = taxpayer.selfAssessment.communicationPreferences
-      resolveCommsPrefs(preferences).map {
-        exceptionCodeAndMessage
+      taxpayer.selfAssessment.communicationPreferences.map {
+       preference => resolveCommsPrefs(preference).map {
+          exceptionCodeAndMessage
+        }.getOrElse((None,None))
       }.getOrElse((None,None))
     }
 
