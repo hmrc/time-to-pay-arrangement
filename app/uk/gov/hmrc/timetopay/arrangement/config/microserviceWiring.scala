@@ -10,10 +10,11 @@ import uk.gov.hmrc.play.http.hooks.HttpHook
 import uk.gov.hmrc.play.http.ws._
 import uk.gov.hmrc.timetopay.arrangement.connectors.ArrangementDesApiConnector
 import uk.gov.hmrc.timetopay.arrangement.controllers.TTPArrangementController
-import uk.gov.hmrc.timetopay.arrangement.models.{DesTTPArrangement, TTPArrangement, LetterAndControl}
+import uk.gov.hmrc.timetopay.arrangement.models.{LetterAndControl, DesTTPArrangement, TTPArrangement}
 import uk.gov.hmrc.timetopay.arrangement.services.{TTPArrangementService, DesTTPArrangementService, LetterAndControlService}
 
 import scala.concurrent.Future
+
 
 object WSHttp extends WSGet with WSPut with WSPost with WSDelete with WSPatch with AppName {
   override val hooks: Seq[HttpHook] = NoneRequired
@@ -48,8 +49,11 @@ trait ServiceRegistry extends ServicesConfig {
   lazy val letterAndControlService = LetterAndControlService
   lazy val desTTPArrangementService = DesTTPArrangementService
 
+  lazy val letterAndControl:(TTPArrangement => Future[LetterAndControl]) = arrangement => letterAndControlService.create(arrangement)
+  lazy val desArrangement:(TTPArrangement => Future[DesTTPArrangement]) = arrangement => desTTPArrangementService.create(arrangement)
+
   lazy val arrangementService: TTPArrangementService = new TTPArrangementService(
-    arrangementDesApiConnector, desTTPArrangementService, letterAndControlService, TTPArrangementRepository
+    arrangementDesApiConnector, desArrangement, letterAndControl, TTPArrangementRepository
   )
 }
 

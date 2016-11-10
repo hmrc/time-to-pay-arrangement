@@ -6,7 +6,7 @@ import org.scalatest.mock.MockitoSugar
 import uk.gov.hmrc.play.http.{HeaderCarrier}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import uk.gov.hmrc.timetopay.arrangement.connectors.{SubmissionError, SubmissionSuccess, ArrangementDesApiConnector}
-import uk.gov.hmrc.timetopay.arrangement.models.{DesSubmissionRequest, TTPArrangement}
+import uk.gov.hmrc.timetopay.arrangement.models.{DesTTPArrangement, LetterAndControl, DesSubmissionRequest, TTPArrangement}
 import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import org.mockito.Matchers._
@@ -16,14 +16,13 @@ import scala.concurrent.Future
 
 class TTPArrangementServiceSpec extends UnitSpec with MockitoSugar with WithFakeApplication with ScalaFutures {
 
+  val letterAndControl:(TTPArrangement => Future[LetterAndControl]) = arrangement => new LetterAndControlService().create(arrangement)
+  val desArrangement:(TTPArrangement => Future[DesTTPArrangement]) = arrangement => new DesTTPArrangementService().create(arrangement)
   val arrangementDesApiConnector = mock[ArrangementDesApiConnector]
-  val desTTPArrangementService = new DesTTPArrangementService
-  val letterAndControlService = new LetterAndControlService
   val ttpArrangementRepository: TTPArrangementRepository = mock[TTPArrangementRepository]
 
-
   val arrangementService = new TTPArrangementService(arrangementDesApiConnector,
-    desTTPArrangementService, letterAndControlService, ttpArrangementRepository)
+    desArrangement, letterAndControl, ttpArrangementRepository)
 
   "TTPArrangementService" should {
     "return Future[Success]" in {
@@ -31,14 +30,9 @@ class TTPArrangementServiceSpec extends UnitSpec with MockitoSugar with WithFake
       val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement]
       val savedArrangement = ttparrangementResponse.as[TTPArrangement]
 
-
       when(ttpArrangementRepository.save(any)).thenReturn(Future.successful(Some(savedArrangement)))
-
-      val letterAndControl =  letterAndControlService.create(arrangement).futureValue
-      val desArrangement = desTTPArrangementService.create(arrangement).futureValue
-
       when(arrangementDesApiConnector.submitArrangement(any(), any())(any()))
-        .thenReturn(Future.successful(Right(SubmissionSuccess(DesSubmissionRequest(desArrangement, letterAndControl)))))
+        .thenReturn(Future.successful(Right(SubmissionSuccess(DesSubmissionRequest(desArrangement(arrangement), letterAndControl(arrangement))))))
 
 
       val response = arrangementService.submit(arrangement)(new HeaderCarrier)
