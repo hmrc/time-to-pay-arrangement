@@ -33,9 +33,9 @@ class DesTTPArrangementService {
   }
 
   def enforcementFlag(taxpayer: Taxpayer) : Option[String]= {
-    val addressTypes: Set[JurisdictionType] = taxpayer.addresses.map {
+    val addressTypes: List[JurisdictionType] = taxpayer.addresses.map {
       JurisdictionChecker.addressType
-    }.toSet
+    }.distinct
 
     addressTypes.size match {
       case 1 => addressTypes.head match {
