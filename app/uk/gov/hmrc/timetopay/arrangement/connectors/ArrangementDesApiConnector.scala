@@ -22,7 +22,7 @@ trait ArrangementDesApiConnector {
   val desArrangementUrl: String
   val http: HttpGet with HttpPost
 
-  val desHeaderCarrier: HeaderCarrier = HeaderCarrier(authorization = Some(Authorization(s"Bearer $authorisationToken")),
+  lazy val desHeaderCarrier: HeaderCarrier = HeaderCarrier(authorization = Some(Authorization(s"Bearer $authorisationToken")),
     otherHeaders = Seq("Environment" -> serviceEnvironment))
 
   def submitArrangement(taxpayer: Taxpayer, desSubmissionRequest: DesSubmissionRequest)(implicit ec: ExecutionContext): Future[SubmissionResult] = {
@@ -30,7 +30,7 @@ trait ArrangementDesApiConnector {
     implicit val hc: HeaderCarrier = desHeaderCarrier
 
     val serviceUrl = s"time-to-pay/taxpayers/${taxpayer.selfAssessment.utr}/arrangements"
-
+    Logger.info(s"hc $hc")
     http.POST[DesSubmissionRequest, HttpResponse](s"$desArrangementUrl/$serviceUrl", desSubmissionRequest)
       .map(response => response.status match {
         case ACCEPTED =>
