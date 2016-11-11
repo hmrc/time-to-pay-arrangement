@@ -64,11 +64,11 @@ class DesTTPArrangementService {
     val paymentPlanReference = ttpArrangement.paymentPlanReference
     val note =
       s"""SSTTP arrangement created online 1st payment amount of £$initialPayment
-         |1st payment due date $paymentDueDate.
-         |Regular payment amount £$regularPaymentAmount
-         |Regular payment frequency monthly.
-         |Review date $reviewDate DDI Ref. $directDebitReference PP Ref. $paymentPlanReference.
-         |TTP letter issued
+         1st payment due date $paymentDueDate.
+         Regular payment amount £$regularPaymentAmount
+         Regular payment frequency monthly.
+         Review date $reviewDate DDI Ref. $directDebitReference PP Ref. $paymentPlanReference.
+         TTP letter issued
        """.stripMargin
     note
   }
