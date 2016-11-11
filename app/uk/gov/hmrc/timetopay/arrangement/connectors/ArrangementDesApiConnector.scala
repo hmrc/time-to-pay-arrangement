@@ -26,6 +26,7 @@ trait ArrangementDesApiConnector {
     otherHeaders = Seq("Environment" -> serviceEnvironment))
 
   def submitArrangement(taxpayer: Taxpayer, desSubmissionRequest: DesSubmissionRequest)(implicit ec: ExecutionContext): Future[SubmissionResult] = {
+    Logger.info(s"Environment $serviceEnvironment")
     implicit val hc: HeaderCarrier = desHeaderCarrier
 
     val serviceUrl = s"time-to-pay/taxpayers/${taxpayer.selfAssessment.utr}/arrangements"
