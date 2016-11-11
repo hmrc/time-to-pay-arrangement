@@ -2,12 +2,16 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import uk.gov.hmrc.timetopay.arrangement.config.LetterAndControlConfig
 import uk.gov.hmrc.timetopay.arrangement.models._
 import uk.gov.hmrc.timetopay.arrangement.resources._
 
 class LetterAndControlServiceSpec extends UnitSpec with WithFakeApplication with ScalaFutures {
 
-  val letterAndControlService = new LetterAndControlService
+
+  val letterAndControlConfig = LetterAndControlConfig("", "","","","","","", "","")
+
+  val letterAndControlService = new LetterAndControlService(letterAndControlConfig)
 
   "LetterAndControlService" should {
     "return no exception code when 1 English address" in {

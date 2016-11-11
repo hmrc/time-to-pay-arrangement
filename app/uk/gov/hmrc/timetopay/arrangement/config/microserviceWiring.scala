@@ -1,5 +1,7 @@
 package uk.gov.hmrc.timetopay.arrangement.config
 
+import play.api.Play
+import play.api.Play.configuration
 import play.api.mvc.Controller
 import uk.gov.hmrc.play.audit.http.config.LoadAuditingConfig
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -31,14 +33,13 @@ object MicroserviceAuthConnector extends AuthConnector with ServicesConfig {
 
 object ArrangementDesApiConnector extends ArrangementDesApiConnector with ServicesConfig {
 
-  override val desArrangementUrl: String =  baseUrl("des-arrangement-api")
+  override val desArrangementUrl: String = baseUrl("des-arrangement-api")
   override val serviceEnvironment: String = getConfString("des-arrangement-api.environment", "unknown")
-  override val authorisationToken: String =getConfString("des-arrangement-api.authorization-token", "not-found")
+  override val authorisationToken: String = getConfString("des-arrangement-api.authorization-token", "not-found")
 
   override val http: HttpGet with HttpPost = WSHttp
 }
 
-object LetterAndControlService extends LetterAndControlService {}
 
 object DesTTPArrangementService extends DesTTPArrangementService {}
 
@@ -49,7 +50,10 @@ trait ServiceRegistry extends ServicesConfig {
 
   import scala.concurrent.ExecutionContext.Implicits.global
   lazy val arrangementDesApiConnector = ArrangementDesApiConnector
-  lazy val letterAndControlService = LetterAndControlService
+
+  import play.api.Play.current
+  lazy val letterAndControlService = new LetterAndControlService(LetterAndControlConfig.create(configuration.getConfig("letterAndControl").getOrElse(throw new RuntimeException("LetterAndControl configuration required")))) {}
+
   lazy val desTTPArrangementService = DesTTPArrangementService
 
   lazy val letterAndControl:(TTPArrangement => Future[LetterAndControl]) = arrangement => letterAndControlService.create(arrangement)

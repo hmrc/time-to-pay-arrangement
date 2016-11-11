@@ -1,13 +1,14 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import play.api.Logger
+import play.api.{Logger}
+import uk.gov.hmrc.timetopay.arrangement.config.LetterAndControlConfig
 import uk.gov.hmrc.timetopay.arrangement.models._
 import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType.JurisdictionType
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class LetterAndControlService {
+class LetterAndControlService(letterAndControlConfig : LetterAndControlConfig) {
 
   type AddressResult = (Address, Option[LetterError])
 
@@ -42,6 +43,7 @@ class LetterAndControlService {
 
     LetterAndControl(
       customerName = taxpayer.customerName,
+      salutation = letterAndControlConfig.salutation,
       addressLine1 = address.addressLine1,
       addressLine2 = address.addressLine2,
       addressLine3 = address.addressLine3,
@@ -50,6 +52,14 @@ class LetterAndControlService {
       postCode = address.postCode,
       totalAll = ttpArrangement.schedule.amountToPay.toString(),
       clmPymtString = paymentMessage(ttpArrangement.schedule),
+      clmIndicateInt= letterAndControlConfig.claimIndicateInt,
+      template = letterAndControlConfig.template,
+      officeName1 = letterAndControlConfig.officeName1,
+      officeName2 = letterAndControlConfig.officeName2,
+      officePostcode = letterAndControlConfig.officePostCode,
+      officePhone = letterAndControlConfig.officePhone,
+      officeFax = letterAndControlConfig.officeFax,
+      officeOpeningHours = letterAndControlConfig.officeOpeningHours,
       exceptionType = exception._1,
       exceptionReason = exception._2
     )
