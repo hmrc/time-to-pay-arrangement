@@ -3,6 +3,7 @@ package uk.gov.hmrc.timetopay.arrangement.controllers
 
 import play.api.Logger
 import play.api.libs.json.Json
+import play.api.libs.json.Json.toJson
 import play.api.mvc.{RequestHeader, Action}
 import uk.gov.hmrc.play.microservice.controller.BaseController
 import uk.gov.hmrc.timetopay.arrangement.models.TTPArrangement
@@ -10,7 +11,7 @@ import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
 import uk.gov.hmrc.timetopay.arrangement.services.TTPArrangementService
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future.successful
+import scala.concurrent.Future._
 
 class TTPArrangementController(arrangementService: TTPArrangementService) extends BaseController {
 
@@ -31,10 +32,11 @@ class TTPArrangementController(arrangementService: TTPArrangementService) extend
   def arrangement(id: String) = Action.async {
     implicit request =>
       Logger.debug(s"Requested arrangement $id")
-      arrangementService.byId(id)
-        .flatMap(_.map(arrangement => successful(Ok(Json.toJson(arrangement))))
-          .getOrElse(successful(NotFound)))
+      arrangementService.byId(id).flatMap {
+        _.fold(successful(NotFound(s"arrangement with $id does not exist")))(r => successful(Ok(toJson(r))))
+      }
   }
+
 
   def protocol(implicit reqHead: RequestHeader) = if (reqHead.secure) "https" else "http"
 
