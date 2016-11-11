@@ -18,7 +18,7 @@ import scala.concurrent.Future
 
 class TTPArrangementControllerSpec extends UnitSpec with MockFactory with ScalaFutures {
 
-  class MockService extends TTPArrangementService(null,null,null,null) {}
+  class MockService extends TTPArrangementService(null,null,null,null, null) {}
 
   val arrangementServiceStub = stub[MockService]
   val arrangementController = new TTPArrangementController(arrangementServiceStub)

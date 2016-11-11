@@ -15,9 +15,10 @@ import scala.concurrent.Future
 class TTPArrangementService(arrangementDesApiConnector: ArrangementDesApiConnector,
                             desTTPArrangementService: (TTPArrangement => Future[DesTTPArrangement]),
                             letterAndControlService: (TTPArrangement => Future[LetterAndControl]),
-                            ttpArrangementRepository: TTPArrangementRepository) {
+                            arrangementSave: (TTPArrangement => Future[Option[TTPArrangement]]),
+                            arrangementGet: (String => Future[Option[TTPArrangement]])) {
 
-  def byId(id: String): Future[Option[TTPArrangement]] = ttpArrangementRepository.findById(id)
+  def byId(id: String): Future[Option[TTPArrangement]] = arrangementGet(id)
 
 
   def submit(arrangement: TTPArrangement)(implicit hc: HeaderCarrier): Future[Option[TTPArrangement]] = {
@@ -38,7 +39,7 @@ class TTPArrangementService(arrangementDesApiConnector: ArrangementDesApiConnect
     val toSave = arrangement.copy(id = Some(UUID.randomUUID().toString),
       createdOn = Some(LocalDateTime.now()),
       desArrangement = Some(desSubmissionRequest))
-    ttpArrangementRepository.save(toSave)
+      arrangementSave(toSave)
   }
 
 

@@ -11,6 +11,7 @@ import uk.gov.hmrc.play.http.ws._
 import uk.gov.hmrc.timetopay.arrangement.connectors.ArrangementDesApiConnector
 import uk.gov.hmrc.timetopay.arrangement.controllers.TTPArrangementController
 import uk.gov.hmrc.timetopay.arrangement.models.{LetterAndControl, DesTTPArrangement, TTPArrangement}
+import uk.gov.hmrc.timetopay.arrangement.repositories._
 import uk.gov.hmrc.timetopay.arrangement.services.{TTPArrangementService, DesTTPArrangementService, LetterAndControlService}
 
 import scala.concurrent.Future
@@ -46,15 +47,18 @@ trait ServiceRegistry extends ServicesConfig {
 
   import uk.gov.hmrc.timetopay.arrangement.repositories._
 
+  import scala.concurrent.ExecutionContext.Implicits.global
   lazy val arrangementDesApiConnector = ArrangementDesApiConnector
   lazy val letterAndControlService = LetterAndControlService
   lazy val desTTPArrangementService = DesTTPArrangementService
 
   lazy val letterAndControl:(TTPArrangement => Future[LetterAndControl]) = arrangement => letterAndControlService.create(arrangement)
   lazy val desArrangement:(TTPArrangement => Future[DesTTPArrangement]) = arrangement => desTTPArrangementService.create(arrangement)
+  lazy val arrangementSave: (TTPArrangement => Future[Option[TTPArrangement]]) = arrangement => TTPArrangementRepository.save(arrangement)
+  lazy val arrangementGet: (String => Future[Option[TTPArrangement]]) = id => TTPArrangementRepository.findById(id)
 
   lazy val arrangementService: TTPArrangementService = new TTPArrangementService(
-    arrangementDesApiConnector, desArrangement, letterAndControl, TTPArrangementRepository
+    arrangementDesApiConnector, desArrangement, letterAndControl, arrangementSave, arrangementGet
   )
 }
 
