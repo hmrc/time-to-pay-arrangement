@@ -29,4 +29,9 @@ case class CommunicationPreferences(welshLanguageIndicator: Boolean,
 
 }
 
-case class Debit(originCode: String, dueDate: LocalDate) {}
+case class Debit(originCode: String, dueDate: LocalDate) {
+
+}
+
+case class DesDebit(debitType: String, dueDate: LocalDate) {
+}

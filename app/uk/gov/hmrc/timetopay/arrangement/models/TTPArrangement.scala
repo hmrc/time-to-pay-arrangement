@@ -22,7 +22,7 @@ case class DesTTPArrangement(startDate: LocalDate,
                                initials: String = "ZZZ",
                                enforcementAction: String,
                                directDebit: Boolean = true,
-                               debitDetails: List[Debit],
+                               debitDetails: List[DesDebit],
                                saNote: String) {
 
 }

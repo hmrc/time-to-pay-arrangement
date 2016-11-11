@@ -13,25 +13,23 @@ import scala.concurrent.Future
 class DesTTPArrangementService {
   val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
-  def create(implicit ttpArrangement: TTPArrangement): Future[DesTTPArrangement] = {
-    Future {
-      val schedule: Schedule = ttpArrangement.schedule
-      val firstPaymentInstalment: Instalment = schedule.instalments.head
+  def create(implicit ttpArrangement: TTPArrangement): Future[DesTTPArrangement] = Future {
+    val schedule: Schedule = ttpArrangement.schedule
+    val firstPaymentInstalment: Instalment = schedule.instalments.head
 
-      val firstPayment = firstPaymentAmount(schedule)
+    val firstPayment = firstPaymentAmount(schedule)
 
-      DesTTPArrangement(
-        startDate = schedule.startDate,
-        endDate = schedule.endDate,
-        firstPaymentDate = firstPaymentInstalment.paymentDate,
-        firstPaymentAmount = firstPayment.toString(),
-        regularPaymentAmount = firstPaymentInstalment.amount.toString(),
-        reviewDate = schedule.endDate.plusWeeks(3),
-        enforcementAction = enforcementFlag(ttpArrangement.taxpayer).getOrElse(""),
-        debitDetails = ttpArrangement.taxpayer.selfAssessment.debits,
-        saNote = saNote(ttpArrangement)
-      )
-    }
+    DesTTPArrangement(
+      startDate = schedule.startDate,
+      endDate = schedule.endDate,
+      firstPaymentDate = firstPaymentInstalment.paymentDate,
+      firstPaymentAmount = firstPayment.toString(),
+      regularPaymentAmount = firstPaymentInstalment.amount.toString(),
+      reviewDate = schedule.endDate.plusWeeks(3),
+      enforcementAction = enforcementFlag(ttpArrangement.taxpayer).getOrElse(""),
+      debitDetails = ttpArrangement.taxpayer.selfAssessment.debits.map { d => DesDebit(d.originCode, d.dueDate) },
+      saNote = saNote(ttpArrangement)
+    )
   }
 
   def enforcementFlag(taxpayer: Taxpayer) : Option[String]= {

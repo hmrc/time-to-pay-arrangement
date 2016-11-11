@@ -22,7 +22,9 @@ package object modelsFormat {
   implicit val instalmentFormat = Json.format[Instalment]
   implicit val scheduleFormat = Json.format[Schedule]
   implicit val addressFormat = Json.format[Address]
+  implicit val desDebitFormat = Json.format[DesDebit]
   implicit val debitFormat = Json.format[Debit]
+
   implicit val communicationPreferencesFormat = Json.format[CommunicationPreferences]
   implicit val selfAssessmentFormat = Json.format[SelfAssessment]
   implicit val taxPayerFormat = Json.format[Taxpayer]

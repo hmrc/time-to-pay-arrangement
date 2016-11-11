@@ -35,10 +35,8 @@ trait ArrangementDesApiConnector {
         case ACCEPTED =>
           Logger.info(s"Submission successful for '${taxpayer.selfAssessment.utr}'")
           Right(SubmissionSuccess(desSubmissionRequest))
-        case INTERNAL_SERVER_ERROR | SERVICE_UNAVAILABLE =>
-          Left(SubmissionError("Service call failed"))
         case _ =>
-          Logger.error(s"Response code from DES ${response.status}")
+          Logger.error(s"Response code from DES ${response.status} and body ${response.body}")
           Left(SubmissionError(response.body))
       })
   }
