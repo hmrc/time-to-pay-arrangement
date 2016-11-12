@@ -4,9 +4,9 @@ import java.time.LocalDate
 
 import play.api.libs.json.Json
 import uk.gov.hmrc.timetopay.arrangement.models.{SelfAssessment, _}
+import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
 
 import scala.io.Source
-import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
 
 package object resources {
 
@@ -23,38 +23,42 @@ package object resources {
   val happyCommsPref = CommunicationPreferences(welshLanguageIndicator = false, audioIndicator = false, largePrintIndicator = false, brailleIndicator = false)
   val selfAssessment = SelfAssessment("XXX", Some(happyCommsPref), List())
 
-  val englishAddress1 = Address(addressLine1 = "XXX", postCode = "B45 0HY")
-  val englishAddress2 = Address(addressLine1 = "XXX", postCode = "B97 5HZ")
-  val welshAddress = Address(addressLine1 = "XXX", postCode = "CF23 8PF")
-  val northernIrelandAddress = Address(addressLine1 = "XXX", postCode = "BT52 2PP")
-  val scottishAddress = Address(addressLine1 = "XXX", postCode = "G3 8NW")
-  val foreignAddress = Address(addressLine1 = "XXX", postCode = "400089")
-  val englishAddressMissingPostCodeAndLine1 = Address(addressLine1 = "", postCode = "")
-  val englishAddressMissingPostCode = Address(addressLine1 = "XXXX", postCode = "")
-  val scottishAddress1 = Address(addressLine1 = "XXX", addressLine2 = "XXX",addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postCode = "G3 8NW")
-  val scottishAddress2 = Address(addressLine1 = "XXX", addressLine2 = "XXX",addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postCode = "EH14 8NW")
-  val welshAddress1 = Address(addressLine1 = "XXX", addressLine2 = "XXX",addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postCode = "LL57 3DL")
-  val welshAddress2 = Address(addressLine1 = "XXX", addressLine2 = "XXX",addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postCode = "SY23 3YA")
+  object Addresses {
+    val englishAddress1 = Address(addressLine1 = "XXX", postCode = "B45 0HY")
+    val englishAddress2 = Address(addressLine1 = "XXX", postCode = "B97 5HZ")
+    val welshAddress = Address(addressLine1 = "XXX", postCode = "CF23 8PF")
+    val northernIrelandAddress = Address(addressLine1 = "XXX", postCode = "BT52 2PP")
+    val scottishAddress = Address(addressLine1 = "XXX", postCode = "G3 8NW")
+    val foreignAddress = Address(addressLine1 = "XXX", postCode = "400089")
+    val englishAddressMissingPostCodeAndLine1 = Address(addressLine1 = "", postCode = "")
+    val englishAddressMissingPostCode = Address(addressLine1 = "XXXX", postCode = "")
+    val scottishAddress1 = Address(addressLine1 = "XXX", addressLine2 = "XXX", addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postCode = "G3 8NW")
+    val scottishAddress2 = Address(addressLine1 = "XXX", addressLine2 = "XXX", addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postCode = "EH14 8NW")
+    val welshAddress1 = Address(addressLine1 = "XXX", addressLine2 = "XXX", addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postCode = "LL57 3DL")
+    val welshAddress2 = Address(addressLine1 = "XXX", addressLine2 = "XXX", addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postCode = "SY23 3YA")
+  }
 
+  object Taxpayers {
 
-  val scottishTaxpayer = Taxpayer("CustomerName", List(scottishAddress), selfAssessment)
-  val englishTaxPayer = Taxpayer("CustomerName", List(englishAddress1), selfAssessment)
-  val welshTaxPayer =  Taxpayer("CustomerName", List(welshAddress), selfAssessment)
-  val northernIrelandTaxpayer = Taxpayer("CustomerName", List(northernIrelandAddress), selfAssessment)
-  val taxPayerWithMissingPostcodeAndLine1 = Taxpayer("CustomerName", List(englishAddressMissingPostCodeAndLine1), selfAssessment)
-  val taxPayerWithMissingPostcode = Taxpayer("CustomerName", List(englishAddressMissingPostCode), selfAssessment)
-  val taxPayerWithMultipleEnglishAddress = Taxpayer("CustomerName", List(englishAddress1, englishAddress2), selfAssessment)
-  val taxPayerWithEnglishAndScottishAddress = Taxpayer("CustomerName", List(englishAddress1, scottishAddress), selfAssessment)
-  val taxPayerWithEnglishAndForeignAddress =  Taxpayer("CustomerName", List(englishAddress1, foreignAddress), selfAssessment)
-  val taxPayerWithScottishAndForeignAddress = Taxpayer("CustomerName", List(scottishAddress, foreignAddress), selfAssessment)
-  val taxPayerWithEnglishScottishAndForeignAddress = Taxpayer("CustomerName", List(englishAddress1, scottishAddress, foreignAddress), selfAssessment)
-  val taxPayerWithNoAddress = Taxpayer("CustomerName", List(), selfAssessment)
-  val unhappySelfAssessment = SelfAssessment("XXX", Some(happyCommsPref.copy(welshLanguageIndicator = true, largePrintIndicator = true)), null)
-  val taxPayerWithLargePrintAndWelsh = Taxpayer("CustomerName", List(englishAddress1), unhappySelfAssessment)
-  val multipleWelshAddressTaxPayer = Taxpayer("CustomerName", List(welshAddress1, welshAddress2), selfAssessment)
-  val multipleScottishAddressTaxPayer = Taxpayer("CustomerName", List(scottishAddress1, scottishAddress2), selfAssessment)
+    import Addresses._
 
-  val multipleAddressTypeTaxPayer = Taxpayer("CustomerName", List(welshAddress, scottishAddress), selfAssessment)
-
+    val taxPayerWithScottishAddress = Taxpayer("CustomerName", List(scottishAddress), selfAssessment)
+    val taxPayerWithEnglishAddress = Taxpayer("CustomerName", List(englishAddress1), selfAssessment)
+    val taxPayerWithWelshAddress = Taxpayer("CustomerName", List(welshAddress), selfAssessment)
+    val taxPayerWithNorthernIrelandAddress = Taxpayer("CustomerName", List(northernIrelandAddress), selfAssessment)
+    val taxPayerWithMissingPostcodeAndLine1 = Taxpayer("CustomerName", List(englishAddressMissingPostCodeAndLine1), selfAssessment)
+    val taxPayerWithMissingPostcode = Taxpayer("CustomerName", List(englishAddressMissingPostCode), selfAssessment)
+    val taxPayerWithMultipleEnglishAddresses = Taxpayer("CustomerName", List(englishAddress1, englishAddress2), selfAssessment)
+    val taxPayerWithEnglishAndScottishAddresses = Taxpayer("CustomerName", List(englishAddress1, scottishAddress), selfAssessment)
+    val taxPayerWithEnglishAndForeignAddresses = Taxpayer("CustomerName", List(englishAddress1, foreignAddress), selfAssessment)
+    val taxPayerWithScottishAndForeignAddresses = Taxpayer("CustomerName", List(scottishAddress, foreignAddress), selfAssessment)
+    val taxPayerWithEnglishScottishAndForeignAddresses = Taxpayer("CustomerName", List(englishAddress1, scottishAddress, foreignAddress), selfAssessment)
+    val taxPayerWithNoAddress = Taxpayer("CustomerName", List(), selfAssessment)
+    val unhappySelfAssessment = SelfAssessment("XXX", Some(happyCommsPref.copy(welshLanguageIndicator = true, largePrintIndicator = true)), null)
+    val taxPayerWithLargePrintAndWelsh = Taxpayer("CustomerName", List(englishAddress1), unhappySelfAssessment)
+    val taxPayerWithMultipleWelshAddresses = Taxpayer("CustomerName", List(welshAddress1, welshAddress2), selfAssessment)
+    val taxPayerWithMultipleScottishAddresses = Taxpayer("CustomerName", List(scottishAddress1, scottishAddress2), selfAssessment)
+    val taxPayerWithMultipleJurisdictions = Taxpayer("CustomerName", List(welshAddress, scottishAddress), selfAssessment)
+  }
 
 }
