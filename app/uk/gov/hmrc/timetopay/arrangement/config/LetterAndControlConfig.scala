@@ -16,6 +16,7 @@ case class LetterAndControlConfig (salutation: String,
 
 object LetterAndControlConfig {
 
+
   def create(configuration: Configuration) = {
 
     def getConfig(key: String) = {

@@ -37,7 +37,7 @@ class TTPArrangementControllerSpec extends UnitSpec with MockFactory with ScalaF
 
     "return 500 if arrangement service fails" in {
       implicit val hc = HeaderCarrier
-      (arrangementServiceStub.submit(_: TTPArrangement)(_: HeaderCarrier)).when(ttparrangementRequest.as[TTPArrangement], *) returns Future.failed(new RuntimeException("DES API Submission Failed"))
+      (arrangementServiceStub.submit(_: TTPArrangement)(_: HeaderCarrier)).when(ttparrangementRequest.as[TTPArrangement], *) returns Future.failed(new RuntimeException("****Simulated exception**** DES API Submission Failed"))
 
       val fakeRequest = FakeRequest("POST", "/ttparrangements").withBody(ttparrangementRequest)
       val result = arrangementController.create().apply(fakeRequest).futureValue
