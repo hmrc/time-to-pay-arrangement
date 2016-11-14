@@ -9,7 +9,6 @@ import uk.gov.hmrc.timetopay.arrangement.models.{DesSubmissionRequest, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
 import scala.concurrent.{ExecutionContext, Future}
 
-
 case class SubmissionSuccess(requestSent: DesSubmissionRequest) {}
 
 case class SubmissionError(message: String) {}

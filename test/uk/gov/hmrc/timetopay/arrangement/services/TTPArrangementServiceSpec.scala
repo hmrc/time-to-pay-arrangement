@@ -13,7 +13,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class TTPArrangementServiceSpec extends UnitSpec with MockFactory with WithFakeApplication with ScalaFutures {
 
-
   val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement]
   val savedArrangement = ttparrangementResponse.as[TTPArrangement]
   val desApiConnectorMock = mock[ArrangementDesApiConnector]
@@ -32,10 +31,8 @@ class TTPArrangementServiceSpec extends UnitSpec with MockFactory with WithFakeA
   private val letter: LetterAndControl = savedArrangement.desArrangement.get.letterAndControl
   val request = DesSubmissionRequest(ttpArrangement, letter)
 
-
   "TTPArrangementService" should {
     "submit arrangement to DES and save the response/request combined" in {
-
       desArrangementFunction.expects(arrangement).returning(Future.successful(ttpArrangement))
 
       letterAndControlFunction.expects(arrangement).returning(Future.successful(letter))
@@ -45,7 +42,6 @@ class TTPArrangementServiceSpec extends UnitSpec with MockFactory with WithFakeA
         .returning(Future.successful(Right(SubmissionSuccess(request))))
 
       saveArrangement expects * returning Future.successful(Some(savedArrangement))
-
 
       val response = arrangementService.submit(arrangement)(new HeaderCarrier)
 
@@ -58,14 +54,11 @@ class TTPArrangementServiceSpec extends UnitSpec with MockFactory with WithFakeA
         desSubmissionRequest.letterAndControl.clmPymtString shouldBe s"Initial payment of ${arrangement.schedule.initialPayment} then ${arrangement.schedule.instalments.size - 1} payments of ${arrangement.schedule.instalments.head.amount} and final payment of " +
           s"${arrangement.schedule.instalments.last.amount}"
       }
-
     }
 
     "return failed future for bad json" in {
-
       desArrangementFunction.expects(arrangement).returning(Future.successful(ttpArrangement))
       letterAndControlFunction.expects(arrangement).returning(Future.successful(letter))
-
 
       (desApiConnectorMock.submitArrangement(_: Taxpayer, _: DesSubmissionRequest)(_: ExecutionContext))
         .expects(arrangement.taxpayer, request, *)
@@ -78,7 +71,6 @@ class TTPArrangementServiceSpec extends UnitSpec with MockFactory with WithFakeA
         e shouldBe a[RuntimeException]
         e.getMessage shouldBe "Bad JSON"
       }
-
     }
   }
 

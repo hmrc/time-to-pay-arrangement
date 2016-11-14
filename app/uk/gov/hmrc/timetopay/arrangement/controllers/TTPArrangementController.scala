@@ -1,10 +1,8 @@
 package uk.gov.hmrc.timetopay.arrangement.controllers
 
-
 import play.api.Logger
-import play.api.libs.json.Json
 import play.api.libs.json.Json.toJson
-import play.api.mvc.{RequestHeader, Action}
+import play.api.mvc.{Action, RequestHeader}
 import uk.gov.hmrc.play.microservice.controller.BaseController
 import uk.gov.hmrc.timetopay.arrangement.models.TTPArrangement
 import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
@@ -36,7 +34,6 @@ class TTPArrangementController(arrangementService: TTPArrangementService) extend
         _.fold(successful(NotFound(s"arrangement with $id does not exist")))(r => successful(Ok(toJson(r))))
       }
   }
-
 
   def protocol(implicit reqHead: RequestHeader) = if (reqHead.secure) "https" else "http"
 

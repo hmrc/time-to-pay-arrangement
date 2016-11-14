@@ -18,7 +18,6 @@ import uk.gov.hmrc.timetopay.arrangement.services.{TTPArrangementService, DesTTP
 
 import scala.concurrent.Future
 
-
 object WSHttp extends WSGet with WSPut with WSPost with WSDelete with WSPatch with AppName {
   override val hooks: Seq[HttpHook] = NoneRequired
 }
@@ -32,7 +31,6 @@ object MicroserviceAuthConnector extends AuthConnector with ServicesConfig {
 }
 
 object ArrangementDesApiConnector extends ArrangementDesApiConnector with ServicesConfig {
-
   override val desArrangementUrl: String = baseUrl("des-arrangement-api")
   override val serviceEnvironment: String = getConfString("des-arrangement-api.environment", "unknown")
   override val authorisationToken: String = getConfString("des-arrangement-api.authorization-token", "not-found")
@@ -40,9 +38,7 @@ object ArrangementDesApiConnector extends ArrangementDesApiConnector with Servic
   override val http: HttpGet with HttpPost = WSHttp
 }
 
-
 object DesTTPArrangementService extends DesTTPArrangementService {}
-
 
 trait ServiceRegistry extends ServicesConfig {
 
@@ -56,8 +52,8 @@ trait ServiceRegistry extends ServicesConfig {
 
   lazy val desTTPArrangementService = DesTTPArrangementService
 
-  lazy val letterAndControl:(TTPArrangement => Future[LetterAndControl]) = arrangement => letterAndControlService.create(arrangement)
-  lazy val desArrangement:(TTPArrangement => Future[DesTTPArrangement]) = arrangement => desTTPArrangementService.create(arrangement)
+  lazy val letterAndControl: (TTPArrangement => Future[LetterAndControl]) = arrangement => letterAndControlService.create(arrangement)
+  lazy val desArrangement: (TTPArrangement => Future[DesTTPArrangement]) = arrangement => desTTPArrangementService.create(arrangement)
   lazy val arrangementSave: (TTPArrangement => Future[Option[TTPArrangement]]) = arrangement => TTPArrangementRepository.save(arrangement)
   lazy val arrangementGet: (String => Future[Option[TTPArrangement]]) = id => TTPArrangementRepository.findById(id)
 
@@ -73,5 +69,5 @@ trait ControllerRegistry {
     classOf[TTPArrangementController] -> new TTPArrangementController(arrangementService)
   )
 
-  def getController[A](controllerClass: Class[A]) : A = controllers(controllerClass).asInstanceOf[A]
+  def getController[A](controllerClass: Class[A]): A = controllers(controllerClass).asInstanceOf[A]
 }

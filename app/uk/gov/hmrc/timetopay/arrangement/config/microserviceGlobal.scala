@@ -10,7 +10,6 @@ import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode}
 import uk.gov.hmrc.play.http.logging.filters.LoggingFilter
 import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
 
-
 object ControllerConfiguration extends ControllerConfig {
   lazy val controllerConfigs = Play.current.configuration.underlying.as[Config]("controllers")
 }
@@ -34,7 +33,6 @@ object MicroserviceAuthFilter extends AuthorisationFilter {
   override def controllerNeedsAuth(controllerName: String): Boolean = ControllerConfiguration.paramsForController(controllerName).needsAuth
 }
 
-
 trait MicroserviceGlobal extends DefaultMicroserviceGlobal with RunMode with ServiceRegistry with ControllerRegistry {
   override val auditConnector = MicroserviceAuditConnector
 
@@ -50,5 +48,5 @@ trait MicroserviceGlobal extends DefaultMicroserviceGlobal with RunMode with Ser
     getController(controllerClass)
   }
 }
-object MicroserviceGlobal extends MicroserviceGlobal
 
+object MicroserviceGlobal extends MicroserviceGlobal

@@ -73,7 +73,7 @@ class LetterAndControlService(letterAndControlConfig : LetterAndControlConfig) {
         Logger.info("No address found in Digital")
         (Address(),Some(LetterError(8, "no-address")))
       case 1 =>
-        singleAddress(taxpayer.addresses.head)
+        validate(taxpayer.addresses.head)
       case _ =>
         multipleAddresses(taxpayer)
     }
@@ -97,20 +97,19 @@ class LetterAndControlService(letterAndControlConfig : LetterAndControlConfig) {
 
     uniqueAddressTypes.size match {
       case 1 =>
-        singleAddress(taxpayer.addresses.head)
+        validate(taxpayer.addresses.head)
       case _ =>
         Logger.info(s"Customer has addresses in ${uniqueAddressTypes.mkString(" and")} jurisdictions")
         (Address(),Some(LetterError(1, "address-jurisdiction-conflict")))
     }
   }
 
-  private def singleAddress(address: Address): AddressResult = address match {
+  private def validate(address: Address): AddressResult = address match {
     case Address(_, _, _, _, _, "") | Address("", _, _, _, _, _) =>
       (address,Some(LetterError(9, "incomplete-address")))
     case _ =>
       (address, None)
   }
-
 
   private def resolveCommsPrefs(commsPrefs: CommunicationPreferences): Option[LetterError] = commsPrefs match {
       case CommunicationPreferences(true, _, true, _) =>
@@ -128,8 +127,6 @@ class LetterAndControlService(letterAndControlConfig : LetterAndControlConfig) {
       case _ => None
     }
 
-  private def exceptionCodeAndMessage(letter: LetterError) = {
-    (Some(letter.code.toString), Some(letter.message))
-  }
+  private def exceptionCodeAndMessage(letter: LetterError) = (Some(letter.code.toString), Some(letter.message))
 
 }

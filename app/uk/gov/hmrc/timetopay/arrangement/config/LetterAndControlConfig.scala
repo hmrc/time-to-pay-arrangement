@@ -2,7 +2,6 @@ package uk.gov.hmrc.timetopay.arrangement.config
 
 import play.api.Configuration
 
-
 case class LetterAndControlConfig (salutation: String,
                                    claimIndicateInt: String,
                                    template: String,
@@ -13,15 +12,12 @@ case class LetterAndControlConfig (salutation: String,
                                    officeFax: String,
                                    officeOpeningHours: String ){
 }
-
 object LetterAndControlConfig {
-
 
   def create(configuration: Configuration) = {
 
-    def getConfig(key: String) = {
-      configuration.getString(key).getOrElse(throw new IllegalArgumentException(s"Missing $key"))
-    }
+    def getConfig(key: String) = configuration.getString(key)
+      .getOrElse(throw new IllegalArgumentException(s"Missing $key"))
 
     LetterAndControlConfig( getConfig("salutation"),
       getConfig("claimIndicateInt") ,

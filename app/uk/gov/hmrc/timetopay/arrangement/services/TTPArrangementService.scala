@@ -20,7 +20,6 @@ class TTPArrangementService(arrangementDesApiConnector: ArrangementDesApiConnect
 
   def byId(id: String): Future[Option[TTPArrangement]] = arrangementGet(id)
 
-
   def submit(arrangement: TTPArrangement)(implicit hc: HeaderCarrier): Future[Option[TTPArrangement]] = {
     Logger.info(s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' and PP '${arrangement.paymentPlanReference}'")
 

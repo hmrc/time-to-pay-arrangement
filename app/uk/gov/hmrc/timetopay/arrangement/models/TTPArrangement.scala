@@ -8,9 +8,7 @@ case class TTPArrangement(id: Option[String],
                           directDebitReference: String,
                           taxpayer: Taxpayer,
                           schedule: Schedule,
-                          desArrangement : Option[DesSubmissionRequest]) {
-
-}
+                          desArrangement : Option[DesSubmissionRequest])
 
 case class DesTTPArrangement(startDate: LocalDate,
                                endDate: LocalDate,
@@ -23,9 +21,7 @@ case class DesTTPArrangement(startDate: LocalDate,
                                enforcementAction: String,
                                directDebit: Boolean = true,
                                debitDetails: List[DesDebit],
-                               saNote: String) {
-
-}
+                               saNote: String)
 
 case class LetterAndControl(customerName: String,
                             salutation: String = "Dear Sir or Madam",
@@ -47,8 +43,6 @@ case class LetterAndControl(customerName: String,
                             template: String = "template",
                             exceptionType: Option[String] = None,
                             exceptionReason: Option[String] = None
-                           ) {
+                           )
 
-}
-
-case class DesSubmissionRequest(ttpArrangement: DesTTPArrangement, letterAndControl: LetterAndControl) {}
+case class DesSubmissionRequest(ttpArrangement: DesTTPArrangement, letterAndControl: LetterAndControl)

@@ -13,7 +13,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
 
-
 class ArrangementDesApiConnectorSpec extends UnitSpec with ScalaFutures with MockFactory  {
   implicit val headerCarrier = HeaderCarrier()
 
@@ -47,11 +46,9 @@ class ArrangementDesApiConnectorSpec extends UnitSpec with ScalaFutures with Moc
       (mockHttp.POST(_:String, _:DesSubmissionRequest, _:Seq[(String,String)])(_:Writes[DesSubmissionRequest], _:HttpReads[HttpResponse], _:HeaderCarrier))
         .expects(*,*,*,*,*,*).returning(Future.successful(response))
 
-
       val result = connector.submitArrangement(taxpayer, request).futureValue
 
       result.left.get.message shouldBe "JSON Not valid"
     }
   }
-
 }

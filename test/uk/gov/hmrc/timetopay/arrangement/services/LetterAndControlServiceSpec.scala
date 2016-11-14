@@ -10,7 +10,6 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 
 class LetterAndControlServiceSpec extends UnitSpec with WithFakeApplication with ScalaFutures {
 
-
   val letterAndControlConfig = LetterAndControlConfig("XXXX", "XXXX","XXXX","XXXX","XXXX","XXXX","XXXX", "XXXX","XXXX")
 
   val letterAndControlService = new LetterAndControlService(letterAndControlConfig)

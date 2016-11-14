@@ -32,7 +32,7 @@ class DesTTPArrangementService {
     )
   }
 
-  def enforcementFlag(taxpayer: Taxpayer) : Option[String]= {
+  def enforcementFlag(taxpayer: Taxpayer): Option[String]= {
     val addressTypes: List[JurisdictionType] = taxpayer.addresses.map {
       JurisdictionChecker.addressType
     }.distinct
@@ -69,6 +69,5 @@ class DesTTPArrangementService {
         s"TTP letter issued"
     note
   }
-
 }
 

@@ -9,5 +9,4 @@ package object repositories {
   }
 
   lazy val TTPArrangementRepository = new TTPArrangementRepository
-
 }

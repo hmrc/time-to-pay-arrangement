@@ -29,5 +29,4 @@ class DesTTPArrangementServiceSpec extends UnitSpec with WithFakeApplication wit
       }
     }
   }
-
 }

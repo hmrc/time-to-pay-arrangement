@@ -21,7 +21,6 @@ object TTPArrangementMongoFormats {
   val id = "_id"
 }
 
-
 class TTPArrangementRepository(implicit mongo: () => DB) extends ReactiveRepository[TTPArrangement, String]("ttparrangements", mongo, TTPArrangementMongoFormats.format, implicitly[Format[String]]) {
 
   def save(ttpArrangement: TTPArrangement) : Future[Option[TTPArrangement]] = {
@@ -36,5 +35,4 @@ class TTPArrangementRepository(implicit mongo: () => DB) extends ReactiveReposit
   override def indexes: Seq[Index] = Seq(
     Index(key = Seq("createdOn" -> IndexType.Ascending), name = Some("expireAtIndex"), options = BSONDocument("expireAfterSeconds" -> 2592000))
   )
-
 }

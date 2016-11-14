@@ -25,7 +25,6 @@ class TTPArrangementControllerSpec extends UnitSpec with MockFactory with ScalaF
 
   "POST /ttparrangements" should {
     "return 201" in {
-
       implicit val hc = HeaderCarrier
       (arrangementServiceStub.submit(_: TTPArrangement)(_: HeaderCarrier)).when(ttparrangementRequest.as[TTPArrangement], *) returns Some(ttparrangementResponse.as[TTPArrangement])
 
@@ -43,7 +42,6 @@ class TTPArrangementControllerSpec extends UnitSpec with MockFactory with ScalaF
       val result = arrangementController.create().apply(fakeRequest).futureValue
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
     }
-
   }
 
   "GET /ttparrangements" should {
@@ -57,7 +55,6 @@ class TTPArrangementControllerSpec extends UnitSpec with MockFactory with ScalaF
       Json.parse(bodyOf(result)).as[TTPArrangement].desArrangement.get.ttpArrangement.saNote shouldBe "SA Note Text Here"
     }
 
-
     "return 404 for non existent arrangement" in {
 
       (arrangementServiceStub.byId(_: String)).when("XXX-XXX-XXX") returns Future.successful(None)
@@ -68,6 +65,4 @@ class TTPArrangementControllerSpec extends UnitSpec with MockFactory with ScalaF
 
     }
   }
-
-
 }

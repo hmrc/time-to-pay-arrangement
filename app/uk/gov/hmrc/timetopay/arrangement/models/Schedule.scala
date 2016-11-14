@@ -2,7 +2,6 @@ package uk.gov.hmrc.timetopay.arrangement.models
 
 import java.time.LocalDate
 
-
 case class Schedule(startDate: LocalDate,
                     endDate: LocalDate,
                     initialPayment: BigDecimal,
@@ -10,10 +9,6 @@ case class Schedule(startDate: LocalDate,
                     instalmentBalance: BigDecimal,
                     totalInterestCharged: BigDecimal,
                     totalPayable: BigDecimal,
-                    instalments: List[Instalment]) {
+                    instalments: List[Instalment])
 
-}
-
-case class Instalment (paymentDate: LocalDate, amount: BigDecimal) {
-
-}
+case class Instalment (paymentDate: LocalDate, amount: BigDecimal)
