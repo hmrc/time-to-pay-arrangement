@@ -25,7 +25,7 @@ class DesTTPArrangementService {
       firstPaymentDate = firstPaymentInstalment.paymentDate,
       firstPaymentAmount = firstPayment.toString(),
       regularPaymentAmount = firstPaymentInstalment.amount.toString(),
-      reviewDate = schedule.endDate.plusWeeks(3),
+      reviewDate = schedule.instalments.last.paymentDate.plusWeeks(3),
       enforcementAction = enforcementFlag(ttpArrangement.taxpayer).getOrElse(""),
       debitDetails = ttpArrangement.taxpayer.selfAssessment.debits.map { d => DesDebit(d.originCode, d.dueDate) },
       saNote = saNote(ttpArrangement)
