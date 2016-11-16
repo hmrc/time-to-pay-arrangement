@@ -1,18 +1,17 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import java.time.{LocalDateTime, LocalDate}
+import java.time.LocalDateTime
 import java.util.UUID
 
 import play.api.Logger
 import uk.gov.hmrc.play.http.HeaderCarrier
-import uk.gov.hmrc.timetopay.arrangement.connectors.{ArrangementDesApiConnector}
-import uk.gov.hmrc.timetopay.arrangement.models.{LetterAndControl, DesTTPArrangement, DesSubmissionRequest, TTPArrangement}
-import uk.gov.hmrc.timetopay.arrangement.repositories.TTPArrangementRepository
+import uk.gov.hmrc.timetopay.arrangement.connectors.{SubmissionError, SubmissionSuccess}
+import uk.gov.hmrc.timetopay.arrangement.models._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class TTPArrangementService(arrangementDesApiConnector: ArrangementDesApiConnector,
+class TTPArrangementService(arrangementDesApiConnector: ((Taxpayer, DesSubmissionRequest) => Future[Either[SubmissionError, SubmissionSuccess]]),
                             desTTPArrangementService: (TTPArrangement => Future[DesTTPArrangement]),
                             letterAndControlService: (TTPArrangement => Future[LetterAndControl]),
                             arrangementSave: (TTPArrangement => Future[Option[TTPArrangement]]),
@@ -26,8 +25,7 @@ class TTPArrangementService(arrangementDesApiConnector: ArrangementDesApiConnect
     (for {
       letterAndControl <- letterAndControlService(arrangement)
       desTTPArrangement <- desTTPArrangementService(arrangement)
-      response <- arrangementDesApiConnector.submitArrangement(arrangement.taxpayer,
-        DesSubmissionRequest(desTTPArrangement, letterAndControl))
+      response <- arrangementDesApiConnector(arrangement.taxpayer,DesSubmissionRequest(desTTPArrangement, letterAndControl))
     } yield response).flatMap {
        _.fold(error => Future.failed(new RuntimeException(error.message)),
          success => saveArrangement(arrangement, success.requestSent))

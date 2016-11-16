@@ -4,25 +4,24 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
-import uk.gov.hmrc.timetopay.arrangement.connectors.{ArrangementDesApiConnector, SubmissionError, SubmissionSuccess}
+import uk.gov.hmrc.timetopay.arrangement.connectors.{SubmissionError, SubmissionSuccess}
 import uk.gov.hmrc.timetopay.arrangement.models._
 import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
 import uk.gov.hmrc.timetopay.arrangement.resources._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Future}
 
 class TTPArrangementServiceSpec extends UnitSpec with MockFactory with WithFakeApplication with ScalaFutures {
 
   val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement]
   val savedArrangement = ttparrangementResponse.as[TTPArrangement]
-  val desApiConnectorMock = mock[ArrangementDesApiConnector]
-
   val letterAndControlFunction = mockFunction[TTPArrangement, Future[LetterAndControl]]
   val desArrangementFunction = mockFunction[TTPArrangement, Future[DesTTPArrangement]]
   val saveArrangement = mockFunction[TTPArrangement, Future[Option[TTPArrangement]]]
   val getArrangement = mockFunction[String, Future[Option[TTPArrangement]]]
+  val desSubmissionApi = mockFunction[Taxpayer, DesSubmissionRequest, Future[Either[SubmissionError, SubmissionSuccess]]]
 
-  val arrangementService = new TTPArrangementService(desApiConnectorMock, desArrangementFunction,
+  val arrangementService = new TTPArrangementService(desSubmissionApi, desArrangementFunction,
     letterAndControlFunction,
     saveArrangement,
     getArrangement
@@ -37,9 +36,7 @@ class TTPArrangementServiceSpec extends UnitSpec with MockFactory with WithFakeA
 
       letterAndControlFunction.expects(arrangement).returning(Future.successful(letter))
 
-      (desApiConnectorMock.submitArrangement(_: Taxpayer, _: DesSubmissionRequest)(_: ExecutionContext))
-        .expects(arrangement.taxpayer, request, *)
-        .returning(Future.successful(Right(SubmissionSuccess(request))))
+      desSubmissionApi.expects(arrangement.taxpayer, request).returning(Future.successful(Right(SubmissionSuccess(request))))
 
       saveArrangement expects * returning Future.successful(Some(savedArrangement))
 
@@ -60,9 +57,7 @@ class TTPArrangementServiceSpec extends UnitSpec with MockFactory with WithFakeA
       desArrangementFunction.expects(arrangement).returning(Future.successful(ttpArrangement))
       letterAndControlFunction.expects(arrangement).returning(Future.successful(letter))
 
-      (desApiConnectorMock.submitArrangement(_: Taxpayer, _: DesSubmissionRequest)(_: ExecutionContext))
-        .expects(arrangement.taxpayer, request, *)
-        .returning(Future.successful(Left(SubmissionError("Bad JSON"))))
+      desSubmissionApi.expects(arrangement.taxpayer, request).returning(Future.successful(Left(SubmissionError("Bad JSON"))))
 
       val headerCarrier = new HeaderCarrier
       val response = arrangementService.submit(arrangement)(headerCarrier)

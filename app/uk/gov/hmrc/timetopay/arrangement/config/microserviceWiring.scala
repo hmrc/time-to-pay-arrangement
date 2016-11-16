@@ -10,9 +10,9 @@ import uk.gov.hmrc.play.config.{AppName, RunMode, ServicesConfig}
 import uk.gov.hmrc.play.http.{HttpPost, HttpGet}
 import uk.gov.hmrc.play.http.hooks.HttpHook
 import uk.gov.hmrc.play.http.ws._
-import uk.gov.hmrc.timetopay.arrangement.connectors.ArrangementDesApiConnector
+import uk.gov.hmrc.timetopay.arrangement.connectors.{SubmissionSuccess, SubmissionError, ArrangementDesApiConnector}
 import uk.gov.hmrc.timetopay.arrangement.controllers.TTPArrangementController
-import uk.gov.hmrc.timetopay.arrangement.models.{LetterAndControl, DesTTPArrangement, TTPArrangement}
+import uk.gov.hmrc.timetopay.arrangement.models._
 import uk.gov.hmrc.timetopay.arrangement.repositories._
 import uk.gov.hmrc.timetopay.arrangement.services.{TTPArrangementService, DesTTPArrangementService, LetterAndControlService}
 
@@ -48,7 +48,8 @@ trait ServiceRegistry extends ServicesConfig {
   lazy val arrangementDesApiConnector = ArrangementDesApiConnector
 
   import play.api.Play.current
-  lazy val letterAndControlService = new LetterAndControlService(LetterAndControlConfig.create(configuration.getConfig("letterAndControl").getOrElse(throw new RuntimeException("LetterAndControl configuration required")))) {}
+  lazy val letterAndControlService = new LetterAndControlService(LetterAndControlConfig.create(configuration.getConfig("letterAndControl")
+    .getOrElse(throw new RuntimeException("LetterAndControl configuration required")))) {}
 
   lazy val desTTPArrangementService = DesTTPArrangementService
 
@@ -56,15 +57,18 @@ trait ServiceRegistry extends ServicesConfig {
   lazy val desArrangement: (TTPArrangement => Future[DesTTPArrangement]) = arrangement => desTTPArrangementService.create(arrangement)
   lazy val arrangementSave: (TTPArrangement => Future[Option[TTPArrangement]]) = arrangement => TTPArrangementRepository.save(arrangement)
   lazy val arrangementGet: (String => Future[Option[TTPArrangement]]) = id => TTPArrangementRepository.findById(id)
+  lazy val desArrangementApi: ((Taxpayer, DesSubmissionRequest) => Future[Either[SubmissionError, SubmissionSuccess]])
+        = (taxpayer, desSubmissionRequest) => arrangementDesApiConnector.submitArrangement(taxpayer, desSubmissionRequest)
 
   lazy val arrangementService: TTPArrangementService = new TTPArrangementService(
-    arrangementDesApiConnector, desArrangement, letterAndControl, arrangementSave, arrangementGet
+    desArrangementApi, desArrangement, letterAndControl, arrangementSave, arrangementGet
   )
 }
 
 trait ControllerRegistry {
   registry: ServiceRegistry =>
 
+  implicit val ec =  scala.concurrent.ExecutionContext.Implicits.global
   private lazy val controllers = Map[Class[_], Controller](
     classOf[TTPArrangementController] -> new TTPArrangementController(arrangementService)
   )

@@ -21,6 +21,7 @@ class TTPArrangementControllerSpec extends UnitSpec with MockFactory with ScalaF
   class MockService extends TTPArrangementService(null,null,null,null, null) {}
 
   val arrangementServiceStub = stub[MockService]
+  implicit val ec =  scala.concurrent.ExecutionContext.Implicits.global
   val arrangementController = new TTPArrangementController(arrangementServiceStub)
 
   "POST /ttparrangements" should {

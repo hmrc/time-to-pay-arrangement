@@ -8,10 +8,10 @@ import uk.gov.hmrc.timetopay.arrangement.models.TTPArrangement
 import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
 import uk.gov.hmrc.timetopay.arrangement.services.TTPArrangementService
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 import scala.concurrent.Future._
 
-class TTPArrangementController(arrangementService: TTPArrangementService) extends BaseController {
+class TTPArrangementController(arrangementService: TTPArrangementService)(implicit ec: ExecutionContext) extends BaseController {
 
   def create() = Action.async(parse.json) {
     implicit request =>
