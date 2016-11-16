@@ -27,7 +27,7 @@ class TTPArrangementService(arrangementDesApiConnector: ((Taxpayer, DesSubmissio
       desTTPArrangement <- desTTPArrangementService(arrangement)
       response <- arrangementDesApiConnector(arrangement.taxpayer,DesSubmissionRequest(desTTPArrangement, letterAndControl))
     } yield response).flatMap {
-       _.fold(error => Future.failed(new RuntimeException(error.message)),
+       _.fold(error => Future.failed(DesApiException(error.code, error.message)),
          success => saveArrangement(arrangement, success.requestSent))
     }
   }
@@ -39,5 +39,6 @@ class TTPArrangementService(arrangementDesApiConnector: ((Taxpayer, DesSubmissio
       arrangementSave(toSave)
   }
 
-
 }
+
+case class DesApiException(code: Int, message: String) extends RuntimeException(s"DES httpCode: $code, reason: $message") {}

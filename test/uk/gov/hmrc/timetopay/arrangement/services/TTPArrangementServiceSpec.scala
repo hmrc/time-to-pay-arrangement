@@ -53,18 +53,30 @@ class TTPArrangementServiceSpec extends UnitSpec with MockFactory with WithFakeA
       }
     }
 
-    "return failed future for bad json" in {
+    "return failed future for DES Bad request" in {
       desArrangementFunction.expects(arrangement).returning(Future.successful(ttpArrangement))
       letterAndControlFunction.expects(arrangement).returning(Future.successful(letter))
 
-      desSubmissionApi.expects(arrangement.taxpayer, request).returning(Future.successful(Left(SubmissionError("Bad JSON"))))
+      desSubmissionApi.expects(arrangement.taxpayer, request).returning(Future.successful(Left(SubmissionError(400, "Bad JSON"))))
 
       val headerCarrier = new HeaderCarrier
       val response = arrangementService.submit(arrangement)(headerCarrier)
 
       ScalaFutures.whenReady(response.failed) { e =>
-        e shouldBe a[RuntimeException]
-        e.getMessage shouldBe "Bad JSON"
+        e shouldBe a [DesApiException]
+        e.getMessage shouldBe "DES httpCode: 400, reason: Bad JSON"
+      }
+    }
+
+    "return failed future for internal exception" in {
+      letterAndControlFunction.expects(arrangement).returning(Future.failed(new RuntimeException("Failed to create letter and control")))
+
+      val headerCarrier = new HeaderCarrier
+      val response = arrangementService.submit(arrangement)(headerCarrier)
+
+      ScalaFutures.whenReady(response.failed) { e =>
+        e shouldBe a [RuntimeException]
+        e.getMessage shouldBe "Failed to create letter and control"
       }
     }
   }

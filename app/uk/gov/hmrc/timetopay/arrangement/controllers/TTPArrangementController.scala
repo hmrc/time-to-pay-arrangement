@@ -6,7 +6,7 @@ import play.api.mvc.{Action, RequestHeader}
 import uk.gov.hmrc.play.microservice.controller.BaseController
 import uk.gov.hmrc.timetopay.arrangement.models.TTPArrangement
 import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
-import uk.gov.hmrc.timetopay.arrangement.services.TTPArrangementService
+import uk.gov.hmrc.timetopay.arrangement.services.{DesApiException, TTPArrangementService}
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future._
@@ -20,9 +20,13 @@ class TTPArrangementController(arrangementService: TTPArrangementService)(implic
           arrangementService.submit(arrangement).map {
             _.map(a => Created.withHeaders(LOCATION -> s"$protocol://${request.host}/ttparrangements/${a.id.get}")).getOrElse(Created)
           }.recover {
-            case failure =>
-              Logger.error("An exception occurred ", failure)
-              InternalServerError(s"A server error occurred: $failure")
+            case desApiException: DesApiException =>
+              val desFailureMessage: String = s"Submission to DES failed, status code [${desApiException.code}] and response [${desApiException.message}]"
+              Logger.error(desFailureMessage)
+              InternalServerError(s"DES submission failed $desFailureMessage")
+            case failure: Throwable =>
+              Logger.error(s"Failed to submit arrangement $failure")
+              InternalServerError(failure.getMessage)
           }
       }
   }
