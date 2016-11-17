@@ -1,8 +1,7 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
 import play.api.Play.application
-import uk.gov.hmrc.timetopay.arrangement.models.Address
-
+import uk.gov.hmrc.timetopay.arrangement.Address
 
 
 object JurisdictionType extends Enumeration  {

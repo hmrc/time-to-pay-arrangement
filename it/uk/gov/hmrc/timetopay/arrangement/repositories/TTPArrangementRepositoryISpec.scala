@@ -1,16 +1,24 @@
 package uk.gov.hmrc.timetopay.arrangement.repositories
 
 
-import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{MustMatchers, GivenWhenThen, BeforeAndAfter, FunSpec}
 import play.api.libs.json.Json
 import uk.gov.hmrc.mongo.MongoConnector
-import uk.gov.hmrc.timetopay.arrangement.FutureHelpers
-import uk.gov.hmrc.timetopay.arrangement.models.{TTPArrangement}
+import uk.gov.hmrc.timetopay.arrangement.{TTPArrangementRepository, TTPArrangement}
+import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
 import scala.io.Source
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.duration._
+
+
+trait FutureHelpers {
+  implicit class futureHelpers[T](f: Future[T]) {
+    def waitFor(timeout: FiniteDuration = 10 seconds) = Await.result(f, timeout)
+  }
+}
 
 
 class TTPArrangementRepositoryISpec extends FunSpec with BeforeAndAfter with GivenWhenThen with FutureHelpers with MustMatchers {

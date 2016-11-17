@@ -3,7 +3,7 @@ package uk.gov.hmrc.timetopay.arrangement.services
 import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import uk.gov.hmrc.timetopay.arrangement.config.LetterAndControlConfig
-import uk.gov.hmrc.timetopay.arrangement.models._
+import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
 import org.scalatest.prop.TableDrivenPropertyChecks._
@@ -12,7 +12,7 @@ class LetterAndControlServiceSpec extends UnitSpec with WithFakeApplication with
 
   val letterAndControlConfig = LetterAndControlConfig("XXXX", "XXXX","XXXX","XXXX","XXXX","XXXX","XXXX", "XXXX","XXXX")
 
-  val letterAndControlService = new LetterAndControlService(letterAndControlConfig)
+  val letterAndControlService = new LetterAndControlBuilder(letterAndControlConfig)
 
   val taxPayerData = Table(
     ("taxPayer", "exceptionCode", "exceptionReason", "message"),

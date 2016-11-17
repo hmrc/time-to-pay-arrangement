@@ -1,14 +1,14 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
 import play.api.{Logger}
+import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.config.LetterAndControlConfig
-import uk.gov.hmrc.timetopay.arrangement.models._
 import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType.JurisdictionType
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class LetterAndControlService(letterAndControlConfig : LetterAndControlConfig) {
+class LetterAndControlBuilder(letterAndControlConfig : LetterAndControlConfig) {
 
   type AddressResult = (Address, Option[LetterError])
 

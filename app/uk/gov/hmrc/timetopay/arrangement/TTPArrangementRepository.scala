@@ -1,4 +1,4 @@
-package uk.gov.hmrc.timetopay.arrangement.repositories
+package uk.gov.hmrc.timetopay.arrangement
 
 import play.api.Logger
 import play.api.libs.json.{Format, Json}
@@ -8,18 +8,18 @@ import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.BSONDocument
 import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
-import uk.gov.hmrc.timetopay.arrangement.models.TTPArrangement
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 object TTPArrangementMongoFormats {
-  import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
+  import modelFormat._
   implicit val format = ReactiveMongoFormats.mongoEntity({
     Format(Json.reads[TTPArrangement], Json.writes[TTPArrangement])
   })
   val id = "_id"
 }
+
 
 class TTPArrangementRepository(implicit mongo: () => DB) extends ReactiveRepository[TTPArrangement, String]("ttparrangements", mongo, TTPArrangementMongoFormats.format, implicitly[Format[String]]) {
 

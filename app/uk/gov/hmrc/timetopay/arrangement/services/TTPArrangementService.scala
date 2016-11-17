@@ -5,8 +5,7 @@ import java.util.UUID
 
 import play.api.Logger
 import uk.gov.hmrc.play.http.HeaderCarrier
-import uk.gov.hmrc.timetopay.arrangement.connectors.{SubmissionError, SubmissionSuccess}
-import uk.gov.hmrc.timetopay.arrangement.models._
+import uk.gov.hmrc.timetopay.arrangement._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

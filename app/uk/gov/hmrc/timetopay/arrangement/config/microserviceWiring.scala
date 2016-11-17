@@ -1,8 +1,8 @@
 package uk.gov.hmrc.timetopay.arrangement.config
 
-import play.api.Play
 import play.api.Play.configuration
 import play.api.mvc.Controller
+import play.modules.reactivemongo.ReactiveMongoPlugin
 import uk.gov.hmrc.play.audit.http.config.LoadAuditingConfig
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.auth.microservice.connectors.AuthConnector
@@ -10,11 +10,8 @@ import uk.gov.hmrc.play.config.{AppName, RunMode, ServicesConfig}
 import uk.gov.hmrc.play.http.{HttpPost, HttpGet}
 import uk.gov.hmrc.play.http.hooks.HttpHook
 import uk.gov.hmrc.play.http.ws._
-import uk.gov.hmrc.timetopay.arrangement.connectors.{SubmissionSuccess, SubmissionError, ArrangementDesApiConnector}
-import uk.gov.hmrc.timetopay.arrangement.controllers.TTPArrangementController
-import uk.gov.hmrc.timetopay.arrangement.models._
-import uk.gov.hmrc.timetopay.arrangement.repositories._
-import uk.gov.hmrc.timetopay.arrangement.services.{TTPArrangementService, DesTTPArrangementService, LetterAndControlService}
+import uk.gov.hmrc.timetopay.arrangement._
+import uk.gov.hmrc.timetopay.arrangement.services.{TTPArrangementService, DesTTPArrangementBuilder, LetterAndControlBuilder}
 
 import scala.concurrent.Future
 
@@ -38,25 +35,32 @@ object ArrangementDesApiConnector extends ArrangementDesApiConnector with Servic
   override val http: HttpGet with HttpPost = WSHttp
 }
 
-object DesTTPArrangementService extends DesTTPArrangementService {}
+object DesTTPArrangementBuilder extends DesTTPArrangementBuilder {}
+
+object RepositoryConfig  {
+  private implicit val connection = {
+    import play.api.Play.current
+    ReactiveMongoPlugin.mongoConnector.db
+  }
+  lazy val TTPArrangementRepository = new TTPArrangementRepository
+
+}
 
 trait ServiceRegistry extends ServicesConfig {
-
-  import uk.gov.hmrc.timetopay.arrangement.repositories._
 
   import scala.concurrent.ExecutionContext.Implicits.global
   lazy val arrangementDesApiConnector = ArrangementDesApiConnector
 
   import play.api.Play.current
-  lazy val letterAndControlService = new LetterAndControlService(LetterAndControlConfig.create(configuration.getConfig("letterAndControl")
+  lazy val letterAndControlService = new LetterAndControlBuilder(LetterAndControlConfig.create(configuration.getConfig("letterAndControl")
     .getOrElse(throw new RuntimeException("LetterAndControl configuration required")))) {}
 
-  lazy val desTTPArrangementService = DesTTPArrangementService
+  lazy val desTTPArrangementService = DesTTPArrangementBuilder
 
   lazy val letterAndControl: (TTPArrangement => Future[LetterAndControl]) = arrangement => letterAndControlService.create(arrangement)
   lazy val desArrangement: (TTPArrangement => Future[DesTTPArrangement]) = arrangement => desTTPArrangementService.create(arrangement)
-  lazy val arrangementSave: (TTPArrangement => Future[Option[TTPArrangement]]) = arrangement => TTPArrangementRepository.save(arrangement)
-  lazy val arrangementGet: (String => Future[Option[TTPArrangement]]) = id => TTPArrangementRepository.findById(id)
+  lazy val arrangementSave: (TTPArrangement => Future[Option[TTPArrangement]]) = arrangement => RepositoryConfig.TTPArrangementRepository.save(arrangement)
+  lazy val arrangementGet: (String => Future[Option[TTPArrangement]]) = id => RepositoryConfig.TTPArrangementRepository.findById(id)
   lazy val desArrangementApi: ((Taxpayer, DesSubmissionRequest) => Future[Either[SubmissionError, SubmissionSuccess]])
         = (taxpayer, desSubmissionRequest) => arrangementDesApiConnector.submitArrangement(taxpayer, desSubmissionRequest)
 

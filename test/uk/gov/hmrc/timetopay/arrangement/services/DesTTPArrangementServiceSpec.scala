@@ -5,15 +5,15 @@ import java.time.LocalDate
 import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import org.scalatest.prop.TableDrivenPropertyChecks._
-import uk.gov.hmrc.timetopay.arrangement.models.TTPArrangement
+import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
 import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
 import uk.gov.hmrc.timetopay.arrangement.resources._
-import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
+import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 
 class DesTTPArrangementServiceSpec extends UnitSpec with WithFakeApplication with ScalaFutures {
 
 
-  val desTTPArrangementService = new DesTTPArrangementService
+  val desTTPArrangementService = new DesTTPArrangementBuilder
 
   val taxPayerData = Table(
     ("taxPayer", "enforcementFlag", "message"),

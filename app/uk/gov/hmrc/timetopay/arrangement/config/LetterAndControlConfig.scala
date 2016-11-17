@@ -19,7 +19,7 @@ object LetterAndControlConfig {
     def getConfig(key: String) = configuration.getString(key)
       .getOrElse(throw new IllegalArgumentException(s"Missing $key"))
 
-    LetterAndControlConfig( getConfig("salutation"),
+    LetterAndControlConfig(getConfig("salutation"),
       getConfig("claimIndicateInt") ,
       getConfig("template"),
       getConfig("office.officeName1"),

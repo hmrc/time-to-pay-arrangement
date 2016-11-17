@@ -7,11 +7,10 @@ import play.api.libs.json.{Writes, JsValue}
 import uk.gov.hmrc.play.http.ws.WSHttp
 import uk.gov.hmrc.play.http._
 import uk.gov.hmrc.play.test.{UnitSpec}
-import uk.gov.hmrc.timetopay.arrangement.models.{DesSubmissionRequest}
+import uk.gov.hmrc.timetopay.arrangement.{DesSubmissionRequest, ArrangementDesApiConnector}
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
 
 class ArrangementDesApiConnectorSpec extends UnitSpec with ScalaFutures with MockFactory  {
   implicit val headerCarrier = HeaderCarrier()

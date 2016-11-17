@@ -3,8 +3,8 @@ package uk.gov.hmrc.timetopay.arrangement
 import java.time.LocalDate
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.timetopay.arrangement.models.{SelfAssessment, _}
-import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
+import uk.gov.hmrc.timetopay.arrangement._
+import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 
 import scala.io.Source
 

@@ -3,14 +3,14 @@ package uk.gov.hmrc.timetopay.arrangement.services
 import java.time.format.DateTimeFormatter
 
 import play.api.Logger
-import uk.gov.hmrc.timetopay.arrangement.models._
+import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType.{JurisdictionType, Scottish}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
-class DesTTPArrangementService {
+class DesTTPArrangementBuilder {
   val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
   def create(implicit ttpArrangement: TTPArrangement): Future[DesTTPArrangement] = Future {

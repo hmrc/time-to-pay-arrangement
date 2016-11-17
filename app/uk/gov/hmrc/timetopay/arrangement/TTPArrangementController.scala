@@ -1,15 +1,14 @@
-package uk.gov.hmrc.timetopay.arrangement.controllers
+package uk.gov.hmrc.timetopay.arrangement
 
 import play.api.Logger
 import play.api.libs.json.Json.toJson
 import play.api.mvc.{Action, RequestHeader}
 import uk.gov.hmrc.play.microservice.controller.BaseController
-import uk.gov.hmrc.timetopay.arrangement.models.TTPArrangement
-import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
 import uk.gov.hmrc.timetopay.arrangement.services.{DesApiException, TTPArrangementService}
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future._
+import modelFormat._
 
 class TTPArrangementController(arrangementService: TTPArrangementService)(implicit ec: ExecutionContext) extends BaseController {
 

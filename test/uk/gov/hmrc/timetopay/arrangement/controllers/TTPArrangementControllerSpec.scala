@@ -7,12 +7,11 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.test.UnitSpec
-import uk.gov.hmrc.timetopay.arrangement.connectors.ArrangementDesApiConnector
-import uk.gov.hmrc.timetopay.arrangement.models.TTPArrangement
-import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
-import uk.gov.hmrc.timetopay.arrangement.repositories.TTPArrangementRepository
+import uk.gov.hmrc.timetopay.arrangement.{TTPArrangementController}
+import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
+import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.resources._
-import uk.gov.hmrc.timetopay.arrangement.services.{LetterAndControlService, DesTTPArrangementService, TTPArrangementService}
+import uk.gov.hmrc.timetopay.arrangement.services.{TTPArrangementService}
 
 import scala.concurrent.Future
 

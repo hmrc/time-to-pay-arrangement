@@ -4,9 +4,9 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
-import uk.gov.hmrc.timetopay.arrangement.connectors.{SubmissionError, SubmissionSuccess}
-import uk.gov.hmrc.timetopay.arrangement.models._
-import uk.gov.hmrc.timetopay.arrangement.modelsFormat._
+import uk.gov.hmrc.timetopay.arrangement.{SubmissionError, SubmissionSuccess}
+import uk.gov.hmrc.timetopay.arrangement._
+import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.resources._
 
 import scala.concurrent.{Future}
