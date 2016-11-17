@@ -1,14 +1,14 @@
-package uk.gov.hmrc.timetopay.arrangement.connectors
+package uk.gov.hmrc.timetopay.arrangement
 
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
 import play.api.http.Status
-import play.api.libs.json.{Writes, JsValue}
-import uk.gov.hmrc.play.http.ws.WSHttp
+import play.api.libs.json.Writes
 import uk.gov.hmrc.play.http._
-import uk.gov.hmrc.play.test.{UnitSpec}
-import uk.gov.hmrc.timetopay.arrangement.{DesSubmissionRequest, ArrangementDesApiConnector}
+import uk.gov.hmrc.play.http.ws.WSHttp
+import uk.gov.hmrc.play.test.UnitSpec
 import uk.gov.hmrc.timetopay.arrangement.resources._
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

@@ -8,7 +8,7 @@ import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
 import org.scalatest.prop.TableDrivenPropertyChecks._
 
-class LetterAndControlServiceSpec extends UnitSpec with WithFakeApplication with ScalaFutures {
+class LetterAndControlBuilderpec extends UnitSpec with WithFakeApplication with ScalaFutures {
 
   val letterAndControlConfig = LetterAndControlConfig("XXXX", "XXXX","XXXX","XXXX","XXXX","XXXX","XXXX", "XXXX","XXXX")
 

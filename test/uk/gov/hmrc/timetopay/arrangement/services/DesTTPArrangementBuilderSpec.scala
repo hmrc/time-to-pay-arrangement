@@ -10,7 +10,7 @@ import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 
-class DesTTPArrangementServiceSpec extends UnitSpec with WithFakeApplication with ScalaFutures {
+class DesTTPArrangementBuilderSpec extends UnitSpec with WithFakeApplication with ScalaFutures {
 
 
   val desTTPArrangementService = new DesTTPArrangementBuilder

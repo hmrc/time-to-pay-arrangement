@@ -1,4 +1,4 @@
-package uk.gov.hmrc.timetopay.arrangement.controllers
+package uk.gov.hmrc.timetopay.arrangement
 
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
@@ -7,11 +7,9 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.test.UnitSpec
-import uk.gov.hmrc.timetopay.arrangement.{TTPArrangementController}
-import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.resources._
-import uk.gov.hmrc.timetopay.arrangement.services.{TTPArrangementService}
+import uk.gov.hmrc.timetopay.arrangement.services.TTPArrangementService
 
 import scala.concurrent.Future
 
