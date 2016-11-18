@@ -9,7 +9,7 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.test.UnitSpec
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.resources._
-import uk.gov.hmrc.timetopay.arrangement.services.TTPArrangementService
+import uk.gov.hmrc.timetopay.arrangement.services.{DesApiException, TTPArrangementService}
 
 import scala.concurrent.Future
 
@@ -34,11 +34,22 @@ class TTPArrangementControllerSpec extends UnitSpec with MockFactory with ScalaF
 
     "return 500 if arrangement service fails" in {
       implicit val hc = HeaderCarrier
-      (arrangementServiceStub.submit(_: TTPArrangement)(_: HeaderCarrier)).when(ttparrangementRequest.as[TTPArrangement], *) returns Future.failed(new RuntimeException("****Simulated exception**** DES API Submission Failed"))
+      (arrangementServiceStub.submit(_: TTPArrangement)(_: HeaderCarrier)).when(ttparrangementRequest.as[TTPArrangement], *) returns Future.failed(new RuntimeException("****Simulated exception**** Internal processing exception"))
 
       val fakeRequest = FakeRequest("POST", "/ttparrangements").withBody(ttparrangementRequest)
       val result = arrangementController.create().apply(fakeRequest).futureValue
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+      bodyOf(result) shouldBe "****Simulated exception**** Internal processing exception"
+    }
+
+    "return 500 if arrangement service throws desapiexception" in {
+      implicit val hc = HeaderCarrier
+      (arrangementServiceStub.submit(_: TTPArrangement)(_: HeaderCarrier)).when(ttparrangementRequest.as[TTPArrangement], *) returns Future.failed(new DesApiException(403, "Forbidden"))
+
+      val fakeRequest = FakeRequest("POST", "/ttparrangements").withBody(ttparrangementRequest)
+      val result = arrangementController.create().apply(fakeRequest).futureValue
+      status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+      bodyOf(result) shouldBe "Submission to DES failed, status code [403] and response [Forbidden]"
     }
   }
 
