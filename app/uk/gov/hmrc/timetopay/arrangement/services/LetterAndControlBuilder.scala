@@ -1,6 +1,6 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import play.api.{Logger}
+import play.api.Logger
 import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.config.LetterAndControlConfig
 import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType.JurisdictionType
@@ -8,7 +8,7 @@ import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType.JurisdictionT
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class LetterAndControlBuilder(letterAndControlConfig : LetterAndControlConfig) {
+class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
 
   type AddressResult = (Address, Option[LetterError])
 
@@ -35,7 +35,7 @@ class LetterAndControlBuilder(letterAndControlConfig : LetterAndControlConfig) {
       exceptionCodeAndMessage
     }.getOrElse {
       taxpayer.selfAssessment.communicationPreferences.map {
-       preference => resolveCommsPrefs(preference).map {
+       preference => commsPrefException(preference).map {
           exceptionCodeAndMessage
         }.getOrElse((None,None))
       }.getOrElse((None,None))
@@ -68,12 +68,12 @@ class LetterAndControlBuilder(letterAndControlConfig : LetterAndControlConfig) {
 
   private def resolveAddress(ttpArrangement: TTPArrangement): AddressResult = {
     val taxpayer: Taxpayer = ttpArrangement.taxpayer
-    taxpayer.addresses.size match {
-      case 0 =>
+    taxpayer.addresses match {
+      case Nil =>
         Logger.info("No address found in Digital")
         (Address(),Some(LetterError(8, "no-address")))
-      case 1 =>
-        validate(taxpayer.addresses.head)
+      case x::Nil =>
+        validate(x)
       case _ =>
         multipleAddresses(taxpayer)
     }
@@ -91,27 +91,29 @@ class LetterAndControlBuilder(letterAndControlConfig : LetterAndControlConfig) {
   }
 
   private def multipleAddresses(implicit taxpayer: Taxpayer) = {
-    val uniqueAddressTypes: Set[JurisdictionType] = taxpayer.addresses.map {
+    val uniqueAddressTypes: List[JurisdictionType] = taxpayer.addresses.map {
       JurisdictionChecker.addressType
-    }.toSet
+    }.distinct
 
-    uniqueAddressTypes.size match {
-      case 1 =>
+    uniqueAddressTypes match {
+      case x::Nil =>
+        Logger.trace("Found single unique address type found")
         validate(taxpayer.addresses.head)
       case _ =>
-        Logger.info(s"Customer has addresses in ${uniqueAddressTypes.mkString(" and")} jurisdictions")
+        Logger.trace(s"Customer has addresses in ${uniqueAddressTypes.mkString(" and")} jurisdictions")
         (Address(),Some(LetterError(1, "address-jurisdiction-conflict")))
     }
   }
 
-  private def validate(address: Address): AddressResult = address match {
+  def validate(address: Address) = address match {
     case Address(_, _, _, _, _, "") | Address("", _, _, _, _, _) =>
       (address,Some(LetterError(9, "incomplete-address")))
     case _ =>
       (address, None)
   }
 
-  private def resolveCommsPrefs(commsPrefs: CommunicationPreferences): Option[LetterError] = commsPrefs match {
+
+  private def commsPrefException(commsPrefs: CommunicationPreferences): Option[LetterError] = commsPrefs match {
       case CommunicationPreferences(true, _, true, _) =>
         Some(LetterError.welshLargePrint())
       case CommunicationPreferences(true, true, _, _) =>

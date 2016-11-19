@@ -37,8 +37,8 @@ class DesTTPArrangementBuilder {
       JurisdictionChecker.addressType
     }.distinct
 
-    addressTypes.size match {
-      case 1 => addressTypes.head match {
+    addressTypes match {
+      case x::Nil => x match {
         case Scottish => Some("Summary Warrant")
         case _ => Some("Distraint")
       }

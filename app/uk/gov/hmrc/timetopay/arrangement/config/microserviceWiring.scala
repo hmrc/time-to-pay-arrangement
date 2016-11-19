@@ -11,7 +11,7 @@ import uk.gov.hmrc.play.http.{HttpPost, HttpGet}
 import uk.gov.hmrc.play.http.hooks.HttpHook
 import uk.gov.hmrc.play.http.ws._
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.services.{TTPArrangementService, DesTTPArrangementBuilder, LetterAndControlBuilder}
+import uk.gov.hmrc.timetopay.arrangement.services._
 
 import scala.concurrent.Future
 
@@ -27,7 +27,7 @@ object MicroserviceAuthConnector extends AuthConnector with ServicesConfig {
   override val authBaseUrl = baseUrl("auth")
 }
 
-object ArrangementDesApiConnector extends ArrangementDesApiConnector with ServicesConfig {
+object DesArrangementApiService$ extends DesArrangementService with ServicesConfig {
   override val desArrangementUrl: String = baseUrl("des-arrangement-api")
   override val serviceEnvironment: String = getConfString("des-arrangement-api.environment", "unknown")
   override val authorisationToken: String = getConfString("des-arrangement-api.authorization-token", "not-found")
@@ -49,7 +49,7 @@ object RepositoryConfig  {
 trait ServiceRegistry extends ServicesConfig {
 
   import scala.concurrent.ExecutionContext.Implicits.global
-  lazy val arrangementDesApiConnector = ArrangementDesApiConnector
+  lazy val arrangementDesApiConnector = DesArrangementApiService$
 
   import play.api.Play.current
   lazy val letterAndControlService = new LetterAndControlBuilder(LetterAndControlConfig.create(configuration.getConfig("letterAndControl")

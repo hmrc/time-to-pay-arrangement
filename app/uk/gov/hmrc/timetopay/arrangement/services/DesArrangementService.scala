@@ -1,19 +1,20 @@
-package uk.gov.hmrc.timetopay.arrangement
+package uk.gov.hmrc.timetopay.arrangement.services
 
 import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.play.http.logging.Authorization
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpPost, HttpResponse}
+import uk.gov.hmrc.timetopay.arrangement.{DesSubmissionRequest, Taxpayer}
+import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 
 import scala.concurrent.{ExecutionContext, Future}
-import modelFormat._
 
 case class SubmissionSuccess(requestSent: DesSubmissionRequest) {}
 
 case class SubmissionError(code: Int, message: String) {}
 
-trait ArrangementDesApiConnector {
+trait DesArrangementService {
 
   type SubmissionResult = Either[SubmissionError, SubmissionSuccess]
 

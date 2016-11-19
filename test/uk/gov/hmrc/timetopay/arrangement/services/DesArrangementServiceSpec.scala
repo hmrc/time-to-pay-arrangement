@@ -1,4 +1,4 @@
-package uk.gov.hmrc.timetopay.arrangement
+package uk.gov.hmrc.timetopay.arrangement.services
 
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
@@ -7,24 +7,25 @@ import play.api.libs.json.Writes
 import uk.gov.hmrc.play.http._
 import uk.gov.hmrc.play.http.ws.WSHttp
 import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.timetopay.arrangement.DesSubmissionRequest
 import uk.gov.hmrc.timetopay.arrangement.resources._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ArrangementDesApiConnectorSpec extends UnitSpec with ScalaFutures with MockFactory  {
+class DesArrangementServiceSpec extends UnitSpec with ScalaFutures with MockFactory  {
   implicit val headerCarrier = HeaderCarrier()
 
   val mockHttp: HttpGet with HttpPost = mock[WSHttp]
 
-  class TestArrangementDesApiConnector extends ArrangementDesApiConnector {
+  class TestDesArrangementApiService extends DesArrangementService {
     override val desArrangementUrl: String = "des-arrangement-api-url"
     override val http: HttpGet with HttpPost = mockHttp
     override val authorisationToken = "token"
     override val serviceEnvironment = "env"
   }
 
-  val connector = new TestArrangementDesApiConnector
+  val connector = new TestDesArrangementApiService
 
   "Calling submitArrangement" should {
     val request: DesSubmissionRequest = DesSubmissionRequest(submitArrangementTTPArrangement, submitArrangementLetterAndControl)
