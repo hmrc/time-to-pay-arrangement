@@ -35,7 +35,7 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
       (for {
         c <- taxpayer.selfAssessment.communicationPreferences
         e <- commsPrefException(c)
-      } yield (Some(e.code.toString), Some(e.message))).getOrElse(None,None)
+      } yield (Some(e.code.toString), Some(e.message))).getOrElse((None,None))
     }
 
     val exception = correspondence._2.fold(resolveCommsException)(x => (Some(x.code.toString), Some(x.message)))
