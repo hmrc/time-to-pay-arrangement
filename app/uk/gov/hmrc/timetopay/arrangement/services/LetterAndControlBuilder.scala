@@ -7,6 +7,7 @@ import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType.JurisdictionT
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Try
 
 class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
 
@@ -29,17 +30,15 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
     val correspondence: AddressResult = resolveAddress(ttpArrangement)
 
     val address: Address = correspondence._1
-    val addressException:Option[LetterError] = correspondence._2
 
-    val exception = addressException.map {
-      exceptionCodeAndMessage
-    }.getOrElse {
-      taxpayer.selfAssessment.communicationPreferences.map {
-       preference => commsPrefException(preference).map {
-          exceptionCodeAndMessage
-        }.getOrElse((None,None))
-      }.getOrElse((None,None))
+    def resolveCommsException = {
+      (for {
+        c <- taxpayer.selfAssessment.communicationPreferences
+        e <- commsPrefException(c)
+      } yield (Some(e.code.toString), Some(e.message))).getOrElse(None,None)
     }
+
+    val exception = correspondence._2.fold(resolveCommsException)(x => (Some(x.code.toString), Some(x.message)))
 
     LetterAndControl(
       customerName = taxpayer.customerName,
@@ -67,7 +66,7 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
   }
 
   private def resolveAddress(ttpArrangement: TTPArrangement): AddressResult = {
-    val taxpayer: Taxpayer = ttpArrangement.taxpayer
+    implicit val taxpayer: Taxpayer = ttpArrangement.taxpayer
     taxpayer.addresses match {
       case Nil =>
         Logger.info("No address found in Digital")
@@ -75,20 +74,10 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
       case x::Nil =>
         validate(x)
       case _ =>
-        multipleAddresses(taxpayer)
+        multipleAddresses
     }
   }
 
-  private def paymentMessage(schedule: Schedule) = {
-    val instalmentSize = schedule.instalments.size - 1
-    val regularPaymentAmount = schedule.instalments.head.amount
-    val lastPaymentAmount = schedule.instalments.last.amount
-
-    val initialPayment = Option(schedule.initialPayment).getOrElse(BigDecimal(0.0)) + schedule.instalments.head.amount
-
-    s"Initial payment of $initialPayment then $instalmentSize payments of $regularPaymentAmount and final payment of " +
-      s"$lastPaymentAmount"
-  }
 
   private def multipleAddresses(implicit taxpayer: Taxpayer) = {
     val uniqueAddressTypes: List[JurisdictionType] = taxpayer.addresses.map {
@@ -113,6 +102,17 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
   }
 
 
+  private def paymentMessage(schedule: Schedule) = {
+    val instalmentSize = schedule.instalments.size - 1
+    val regularPaymentAmount = schedule.instalments.head.amount
+    val lastPaymentAmount = schedule.instalments.last.amount
+
+    val initialPayment = Try(schedule.initialPayment).getOrElse(BigDecimal(0.0)) + schedule.instalments.head.amount
+
+    s"Initial payment of $initialPayment then $instalmentSize payments of $regularPaymentAmount and final payment of " +
+      s"$lastPaymentAmount"
+  }
+
   private def commsPrefException(commsPrefs: CommunicationPreferences): Option[LetterError] = commsPrefs match {
       case CommunicationPreferences(true, _, true, _) =>
         Some(LetterError.welshLargePrint())
@@ -128,7 +128,5 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
         Some(LetterError.largePrint())
       case _ => None
     }
-
-  private def exceptionCodeAndMessage(letter: LetterError) = (Some(letter.code.toString), Some(letter.message))
 
 }

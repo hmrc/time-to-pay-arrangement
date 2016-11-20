@@ -32,6 +32,7 @@ package object resources {
     val foreignAddress = Address(addressLine1 = "XXX", postCode = "400089")
     val englishAddressMissingPostCodeAndLine1 = Address(addressLine1 = "", postCode = "")
     val englishAddressMissingPostCode = Address(addressLine1 = "XXXX", postCode = "")
+    val englishAddressMissingLine1= Address(addressLine1 = "", postCode = "XXXX")
     val scottishAddress1 = Address(addressLine1 = "XXX", addressLine2 = "XXX", addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postCode = "G3 8NW")
     val scottishAddress2 = Address(addressLine1 = "XXX", addressLine2 = "XXX", addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postCode = "EH14 8NW")
     val welshAddress1 = Address(addressLine1 = "XXX", addressLine2 = "XXX", addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postCode = "LL57 3DL")
@@ -47,6 +48,7 @@ package object resources {
     val taxPayerWithWelshAddress = Taxpayer("CustomerName", List(welshAddress), selfAssessment)
     val taxPayerWithNorthernIrelandAddress = Taxpayer("CustomerName", List(northernIrelandAddress), selfAssessment)
     val taxPayerWithMissingPostcodeAndLine1 = Taxpayer("CustomerName", List(englishAddressMissingPostCodeAndLine1), selfAssessment)
+    val taxPayerWithMissingLine1 =  Taxpayer("CustomerName", List(englishAddressMissingLine1), selfAssessment)
     val taxPayerWithMissingPostcode = Taxpayer("CustomerName", List(englishAddressMissingPostCode), selfAssessment)
     val taxPayerWithMultipleEnglishAddresses = Taxpayer("CustomerName", List(englishAddress1, englishAddress2), selfAssessment)
     val taxPayerWithEnglishAndScottishAddresses = Taxpayer("CustomerName", List(englishAddress1, scottishAddress), selfAssessment)
@@ -59,6 +61,7 @@ package object resources {
     val taxPayerWithMultipleWelshAddresses = Taxpayer("CustomerName", List(welshAddress1, welshAddress2), selfAssessment)
     val taxPayerWithMultipleScottishAddresses = Taxpayer("CustomerName", List(scottishAddress1, scottishAddress2), selfAssessment)
     val taxPayerWithMultipleJurisdictions = Taxpayer("CustomerName", List(welshAddress, scottishAddress), selfAssessment)
+
   }
 
 }

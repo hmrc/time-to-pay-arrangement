@@ -8,7 +8,7 @@ import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
 import org.scalatest.prop.TableDrivenPropertyChecks._
 
-class LetterAndControlBuilderpec extends UnitSpec with WithFakeApplication with ScalaFutures {
+class LetterAndControlBuilderSpec extends UnitSpec with WithFakeApplication with ScalaFutures {
 
   val letterAndControlConfig = LetterAndControlConfig("XXXX", "XXXX","XXXX","XXXX","XXXX","XXXX","XXXX", "XXXX","XXXX")
 
@@ -20,7 +20,8 @@ class LetterAndControlBuilderpec extends UnitSpec with WithFakeApplication with 
     (taxPayerWithWelshAddress, None, None, "1 Welsh Address"),
     (taxPayerWithNorthernIrelandAddress, None, None, "1 Northern Ireland Address"),
     (taxPayerWithMissingPostcodeAndLine1, Some("9"), Some("incomplete-address"), "Missing address line 1 and postcode"),
-    (taxPayerWithMissingPostcode, Some("9"), Some("incomplete-address"), "missing postcode"),
+    (taxPayerWithMissingPostcode, Some("9"), Some("incomplete-address"), "missing line 1"),
+    (taxPayerWithMissingLine1, Some("9"), Some("incomplete-address"), "missing postcode"),
     (taxPayerWithMultipleEnglishAddresses, None, None, "multiple English addresses"),
     (taxPayerWithEnglishAndScottishAddresses, Some("1"), Some("address-jurisdiction-conflict"), "an English and Scottish address"),
     (taxPayerWithEnglishAndForeignAddresses, None, None, "an English and Foreign address"),
