@@ -260,6 +260,7 @@ package object resources {
   val schedule: Schedule = Schedule(LocalDate.now(), LocalDate.now(), 0.0, BigDecimal("2000.00"), 0.0, 0.0, 0.0, List(Instalment(LocalDate.now(), 0.0)))
   val happyCommsPref = CommunicationPreferences(welshLanguageIndicator = false, audioIndicator = false, largePrintIndicator = false, brailleIndicator = false)
   val selfAssessment = SelfAssessment("XXX", Some(happyCommsPref), List())
+  val selfAssessmentNoCommsPref = SelfAssessment("XXX", None, List())
 
   object Addresses {
     val englishAddress1 = Address(addressLine1 = "XXX", postCode = "B45 0HY")
@@ -281,6 +282,7 @@ package object resources {
 
     import Addresses._
 
+    val taxPayerWithEnglishAddressWithNoComsPref = Taxpayer("CustomerName", List(englishAddress1), selfAssessmentNoCommsPref)
     val taxPayerWithScottishAddress = Taxpayer("CustomerName", List(scottishAddress), selfAssessment)
     val taxPayerWithEnglishAddress = Taxpayer("CustomerName", List(englishAddress1), selfAssessment)
     val taxPayerWithWelshAddress = Taxpayer("CustomerName", List(welshAddress), selfAssessment)

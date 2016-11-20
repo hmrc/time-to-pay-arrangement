@@ -17,6 +17,7 @@ class LetterAndControlBuilderSpec extends UnitSpec with WithFakeApplication with
   val taxPayerData = Table(
     ("taxPayer", "exceptionCode", "exceptionReason", "message"),
     (taxPayerWithEnglishAddress, None, None, "1 English Address"),
+    (taxPayerWithEnglishAddressWithNoComsPref, None, None, "1 English Address and no comms preference"),
     (taxPayerWithWelshAddress, None, None, "1 Welsh Address"),
     (taxPayerWithNorthernIrelandAddress, None, None, "1 Northern Ireland Address"),
     (taxPayerWithMissingPostcodeAndLine1, Some("9"), Some("incomplete-address"), "Missing address line 1 and postcode"),
