@@ -16,12 +16,12 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
   case class LetterError (code: Int, message: String)
 
   object LetterError {
-    def welshLargePrint() = LetterError(5, "welsh-large-print-required")
-    def welshAudio() = LetterError(7,"audio-welsh-required")
-    def welsh() = LetterError(4,"welsh-required")
-    def braille() = LetterError(2,"braille-required")
-    def audio() = LetterError(6,"audio-required")
-    def largePrint() = LetterError(3, "large-print-required")
+    def welshLargePrint() = this(5, "welsh-large-print-required")
+    def welshAudio() = this(7,"audio-welsh-required")
+    def welsh() = this(4,"welsh-required")
+    def braille() = this(2,"braille-required")
+    def audio() = this(6,"audio-required")
+    def largePrint() = this(3, "large-print-required")
   }
 
   def create(ttpArrangement: TTPArrangement): Future[LetterAndControl] = Future {
