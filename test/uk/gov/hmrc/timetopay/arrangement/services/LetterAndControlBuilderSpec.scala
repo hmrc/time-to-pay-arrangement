@@ -36,7 +36,7 @@ class LetterAndControlBuilderSpec extends UnitSpec with WithFakeApplication with
       forAll(taxPayerData) { (taxpayer, exceptionCode, exceptionReason, message) =>
         s"return (exceptionCode = $exceptionCode and exceptionReason = $exceptionReason) for $message" in {
 
-        val result = letterAndControlService.create(TTPArrangement(None, None, "XXX", "XXX", taxpayer, schedule, None)).futureValue
+        val result = letterAndControlService.create(TTPArrangement(None, None, "XXX", "XXX", taxpayer, schedule, None))
 
         result.exceptionType shouldBe exceptionCode
         result.exceptionReason shouldBe exceptionReason

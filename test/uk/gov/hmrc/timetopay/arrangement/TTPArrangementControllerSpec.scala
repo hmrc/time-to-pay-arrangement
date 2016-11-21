@@ -29,7 +29,17 @@ class TTPArrangementControllerSpec extends UnitSpec with MockFactory with ScalaF
       val fakeRequest = FakeRequest("POST", "/ttparrangements").withBody(ttparrangementRequest)
       val result = arrangementController.create().apply(fakeRequest).futureValue
       status(result) shouldBe Status.CREATED
-      result.header.headers.get("Location") should not be null
+      result.header.headers.get("Location") should not be None
+    }
+
+    "return 201 without header if saving arrangement fails" in {
+      implicit val hc = HeaderCarrier
+      (arrangementServiceStub.submit(_: TTPArrangement)(_: HeaderCarrier)).when(ttparrangementRequest.as[TTPArrangement], *) returns None
+
+      val fakeRequest = FakeRequest("POST", "/ttparrangements").withBody(ttparrangementRequest)
+      val result = arrangementController.create().apply(fakeRequest).futureValue
+      status(result) shouldBe Status.CREATED
+      result.header.headers.get("Location") shouldBe None
     }
 
     "return 500 if arrangement service fails" in {

@@ -13,7 +13,7 @@ import scala.concurrent.Future
 class DesTTPArrangementBuilder {
   val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
-  def create(implicit ttpArrangement: TTPArrangement): Future[DesTTPArrangement] = Future {
+  def create(implicit ttpArrangement: TTPArrangement): DesTTPArrangement =  {
     val schedule: Schedule = ttpArrangement.schedule
     val firstPaymentInstalment: Instalment = schedule.instalments.head
 

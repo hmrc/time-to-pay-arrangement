@@ -57,8 +57,8 @@ trait ServiceRegistry extends ServicesConfig {
 
   lazy val desTTPArrangementService = DesTTPArrangementBuilder
 
-  lazy val letterAndControl: (TTPArrangement => Future[LetterAndControl]) = arrangement => letterAndControlService.create(arrangement)
-  lazy val desArrangement: (TTPArrangement => Future[DesTTPArrangement]) = arrangement => desTTPArrangementService.create(arrangement)
+  lazy val letterAndControl: (TTPArrangement => LetterAndControl) = arrangement => letterAndControlService.create(arrangement)
+  lazy val desArrangement: (TTPArrangement => DesTTPArrangement) = arrangement => desTTPArrangementService.create(arrangement)
   lazy val arrangementSave: (TTPArrangement => Future[Option[TTPArrangement]]) = arrangement => RepositoryConfig.TTPArrangementRepository.save(arrangement)
   lazy val arrangementGet: (String => Future[Option[TTPArrangement]]) = id => RepositoryConfig.TTPArrangementRepository.findById(id)
   lazy val desArrangementApi: ((Taxpayer, DesSubmissionRequest) => Future[Either[SubmissionError, SubmissionSuccess]])

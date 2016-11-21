@@ -24,7 +24,7 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
     def largePrint() = LetterError(3, "large-print-required")
   }
 
-  def create(ttpArrangement: TTPArrangement): Future[LetterAndControl] = Future {
+  def create(ttpArrangement: TTPArrangement): LetterAndControl =  {
     val taxpayer = ttpArrangement.taxpayer
 
     val correspondence: AddressResult = resolveAddress(ttpArrangement)

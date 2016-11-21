@@ -36,7 +36,7 @@ class DesTTPArrangementBuilderSpec extends UnitSpec with WithFakeApplication wit
 
     "create a des arrangement" in {
       implicit val arrangement = ttparrangementRequest.as[TTPArrangement]
-      val desArrangement = desTTPArrangementService.create(arrangement).futureValue
+      val desArrangement = desTTPArrangementService.create(arrangement)
       desArrangement.enforcementAction shouldBe "Distraint"
       desArrangement.directDebit shouldBe true
       desArrangement.initials shouldBe "ZZZ"
