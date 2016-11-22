@@ -36,7 +36,7 @@ class TTPArrangementServiceSpec extends UnitSpec with MockFactory with WithFakeA
 
       letterAndControlFunction.expects(arrangement).returning(letter)
 
-      desSubmissionApi.expects(arrangement.taxpayer, request).returning(Future.successful(Right(SubmissionSuccess(request))))
+      desSubmissionApi.expects(arrangement.taxpayer, request).returning(Future.successful(Right(SubmissionSuccess())))
 
       saveArrangement expects * returning Future.successful(Some(savedArrangement))
 
@@ -59,6 +59,8 @@ class TTPArrangementServiceSpec extends UnitSpec with MockFactory with WithFakeA
 
       desSubmissionApi.expects(arrangement.taxpayer, request).returning(Future.successful(Left(SubmissionError(400, "Bad JSON"))))
 
+      saveArrangement expects * returning Future.successful(Some(savedArrangement))
+
       val headerCarrier = new HeaderCarrier
       val response = arrangementService.submit(arrangement)(headerCarrier)
 
@@ -67,6 +69,40 @@ class TTPArrangementServiceSpec extends UnitSpec with MockFactory with WithFakeA
         e.getMessage shouldBe "DES httpCode: 400, reason: Bad JSON"
       }
     }
+
+    "return No arrangement if saving fails" in {
+      desArrangementFunction.expects(arrangement).returning(ttpArrangement)
+      letterAndControlFunction.expects(arrangement).returning(letter)
+
+      desSubmissionApi.expects(arrangement.taxpayer, request).returning(Future.successful(Right(SubmissionSuccess())))
+
+      saveArrangement expects * returning Future.successful(None)
+
+      val headerCarrier = new HeaderCarrier
+      val response = arrangementService.submit(arrangement)(headerCarrier)
+
+      ScalaFutures.whenReady(response) {
+        r => r shouldBe None
+      }
+    }
+
+    "return No arrangement if DB connection fails" in {
+      desArrangementFunction.expects(arrangement).returning(ttpArrangement)
+      letterAndControlFunction.expects(arrangement).returning(letter)
+
+      desSubmissionApi.expects(arrangement.taxpayer, request).returning(Future.successful(Right(SubmissionSuccess())))
+
+      saveArrangement expects * throwing new RuntimeException("Couldn't connect to mongo")
+
+      val headerCarrier = new HeaderCarrier
+      val response = arrangementService.submit(arrangement)(headerCarrier)
+
+      ScalaFutures.whenReady(response) {
+        r => r shouldBe None
+      }
+    }
+
+
 
     "return failed future for internal exception" in {
       letterAndControlFunction.expects(arrangement).throwing(new RuntimeException("Failed to create letter and control"))

@@ -9,6 +9,7 @@ import uk.gov.hmrc.timetopay.arrangement._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.Try
 
 class TTPArrangementService(arrangementDesApiConnector: ((Taxpayer, DesSubmissionRequest) => Future[Either[SubmissionError, SubmissionSuccess]]),
                             desTTPArrangementService: (TTPArrangement => DesTTPArrangement),
@@ -25,18 +26,24 @@ class TTPArrangementService(arrangementDesApiConnector: ((Taxpayer, DesSubmissio
     val letterAndControl = letterAndControlService(arrangement)
     val desTTPArrangement = desTTPArrangementService(arrangement)
 
-    arrangementDesApiConnector(arrangement.taxpayer,DesSubmissionRequest(desTTPArrangement, letterAndControl))
-        .flatMap {
-          _.fold(error => Future.failed(DesApiException(error.code, error.message)),
-            success => saveArrangement(arrangement, success.requestSent))
-        }
+    val request: DesSubmissionRequest = DesSubmissionRequest(desTTPArrangement, letterAndControl)
+
+    (for {
+      response <- arrangementDesApiConnector(arrangement.taxpayer, request)
+      ttp <- saveArrangement(arrangement, request)
+    } yield (response, ttp)).flatMap {
+      result =>
+        result._1.fold(error => Future.failed(DesApiException(error.code, error.message)),
+          success => Future.successful(result._2))
+    }
   }
 
   private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[TTPArrangement]] = {
     val toSave = arrangement.copy(id = Some(UUID.randomUUID().toString),
       createdOn = Some(LocalDateTime.now()),
       desArrangement = Some(desSubmissionRequest))
-      arrangementSave(toSave)
+
+    Try(arrangementSave(toSave)).getOrElse(Future.successful(None))
   }
 
 }

@@ -36,7 +36,7 @@ class DesArrangementServiceSpec extends UnitSpec with ScalaFutures with MockFact
 
       val result = connector.submitArrangement(taxpayer,  request).futureValue
 
-      result.right.get.requestSent shouldBe request
+      result.right.get shouldBe SubmissionSuccess()
 
     }
     "return 400 response" in {

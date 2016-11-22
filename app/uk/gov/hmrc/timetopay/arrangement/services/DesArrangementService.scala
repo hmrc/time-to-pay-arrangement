@@ -10,9 +10,9 @@ import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class SubmissionSuccess(requestSent: DesSubmissionRequest) {}
+case class SubmissionSuccess()
 
-case class SubmissionError(code: Int, message: String) {}
+case class SubmissionError(code: Int, message: String)
 
 trait DesArrangementService {
 
@@ -37,7 +37,7 @@ trait DesArrangementService {
       .map(response => response.status match {
         case ACCEPTED =>
           Logger.info(s"Submission successful for '${taxpayer.selfAssessment.utr}'")
-          Right(SubmissionSuccess(desSubmissionRequest))
+          Right(SubmissionSuccess())
         case _ =>
           Logger.error(s"Failure from DES, code ${response.status} and body ${response.body}")
           Left(SubmissionError(response.status, response.body))
