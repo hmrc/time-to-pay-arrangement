@@ -2,22 +2,25 @@ package uk.gov.hmrc.timetopay.arrangement
 
 import play.api.Logger
 import play.api.libs.json.Json.toJson
-import play.api.mvc.{Action, RequestHeader}
+import play.api.mvc.{Result, Action, RequestHeader}
 import uk.gov.hmrc.play.microservice.controller.BaseController
 import uk.gov.hmrc.timetopay.arrangement.services.{DesApiException, TTPArrangementService}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{Future, ExecutionContext}
 import scala.concurrent.Future._
 import modelFormat._
 
 class TTPArrangementController(arrangementService: TTPArrangementService)(implicit ec: ExecutionContext) extends BaseController {
 
+  def createdNoLocation = Future.successful[Result](Created)
+  def createdWithLocation(id: String)(implicit reqHead: RequestHeader) = Future.successful[Result](Created.withHeaders(LOCATION -> s"$protocol://${reqHead.host}/ttparrangements/$id"))
+
   def create() = Action.async(parse.json) {
     implicit request =>
       withJsonBody[TTPArrangement] {
         arrangement =>
-          arrangementService.submit(arrangement).map {
-            _.map(a => Created.withHeaders(LOCATION -> s"$protocol://${request.host}/ttparrangements/${a.id.get}")).getOrElse(Created)
+          arrangementService.submit(arrangement).flatMap {
+            x => x.fold(createdNoLocation)(a => createdWithLocation(a.id.get))
           }.recover {
             case desApiException: DesApiException =>
               val desFailureMessage: String = s"Submission to DES failed, status code [${desApiException.code}] and response [${desApiException.message}]"
@@ -29,6 +32,7 @@ class TTPArrangementController(arrangementService: TTPArrangementService)(implic
           }
       }
   }
+
 
   def arrangement(id: String) = Action.async {
     implicit request =>
