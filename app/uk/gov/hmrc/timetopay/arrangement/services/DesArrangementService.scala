@@ -23,8 +23,9 @@ trait DesArrangementService {
   val desArrangementUrl: String
   val http: HttpGet with HttpPost
 
-  lazy val desHeaderCarrier: HeaderCarrier = HeaderCarrier(authorization = Some(Authorization(s"Bearer $authorisationToken")),
-    otherHeaders = Seq("Environment" -> serviceEnvironment))
+  lazy val desHeaderCarrier: HeaderCarrier = HeaderCarrier(authorization = Some(Authorization(s"Bearer $authorisationToken")))
+    .withExtraHeaders("Environment" -> serviceEnvironment)
+
 
   def submitArrangement(taxpayer: Taxpayer, desSubmissionRequest: DesSubmissionRequest)(implicit ec: ExecutionContext): Future[SubmissionResult] = {
     implicit val hc: HeaderCarrier = desHeaderCarrier
