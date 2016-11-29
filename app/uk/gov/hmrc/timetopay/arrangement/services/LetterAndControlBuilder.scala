@@ -69,11 +69,13 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
     implicit val taxpayer: Taxpayer = ttpArrangement.taxpayer
     taxpayer.addresses match {
       case Nil =>
-        Logger.info("No address found in Digital")
+        Logger.debug("No address found in Digital")
         (Address(),Some(LetterError(8, "no-address")))
       case x::Nil =>
+        Logger.debug("Found single address")
         validate(x)
       case _ =>
+        Logger.debug("Found multiple addresses")
         multipleAddresses
     }
   }
