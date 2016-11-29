@@ -27,7 +27,7 @@ object MicroserviceAuthConnector extends AuthConnector with ServicesConfig {
   override val authBaseUrl = baseUrl("auth")
 }
 
-object DesArrangementApiService$ extends DesArrangementService with ServicesConfig {
+object DesArrangementApiService extends DesArrangementService with ServicesConfig {
   override val desArrangementUrl: String = baseUrl("des-arrangement-api")
   override val serviceEnvironment: String = getConfString("des-arrangement-api.environment", "unknown")
   override val authorisationToken: String = getConfString("des-arrangement-api.authorization-token", "not-found")
@@ -49,7 +49,7 @@ object RepositoryConfig  {
 trait ServiceRegistry extends ServicesConfig {
 
   import scala.concurrent.ExecutionContext.Implicits.global
-  lazy val arrangementDesApiConnector = DesArrangementApiService$
+  lazy val arrangementDesApiConnector = DesArrangementApiService
 
   import play.api.Play.current
   lazy val letterAndControlService = new LetterAndControlBuilder(LetterAndControlConfig.create(configuration.getConfig("letterAndControl")
