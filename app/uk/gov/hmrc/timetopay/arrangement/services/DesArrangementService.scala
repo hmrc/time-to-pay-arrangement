@@ -1,12 +1,12 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
 import play.api.Logger
-import play.api.http.Status._
+import play.api.http.Status
 import play.api.libs.json.Json
+import uk.gov.hmrc.play.http._
 import uk.gov.hmrc.play.http.logging.Authorization
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpPost, HttpResponse}
-import uk.gov.hmrc.timetopay.arrangement.{DesSubmissionRequest, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
+import uk.gov.hmrc.timetopay.arrangement.{DesSubmissionRequest, Taxpayer}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -36,13 +36,27 @@ trait DesArrangementService {
     Logger.debug(s"Request sent to DES ${Json.prettyPrint(Json.toJson(desSubmissionRequest))}")
 
     http.POST[DesSubmissionRequest, HttpResponse](s"$desArrangementUrl/$serviceUrl", desSubmissionRequest)
-      .map(response => response.status match {
-        case ACCEPTED =>
-          Logger.info(s"Submission successful for '${taxpayer.selfAssessment.utr}'")
-          Right(SubmissionSuccess())
-        case _ =>
-          Logger.error(s"Failure from DES, code ${response.status} and body ${response.body}")
-          Left(SubmissionError(response.status, response.body))
-      })
+      .map(_ => {
+        Logger.info(s"Submission successful for '${taxpayer.selfAssessment.utr}'")
+        Right(SubmissionSuccess())
+      }).recover {
+      case e: Throwable => onError(e)
+    }
   }
+
+  private def onError(ex: Throwable) = {
+    val (code, message) = ex match {
+      case e: HttpException => (e.responseCode, e.getMessage)
+
+      case e: Upstream4xxResponse => (e.reportAs, e.getMessage)
+      case e: Upstream5xxResponse => (e.reportAs, e.getMessage)
+
+      case e: Throwable => (Status.INTERNAL_SERVER_ERROR, e.getMessage)
+    }
+
+    Logger.error(s"Failure from DES, code $code and body $message")
+    Left(SubmissionError(code, message))
+  }
+
 }
+
