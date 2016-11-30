@@ -40,9 +40,10 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
 
     val exception = correspondence._2.fold(resolveCommsException)(x => (Some(x.code.toString), Some(x.message)))
 
+    val customerName = taxpayer.customerName
     LetterAndControl(
-      customerName = taxpayer.customerName,
-      salutation = letterAndControlConfig.salutation,
+      customerName = customerName,
+      salutation = s"${letterAndControlConfig.salutation} $customerName",
       addressLine1 = address.addressLine1,
       addressLine2 = address.addressLine2,
       addressLine3 = address.addressLine3,

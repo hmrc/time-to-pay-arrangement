@@ -10,7 +10,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 
 class LetterAndControlBuilderSpec extends UnitSpec with WithFakeApplication with ScalaFutures {
 
-  val letterAndControlConfig = LetterAndControlConfig("XXXX", "XXXX","XXXX","XXXX","XXXX","XXXX","XXXX", "XXXX","XXXX")
+  val letterAndControlConfig = LetterAndControlConfig("Dear", "XXXX","XXXX","XXXX","XXXX","XXXX","XXXX", "XXXX","XXXX")
 
   val letterAndControlService = new LetterAndControlBuilder(letterAndControlConfig)
 
@@ -38,6 +38,8 @@ class LetterAndControlBuilderSpec extends UnitSpec with WithFakeApplication with
 
         val result = letterAndControlService.create(TTPArrangement(None, None, "XXX", "XXX", taxpayer, schedule, None))
 
+        result.customerName shouldBe taxpayer.customerName
+        result.salutation shouldBe s"Dear ${taxpayer.customerName}"
         result.exceptionType shouldBe exceptionCode
         result.exceptionReason shouldBe exceptionReason
       }
