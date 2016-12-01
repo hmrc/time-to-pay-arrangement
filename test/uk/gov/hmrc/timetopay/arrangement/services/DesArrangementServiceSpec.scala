@@ -44,7 +44,7 @@ class DesArrangementServiceSpec extends UnitSpec with ScalaFutures with MockFact
       val response = HttpResponse(responseStatus = Status.BAD_REQUEST, responseString= Some("JSON Not valid"))
 
       (mockHttp.POST(_:String, _:DesSubmissionRequest, _:Seq[(String,String)])(_:Writes[DesSubmissionRequest], _:HttpReads[HttpResponse], _:HeaderCarrier))
-        .expects(*,*,*,*,*,*).returning(Future.failed(new Upstream4xxResponse("JSON Not valid", 400, 500, Map())))
+        .expects(*,*,*,*,*,*).returning(Future.failed(Upstream4xxResponse("JSON Not valid", 400, 500, Map())))
 
       val result = connector.submitArrangement(taxpayer, request).futureValue
 
