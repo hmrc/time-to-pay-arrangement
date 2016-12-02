@@ -26,7 +26,7 @@ class DesTTPArrangementBuilder {
       firstPaymentAmount = firstPayment.toString(),
       regularPaymentAmount = firstPaymentInstalment.amount.toString(),
       reviewDate = schedule.instalments.last.paymentDate.plusWeeks(3),
-      enforcementAction = enforcementFlag(ttpArrangement.taxpayer).getOrElse(""),
+      enforcementAction = enforcementFlag(ttpArrangement.taxpayer).getOrElse("Other"),
       debitDetails = ttpArrangement.taxpayer.selfAssessment.debits.map { d => DesDebit(d.originCode, d.dueDate) },
       saNote = saNote(ttpArrangement)
     )
