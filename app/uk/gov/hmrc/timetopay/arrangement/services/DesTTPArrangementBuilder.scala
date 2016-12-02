@@ -43,8 +43,8 @@ class DesTTPArrangementBuilder {
         case _ => Some("Distraint")
       }
       case _ =>
-        Logger.info(s"Unable to determine enforcement flag as multiple mixed jurisdictions detected $addressTypes")
-        None
+        Logger.info(s"Unable to determine enforcement flag as multiple mixed or no jurisdictions detected $addressTypes")
+        Some("Other")
     }
   }
 

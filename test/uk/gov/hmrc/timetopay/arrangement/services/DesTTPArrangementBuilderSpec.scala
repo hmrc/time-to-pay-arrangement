@@ -22,8 +22,8 @@ class DesTTPArrangementBuilderSpec extends UnitSpec with WithFakeApplication wit
     (taxPayerWithEnglishAddress, Some("Distraint"), "single english postcode"),
     (taxPayerWithMultipleScottishAddresses, Some("Summary Warrant"), "multiple scottish postcode"),
     (taxPayerWithMultipleWelshAddresses, Some("Distraint"), "multiple welsh postcode"),
-    (taxPayerWithMultipleJurisdictions, None, "mixed postcodes"),
-    (taxPayerWithNoAddress, None, "no addresss")
+    (taxPayerWithMultipleJurisdictions, Some("Other"), "mixed postcodes"),
+    (taxPayerWithNoAddress, Some("Other"), "no addresss")
   )
 
   "DesTTPArrangementService " should {
