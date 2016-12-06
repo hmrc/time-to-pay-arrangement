@@ -63,13 +63,12 @@ class DesTTPArrangementBuilder {
     val directDebitReference = ttpArrangement.directDebitReference
     val paymentPlanReference = ttpArrangement.paymentPlanReference
     val finalPayment = ttpArrangement.schedule.instalments.last.amount
-    val note =
-      s"DDI: $directDebitReference PP: $paymentPlanReference " +
+
+    s"DDI: $directDebitReference PP: $paymentPlanReference " +
         s"Initial Payment Date: $initialPaymentDate First Payment: £$initialPayment " +
         s"Regular Payment: £$regularPaymentAmount Frequency: Monthly " +
         s"Final Payment: £$finalPayment Review Date: $reviewDate"
 
-    note
   }
 }
 

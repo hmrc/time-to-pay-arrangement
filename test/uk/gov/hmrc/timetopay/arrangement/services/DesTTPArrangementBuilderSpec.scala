@@ -43,10 +43,10 @@ class DesTTPArrangementBuilderSpec extends UnitSpec with WithFakeApplication wit
       desArrangement.startDate shouldBe LocalDate.parse("2016-09-01")
       desArrangement.regularPaymentFrequency shouldBe "Monthly"
       desArrangement.firstPaymentAmount shouldBe "1298.95"
-      desArrangement.saNote shouldBe "DDI : 1234567890 PP: 1234567890 Initial Payment Date: 01/10/2016 First Payment: " +
+      desArrangement.saNote shouldBe "DDI: 1234567890 PP: 1234567890 Initial Payment Date: 01/10/2016 First Payment: " +
         "£1298.95 Regular Payment: £1248.95 " +
         "Frequency: Monthly " +
-        "Final Payment: £1248.95 Review Date 22/08/2017"
+        "Final Payment: £1248.95 Review Date: 22/08/2017"
     }
   }
 }
