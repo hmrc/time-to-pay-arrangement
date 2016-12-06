@@ -49,7 +49,7 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
       addressLine3 = address.addressLine3,
       addressLine4 = address.addressLine4,
       addressLine5 = address.addressLine5,
-      postCode = address.postCode,
+      postCode = address.postcode,
       totalAll = ttpArrangement.schedule.amountToPay.toString(),
       clmPymtString = paymentMessage(ttpArrangement.schedule),
       clmIndicateInt= letterAndControlConfig.claimIndicateInt,

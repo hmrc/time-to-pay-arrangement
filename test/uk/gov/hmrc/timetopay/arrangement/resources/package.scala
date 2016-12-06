@@ -21,7 +21,7 @@ package object resources {
                                            |        "addressLine3": "",
                                            |        "addressLine4": "",
                                            |        "addressLine5": "",
-                                           |        "postCode": ""
+                                           |        "postcode": ""
                                            |      }
                                            |    ],
                                            |    "customerName": "Customer Name",
@@ -86,7 +86,7 @@ package object resources {
                                             |        "addressLine3": "",
                                             |        "addressLine4": "",
                                             |        "addressLine5": "",
-                                            |        "postCode": ""
+                                            |        "postcode": ""
                                             |      }
                                             |    ],
                                             |    "selfAssessment": {
@@ -237,7 +237,7 @@ package object resources {
                  |      "addressLine3": "",
                  |      "addressLine4": "",
                  |      "addressLine5": "",
-                 |      "postCode": ""
+                 |      "postcode": ""
                  |    }
                  |  ],
                  |  "selfAssessment": {
@@ -263,19 +263,19 @@ package object resources {
   val selfAssessmentNoCommsPref = SelfAssessment("XXX", None, List())
 
   object Addresses {
-    val englishAddress1 = Address(addressLine1 = "XXX", postCode = "B45 0HY")
-    val englishAddress2 = Address(addressLine1 = "XXX", postCode = "B97 5HZ")
-    val welshAddress = Address(addressLine1 = "XXX", postCode = "CF23 8PF")
-    val northernIrelandAddress = Address(addressLine1 = "XXX", postCode = "BT52 2PP")
-    val scottishAddress = Address(addressLine1 = "XXX", postCode = "G3 8NW")
-    val foreignAddress = Address(addressLine1 = "XXX", postCode = "400089")
-    val englishAddressMissingPostCodeAndLine1 = Address(addressLine1 = "", postCode = "")
-    val englishAddressMissingPostCode = Address(addressLine1 = "XXXX", postCode = "")
-    val englishAddressMissingLine1= Address(addressLine1 = "", postCode = "XXXX")
-    val scottishAddress1 = Address(addressLine1 = "XXX", addressLine2 = "XXX", addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postCode = "G3 8NW")
-    val scottishAddress2 = Address(addressLine1 = "XXX", addressLine2 = "XXX", addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postCode = "EH14 8NW")
-    val welshAddress1 = Address(addressLine1 = "XXX", addressLine2 = "XXX", addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postCode = "LL57 3DL")
-    val welshAddress2 = Address(addressLine1 = "XXX", addressLine2 = "XXX", addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postCode = "SY23 3YA")
+    val englishAddress1 = Address(addressLine1 = "XXX", postcode = "B45 0HY")
+    val englishAddress2 = Address(addressLine1 = "XXX", postcode = "B97 5HZ")
+    val welshAddress = Address(addressLine1 = "XXX", postcode = "CF23 8PF")
+    val northernIrelandAddress = Address(addressLine1 = "XXX", postcode = "BT52 2PP")
+    val scottishAddress = Address(addressLine1 = "XXX", postcode = "G3 8NW")
+    val foreignAddress = Address(addressLine1 = "XXX", postcode = "400089")
+    val englishAddressMissingPostCodeAndLine1 = Address(addressLine1 = "", postcode = "")
+    val englishAddressMissingPostCode = Address(addressLine1 = "XXXX", postcode = "")
+    val englishAddressMissingLine1= Address(addressLine1 = "", postcode = "XXXX")
+    val scottishAddress1 = Address(addressLine1 = "XXX", addressLine2 = "XXX", addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postcode = "G3 8NW")
+    val scottishAddress2 = Address(addressLine1 = "XXX", addressLine2 = "XXX", addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postcode = "EH14 8NW")
+    val welshAddress1 = Address(addressLine1 = "XXX", addressLine2 = "XXX", addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postcode = "LL57 3DL")
+    val welshAddress2 = Address(addressLine1 = "XXX", addressLine2 = "XXX", addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postcode = "SY23 3YA")
   }
 
   object Taxpayers {

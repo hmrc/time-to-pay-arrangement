@@ -30,7 +30,7 @@ case class Address(addressLine1: String = "",
                    addressLine3: String = "",
                    addressLine4: String = "",
                    addressLine5: String = "",
-                   postCode: String = "")
+                   postcode: String = "")
 
 case class CommunicationPreferences(welshLanguageIndicator: Boolean,
                                     audioIndicator: Boolean,

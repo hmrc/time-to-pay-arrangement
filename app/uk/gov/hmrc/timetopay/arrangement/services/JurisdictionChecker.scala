@@ -19,7 +19,7 @@ object JurisdictionChecker {
     .getOrElse(throw new RuntimeException("Welsh postcode prefix needed")).r
 
   def addressType(address: Address): JurisdictionType = {
-     address.postCode match {
+     address.postcode match {
        case scottishPostCodeRegex(_) => Scottish
        case welshPostCodeRegex(_) => Welsh
        case _ =>  English
