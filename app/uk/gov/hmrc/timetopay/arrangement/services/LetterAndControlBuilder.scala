@@ -106,14 +106,19 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
 
 
   private def paymentMessage(schedule: Schedule) = {
-    val instalmentSize = schedule.instalments.size - 1
+    val instalmentSize = schedule.instalments.size - 2
     val regularPaymentAmount = schedule.instalments.head.amount
     val lastPaymentAmount = schedule.instalments.last.amount
 
     val initialPayment = Try(schedule.initialPayment).getOrElse(BigDecimal(0.0)) + schedule.instalments.head.amount
 
-    s"Initial payment of $initialPayment then $instalmentSize payments of $regularPaymentAmount and final payment of " +
-      s"$lastPaymentAmount"
+    instalmentSize match {
+      case 0 => s"Initial payment of $initialPayment then a final payment of " + s"$lastPaymentAmount"
+      case _ => s"Initial payment of $initialPayment then $instalmentSize payments of $regularPaymentAmount and final payment of " +
+        s"$lastPaymentAmount"
+    }
+
+
   }
 
   private def commsPrefException(commsPrefs: CommunicationPreferences): Option[LetterError] = commsPrefs match {

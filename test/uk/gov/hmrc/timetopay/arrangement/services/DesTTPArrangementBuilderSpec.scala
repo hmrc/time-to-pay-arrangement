@@ -17,13 +17,13 @@ class DesTTPArrangementBuilderSpec extends UnitSpec with WithFakeApplication wit
 
   val taxPayerData = Table(
     ("taxPayer", "enforcementFlag", "message"),
-    (taxPayerWithScottishAddress, Some("Summary Warrant"), "single scottish postcode"),
-    (taxPayerWithWelshAddress, Some("Distraint"), "single welsh postcode"),
-    (taxPayerWithEnglishAddress, Some("Distraint"), "single english postcode"),
-    (taxPayerWithMultipleScottishAddresses, Some("Summary Warrant"), "multiple scottish postcode"),
-    (taxPayerWithMultipleWelshAddresses, Some("Distraint"), "multiple welsh postcode"),
-    (taxPayerWithMultipleJurisdictions, Some("Other"), "mixed postcodes"),
-    (taxPayerWithNoAddress, Some("Other"), "no addresss")
+    (taxPayerWithScottishAddress, "Summary Warrant", "single scottish postcode"),
+    (taxPayerWithWelshAddress, "Distraint", "single welsh postcode"),
+    (taxPayerWithEnglishAddress, "Distraint", "single english postcode"),
+    (taxPayerWithMultipleScottishAddresses, "Summary Warrant", "multiple scottish postcode"),
+    (taxPayerWithMultipleWelshAddresses, "Distraint", "multiple welsh postcode"),
+    (taxPayerWithMultipleJurisdictions, "Other", "mixed postcodes"),
+    (taxPayerWithNoAddress, "Other", "no addresss")
   )
 
   "DesTTPArrangementService " should {
@@ -43,10 +43,10 @@ class DesTTPArrangementBuilderSpec extends UnitSpec with WithFakeApplication wit
       desArrangement.startDate shouldBe LocalDate.parse("2016-09-01")
       desArrangement.regularPaymentFrequency shouldBe "Monthly"
       desArrangement.firstPaymentAmount shouldBe "1298.95"
-      desArrangement.saNote shouldBe "SSTTP arrangement created online 1st payment amount of £1298.95 " +
-        "1st payment due date 01/09/2016." +
-        "Regular payment amount £1248.95. Regular payment frequency monthly. " +
-        "Review date 22/08/2017 DDI Ref. 1234567890 PP Ref. 1234567890.TTP letter issued"
+      desArrangement.saNote shouldBe "DDI : 1234567890 PP: 1234567890 Initial Payment Date: 01/10/2016 First Payment: " +
+        "£1298.95 Regular Payment: £1248.95 " +
+        "Frequency: Monthly " +
+        "Final Payment: £1248.95 Review Date 22/08/2017"
     }
   }
 }

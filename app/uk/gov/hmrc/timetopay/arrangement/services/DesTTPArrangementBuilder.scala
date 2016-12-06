@@ -26,25 +26,25 @@ class DesTTPArrangementBuilder {
       firstPaymentAmount = firstPayment.toString(),
       regularPaymentAmount = firstPaymentInstalment.amount.toString(),
       reviewDate = schedule.instalments.last.paymentDate.plusWeeks(3),
-      enforcementAction = enforcementFlag(ttpArrangement.taxpayer).getOrElse("Other"),
+      enforcementAction = enforcementFlag(ttpArrangement.taxpayer),
       debitDetails = ttpArrangement.taxpayer.selfAssessment.debits.map { d => DesDebit(d.originCode, d.dueDate) },
       saNote = saNote(ttpArrangement)
     )
   }
 
-  def enforcementFlag(taxpayer: Taxpayer): Option[String]= {
+  def enforcementFlag(taxpayer: Taxpayer): String= {
     val addressTypes: List[JurisdictionType] = taxpayer.addresses.map {
       JurisdictionChecker.addressType
     }.distinct
 
     addressTypes match {
       case x::Nil => x match {
-        case Scottish => Some("Summary Warrant")
-        case _ => Some("Distraint")
+        case Scottish => "Summary Warrant"
+        case _ => "Distraint"
       }
       case _ =>
         Logger.info(s"Unable to determine enforcement flag as multiple mixed or no jurisdictions detected $addressTypes")
-        Some("Other")
+        "Other"
     }
   }
 
@@ -59,15 +59,18 @@ class DesTTPArrangementBuilder {
     val initialPayment = firstPaymentAmount(schedule)
     val reviewDate = schedule.endDate.plusWeeks(3).format(formatter)
     val regularPaymentAmount = schedule.instalments.head.amount
-    val paymentDueDate = ttpArrangement.schedule.startDate.format(formatter)
+    val initialPaymentDate = ttpArrangement.schedule.instalments.head.paymentDate.format(formatter)
     val directDebitReference = ttpArrangement.directDebitReference
     val paymentPlanReference = ttpArrangement.paymentPlanReference
+    val finalPayment = ttpArrangement.schedule.instalments.last.amount
     val note =
-      s"SSTTP arrangement created online 1st payment amount of £$initialPayment 1st payment due date $paymentDueDate." +
-        s"Regular payment amount £$regularPaymentAmount. Regular payment frequency monthly. " +
-        s"Review date $reviewDate DDI Ref. $directDebitReference PP Ref. $paymentPlanReference." +
-        s"TTP letter issued"
+      s"DDI : $directDebitReference PP: $paymentPlanReference " +
+        s"Initial Payment Date: $initialPaymentDate First Payment: £$initialPayment " +
+        s"Regular Payment: £$regularPaymentAmount Frequency: Monthly " +
+        s"Final Payment: £$finalPayment Review Date $reviewDate"
+
     note
   }
 }
+
 
