@@ -20,7 +20,7 @@ Input
              "addressLine3": "",
              "addressLine4": "",
              "addressLine5": "",
-             "postCode": ""
+             "postcode": ""
            }
          ],
     "selfAssessment": {
@@ -93,7 +93,7 @@ Returns a specific arrangement based on the identifier. This api is for internal
               "addressLine3": "",
               "addressLine4": "",
               "addressLine5": "",
-              "postCode": ""
+              "postcode": ""
             }
     ],
     "selfAssessment": {
