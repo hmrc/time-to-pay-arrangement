@@ -57,7 +57,7 @@ class TTPArrangementRepositoryISpec extends FunSpec with BeforeAndAfter with Giv
               |        "addressLine3": "",
               |        "addressLine4": "",
               |        "addressLine5": "",
-              |        "postCode": ""
+              |        "postcode": ""
               |      }
               |    ],
               |    "selfAssessment": {
