@@ -2,6 +2,7 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import java.time.format.DateTimeFormatter
 
+import org.apache.commons.lang3.StringUtils
 import play.api.Logger
 import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType.{JurisdictionType, Scottish}
@@ -64,11 +65,12 @@ class DesTTPArrangementBuilder {
     val paymentPlanReference = ttpArrangement.paymentPlanReference
     val finalPayment = ttpArrangement.schedule.instalments.last.amount
 
-    s"DDI: $directDebitReference PP: $paymentPlanReference " +
+    val saNotes = s"DDI: $directDebitReference PP: $paymentPlanReference " +
         s"Initial Payment Date: $initialPaymentDate First Payment: £$initialPayment " +
         s"Regular Payment: £$regularPaymentAmount Frequency: Monthly " +
         s"Final Payment: £$finalPayment Review Date: $reviewDate"
 
+    saNotes.take(250)
   }
 }
 
