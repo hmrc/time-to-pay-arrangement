@@ -55,7 +55,7 @@ class DesTTPArrangementBuilder {
     firstPayment.amount.+(initialPayment)
   }
 
-  private def saNote(ttpArrangement: TTPArrangement) = {
+  def saNote(ttpArrangement: TTPArrangement) = {
     val schedule: Schedule = ttpArrangement.schedule
     val initialPayment = firstPaymentAmount(schedule)
     val reviewDate = schedule.endDate.plusWeeks(3).format(formatter)

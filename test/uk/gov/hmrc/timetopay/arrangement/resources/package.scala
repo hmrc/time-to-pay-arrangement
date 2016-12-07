@@ -11,8 +11,8 @@ package object resources {
 
   val ttparrangementRequest = Json.parse(s"""
                                            |{
-                                           |  "paymentPlanReference": "1234567890",
-                                           |  "directDebitReference": "1234567890",
+                                           |  "paymentPlanReference": "12345678901234567890123456789012345678900123456",
+                                           |  "directDebitReference": "12345678901234567890123456789012345678900123456",
                                            |  "taxpayer": {
                                            |    "addresses": [
                                            |      {
@@ -45,7 +45,7 @@ package object resources {
                                            |    "startDate": "2016-09-01",
                                            |    "endDate": "2017-08-01",
                                            |    "initialPayment": 50,
-                                           |    "amountToPay": 5000,
+                                           |    "amountToPay": 50000000,
                                            |    "instalmentBalance": 4950,
                                            |    "totalInterestCharged": 45.83,
                                            |    "totalPayable": 5045.83,
