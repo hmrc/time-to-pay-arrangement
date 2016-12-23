@@ -272,10 +272,10 @@ package object resources {
     val englishAddressMissingPostCodeAndLine1 = Address(addressLine1 = "", postcode = "")
     val englishAddressMissingPostCode = Address(addressLine1 = "XXXX", postcode = "")
     val englishAddressMissingLine1= Address(addressLine1 = "", postcode = "XXXX")
-    val scottishAddress1 = Address(addressLine1 = "XXX", addressLine2 = "XXX", addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postcode = "G3 8NW")
-    val scottishAddress2 = Address(addressLine1 = "XXX", addressLine2 = "XXX", addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postcode = "EH14 8NW")
-    val welshAddress1 = Address(addressLine1 = "XXX", addressLine2 = "XXX", addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postcode = "LL57 3DL")
-    val welshAddress2 = Address(addressLine1 = "XXX", addressLine2 = "XXX", addressLine3 = "XXX", addressLine4 = "XXXX", addressLine5 = "XXXX", postcode = "SY23 3YA")
+    val scottishAddress1 = Address(addressLine1 = "XXX", addressLine2 = Some("XXX"), addressLine3 = Some("XXX"), addressLine4 = Some("XXXX"), addressLine5 = Some("XXXX"), postcode = "G3 8NW")
+    val scottishAddress2 = Address(addressLine1 = "XXX", addressLine2 = Some("XXX"), addressLine3 = Some("XXX"), addressLine4 = Some("XXXX"), addressLine5 = Some("XXXX"), postcode = "EH14 8NW")
+    val welshAddress1 = Address(addressLine1 = "XXX", addressLine2 = Some("XXX"), addressLine3 = Some("XXX"), addressLine4 = Some("XXXX"), addressLine5 = Some("XXXX"), postcode = "LL57 3DL")
+    val welshAddress2 = Address(addressLine1 = "XXX", addressLine2 = Some("XXX"), addressLine3 = Some("XXX"), addressLine4 = Some("XXXX"), addressLine5 = Some("XXXX"), postcode = "SY23 3YA")
   }
 
   object Taxpayers {

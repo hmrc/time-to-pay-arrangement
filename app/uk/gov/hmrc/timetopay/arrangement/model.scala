@@ -26,10 +26,10 @@ case class SelfAssessment(utr: String,
                           debits: List[Debit])
 
 case class Address(addressLine1: String = "",
-                   addressLine2: String = "",
-                   addressLine3: String = "",
-                   addressLine4: String = "",
-                   addressLine5: String = "",
+                   addressLine2: Option[String] = None,
+                   addressLine3: Option[String] = None,
+                   addressLine4: Option[String] = None,
+                   addressLine5: Option[String] = None,
                    postcode: String = "")
 
 case class CommunicationPreferences(welshLanguageIndicator: Boolean,
