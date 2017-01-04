@@ -43,10 +43,10 @@ class DesTTPArrangementBuilderSpec extends UnitSpec with WithFakeApplication wit
       desArrangement.startDate shouldBe LocalDate.parse("2016-09-01")
       desArrangement.regularPaymentFrequency shouldBe "Monthly"
       desArrangement.firstPaymentAmount shouldBe "1298.95"
-      val expectedResult: String = "DDI: 12345678901234567890123456789012345678900123456 PP: 12345678901234567890123456789012345678900123456 Initial Payment Date: 01/10/2016 First Payment: " +
-        "£1298.95 Regular Payment: £1248.95 " +
-        "Frequency: Monthly " +
-        "Final Payment: £1248.95 Review Date: 22/08/"
+      val expectedResult: String = "DDI 12345678901234567890123456789012345678900123456, PP 12345678901234567890123456789012345678900123456, First Payment Due Date 01/10/2016, First Payment " +
+        "£1298.95, Regular Payment £1248.95, " +
+        "Frequency Monthly, " +
+        "Final Payment £1248.95, Review Date 22/08"
       desArrangement.saNote.length shouldBe 250
       desArrangement.saNote shouldBe expectedResult
     }
