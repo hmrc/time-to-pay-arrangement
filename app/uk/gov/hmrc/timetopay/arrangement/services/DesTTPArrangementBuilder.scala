@@ -1,5 +1,6 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 import org.apache.commons.lang3.StringUtils
@@ -55,20 +56,20 @@ class DesTTPArrangementBuilder {
     firstPayment.amount.+(initialPayment)
   }
 
-  def saNote(ttpArrangement: TTPArrangement) = {
+  def saNote(ttpArrangement: TTPArrangement): String = {
     val schedule: Schedule = ttpArrangement.schedule
     val initialPayment = firstPaymentAmount(schedule)
     val reviewDate = schedule.endDate.plusWeeks(3).format(formatter)
     val regularPaymentAmount = schedule.instalments.head.amount
-    val initialPaymentDate = ttpArrangement.schedule.instalments.head.paymentDate.format(formatter)
+    val initialPaymentDate = schedule.instalments.head.paymentDate.format(formatter)
     val directDebitReference = ttpArrangement.directDebitReference
     val paymentPlanReference = ttpArrangement.paymentPlanReference
     val finalPayment = ttpArrangement.schedule.instalments.last.amount
 
-    val saNotes = s"DDI: $directDebitReference PP: $paymentPlanReference " +
-        s"Initial Payment Date: $initialPaymentDate First Payment: £$initialPayment " +
-        s"Regular Payment: £$regularPaymentAmount Frequency: Monthly " +
-        s"Final Payment: £$finalPayment Review Date: $reviewDate"
+    val saNotes = s"DDI $directDebitReference, PP $paymentPlanReference, " +
+        s"First Payment Due Date $initialPaymentDate, First Payment £$initialPayment, " +
+        s"Regular Payment £$regularPaymentAmount, Frequency Monthly, " +
+        s"Final Payment £$finalPayment, Review Date $reviewDate"
 
     saNotes.take(250)
   }
