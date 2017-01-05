@@ -16,12 +16,12 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
   case class LetterError (code: Int, message: String)
 
   object LetterError {
-    def welshLargePrint() = LetterError(5, "welsh-large-print-required")
-    def welshAudio() = LetterError(7,"audio-welsh-required")
-    def welsh() = LetterError(4,"welsh-required")
-    def braille() = LetterError(2,"braille-required")
-    def audio() = LetterError(6,"audio-required")
-    def largePrint() = LetterError(3, "large-print-required")
+    def welshLargePrint() = LetterError(5, "welsh large print required")
+    def welshAudio() = LetterError(7,"audio welsh required")
+    def welsh() = LetterError(4,"welsh required")
+    def braille() = LetterError(2,"braille required")
+    def audio() = LetterError(6,"audio required")
+    def largePrint() = LetterError(3, "large print required")
   }
 
   def create(ttpArrangement: TTPArrangement): LetterAndControl =  {
@@ -71,7 +71,7 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
     taxpayer.addresses match {
       case Nil =>
         Logger.debug("No address found in Digital")
-        (Address(),Some(LetterError(8, "no-address")))
+        (Address(),Some(LetterError(8, "no address")))
       case x::Nil =>
         Logger.debug("Found single address")
         validate(x)
@@ -93,13 +93,13 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
         validate(taxpayer.addresses.head)
       case _ =>
         Logger.trace(s"Customer has addresses in ${uniqueAddressTypes.mkString(" and")} jurisdictions")
-        (Address(),Some(LetterError(1, "address-jurisdiction-conflict")))
+        (Address(),Some(LetterError(1, "address jurisdiction conflict")))
     }
   }
 
   def validate(address: Address) = address match {
     case Address(_, _, _, _, _, "") | Address("", _, _, _, _, _) =>
-      (address,Some(LetterError(9, "incomplete-address")))
+      (address,Some(LetterError(9, "incomplete address")))
     case _ =>
       (address, None)
   }
