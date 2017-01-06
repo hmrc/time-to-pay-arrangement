@@ -29,7 +29,7 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
 
     val correspondence: AddressResult = resolveAddress(ttpArrangement)
 
-    val address: Address = correspondence._1
+    val address: Address = validateAddressFormat(correspondence._1)
 
     def resolveCommsException = {
       (for {
@@ -45,12 +45,12 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
       customerName = customerName,
       salutation = s"${letterAndControlConfig.salutation} $customerName",
       addressLine1 = address.addressLine1,
-      addressLine2 = address.addressLine2.getOrElse(""),
-      addressLine3 = address.addressLine3.getOrElse(""),
-      addressLine4 = address.addressLine4.getOrElse(""),
-      addressLine5 = address.addressLine5.getOrElse(""),
+      addressLine2 = address.addressLine2,
+      addressLine3 = address.addressLine3,
+      addressLine4 = address.addressLine4,
+      addressLine5 = address.addressLine5,
       postCode = address.postcode,
-      totalAll = ttpArrangement.schedule.amountToPay.toString(),
+      totalAll = ttpArrangement.schedule.amountToPay.setScale(2).toString(),
       clmPymtString = paymentMessage(ttpArrangement.schedule),
       clmIndicateInt= letterAndControlConfig.claimIndicateInt,
       template = letterAndControlConfig.template,
@@ -65,6 +65,15 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
     )
 
   }
+
+  private def validateAddressFormat(address: Address): Address = Address(
+      addressLine1 = address.addressLine1,
+      addressLine2 = if (address.addressLine2.getOrElse("").equals("")) None else address.addressLine2,
+      addressLine3 = if (address.addressLine3.getOrElse("").equals("")) None else address.addressLine3,
+      addressLine4 = if (address.addressLine4.getOrElse("").equals("")) None else address.addressLine4,
+      addressLine5 = if (address.addressLine5.getOrElse("").equals("")) None else address.addressLine5,
+      postcode = address.postcode
+    )
 
   private def resolveAddress(ttpArrangement: TTPArrangement): AddressResult = {
     implicit val taxpayer: Taxpayer = ttpArrangement.taxpayer
@@ -107,10 +116,10 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
 
   private def paymentMessage(schedule: Schedule) = {
     val instalmentSize = schedule.instalments.size - 2
-    val regularPaymentAmount = schedule.instalments.head.amount
-    val lastPaymentAmount = schedule.instalments.last.amount
+    val regularPaymentAmount = schedule.instalments.head.amount.setScale(2)
+    val lastPaymentAmount = schedule.instalments.last.amount.setScale(2)
 
-    val initialPayment = Try(schedule.initialPayment).getOrElse(BigDecimal(0.0)) + schedule.instalments.head.amount
+    val initialPayment = (Try(schedule.initialPayment).getOrElse(BigDecimal(0.0)) + schedule.instalments.head.amount).setScale(2)
 
     instalmentSize match {
       case 0 => s"Initial payment of $initialPayment then a final payment of " + s"$lastPaymentAmount"
