@@ -148,16 +148,22 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
 
   private def commsPrefException(commsPrefs: CommunicationPreferences): Option[LetterError] = commsPrefs match {
       case CommunicationPreferences(true, _, true, _) =>
+        Logger.debug(s"Exception found in LetterAndControl - Code: 5 Reason: Welsh large print required")
         Some(LetterError.welshLargePrint())
       case CommunicationPreferences(true, true, _, _) =>
+        Logger.debug(s"Exception found in LetterAndControl - Code: 7 Reason: Audio Welsh required")
         Some(LetterError.welshAudio())
       case CommunicationPreferences(true, _, _, _) =>
+        Logger.debug(s"Exception found in LetterAndControl - Code: 4 Reason: Welsh required")
         Some(LetterError.welsh())
       case CommunicationPreferences(_, _, _, true) =>
+        Logger.debug(s"Exception found in LetterAndControl - Code: 2 Reason: Braille required")
         Some(LetterError.braille())
       case CommunicationPreferences(_, true, _, _) =>
+        Logger.debug(s"Exception found in LetterAndControl - Code: 6 Reason: Audio required")
         Some(LetterError.audio())
       case CommunicationPreferences(_, _, true, _) =>
+        Logger.debug(s"Exception found in LetterAndControl - Code: 3 Reason: Large print required")
         Some(LetterError.largePrint())
       case _ => None
     }

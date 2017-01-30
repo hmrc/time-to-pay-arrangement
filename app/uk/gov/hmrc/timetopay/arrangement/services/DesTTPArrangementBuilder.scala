@@ -16,16 +16,11 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-import org.apache.commons.lang3.StringUtils
 import play.api.Logger
 import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType.{JurisdictionType, Scottish}
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 
 class DesTTPArrangementBuilder {
