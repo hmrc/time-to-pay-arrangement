@@ -43,7 +43,7 @@ class TTPArrangementRepository(implicit mongo: () => DB) extends ReactiveReposit
     Logger.debug("Saving ttparrangement record")
     insert(ttpArrangement)
       .collect {
-        case DefaultWriteResult(true, 1, Seq(), None, _, None) => Logger.info("arrangement record persisted"); Some(ttpArrangement)
+        case DefaultWriteResult(true, 1, Seq(), None, _, None) => Logger.info(s"Arrangement record persisted ID: ${ttpArrangement.id}"); Some(ttpArrangement)
         case DefaultWriteResult(false, 1, Seq(), None, _, Some(msg)) =>
           Logger.error(s"An error occurred saving record: $msg")
           None
