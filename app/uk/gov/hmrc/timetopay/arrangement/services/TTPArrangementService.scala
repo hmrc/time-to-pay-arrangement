@@ -44,16 +44,23 @@ class TTPArrangementService(arrangementDesApiConnector: ((Taxpayer, DesSubmissio
 
     val request: DesSubmissionRequest = DesSubmissionRequest(desTTPArrangement, Some(letterAndControl))
 
-    def submitOnValError(code: Int, errorMessage:String,ttp: Option[TTPArrangement])= {
+
+    def assignArrangement(response : Either[SubmissionError, SubmissionSuccess] ,ttp:Option[TTPArrangement]) = {
+      response match {
+        case Right(_) => Future.successful(ttp)
+        case Left(e) => Future.failed(DesApiException(e.code, e.message))
+      }
+    }
+
+    def resubmitOnValError(code: Int, errorMessage: String, ttp: Option[TTPArrangement]) = {
       //todo perhaps move to config
-   val  validationFailNumber = 455
-      def isValidationFail:Boolean =  code == validationFailNumber
-        if(isValidationFail) {
-          arrangementDesApiConnector(arrangement.taxpayer, request.copy(letterAndControl = None)).flatMap(_ match {
-            case Right(r) => Future.successful(ttp)
-            case Left(e) => Future.failed(DesApiException(e.code, e.message))
-          })
-        }
+      val validationFailNumber = 455
+      def isValidationFail: Boolean = code == validationFailNumber
+
+      if (isValidationFail) {
+        arrangementDesApiConnector(arrangement.taxpayer, request.copy(letterAndControl = None)).flatMap(
+          assignArrangement(_, ttp))
+      }
         else Future.failed(DesApiException(code, errorMessage))
       }
 
@@ -62,12 +69,13 @@ class TTPArrangementService(arrangementDesApiConnector: ((Taxpayer, DesSubmissio
       ttp <- saveArrangement(arrangement, request)
     } yield (response, ttp)).flatMap {
       result =>
-        result._1.fold(error => Future.failed(DesApiException(error.code, error.message)), success => Future.successful(result._2)).recoverWith {
-          case apiErrorResponse:DesApiException =>
-            submitOnValError(apiErrorResponse.code,apiErrorResponse.message,result._2)
+        assignArrangement(result._1,result._2).recoverWith {
+          case apiErrorResponse: DesApiException =>
+            resubmitOnValError(apiErrorResponse.code, apiErrorResponse.message, result._2)
         }
     }
   }
+
   private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[TTPArrangement]] = {
     val toSave = arrangement.copy(id = Some(UUID.randomUUID().toString),
       createdOn = Some(LocalDateTime.now()),
