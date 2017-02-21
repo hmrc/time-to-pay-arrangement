@@ -44,7 +44,7 @@ class DesArrangementServiceSpec extends UnitSpec with ScalaFutures with MockFact
   val connector = new TestDesArrangementApiService
 
   "Calling submitArrangement" should {
-    val request: DesSubmissionRequest = DesSubmissionRequest(submitArrangementTTPArrangement, submitArrangementLetterAndControl)
+    val request: DesSubmissionRequest = DesSubmissionRequest(submitArrangementTTPArrangement, Some(submitArrangementLetterAndControl))
     "return 202 accepted response" in {
 
       (mockHttp.POST(_:String, _:DesSubmissionRequest, _:Seq[(String,String)])(_:Writes[DesSubmissionRequest], _:HttpReads[HttpResponse], _:HeaderCarrier))

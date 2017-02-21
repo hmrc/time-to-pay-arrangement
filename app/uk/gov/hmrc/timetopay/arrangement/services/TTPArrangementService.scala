@@ -42,18 +42,32 @@ class TTPArrangementService(arrangementDesApiConnector: ((Taxpayer, DesSubmissio
     val letterAndControl = letterAndControlService(arrangement)
     val desTTPArrangement = desTTPArrangementService(arrangement)
 
-    val request: DesSubmissionRequest = DesSubmissionRequest(desTTPArrangement, letterAndControl)
+    val request: DesSubmissionRequest = DesSubmissionRequest(desTTPArrangement, Some(letterAndControl))
+
+    def submitOnValError(code: Int, errorMessage:String,ttp: Option[TTPArrangement])= {
+      //todo perhaps move to config
+   val  validationFailNumber = 455
+      def isValidationFail:Boolean =  code == validationFailNumber
+        if(isValidationFail) {
+          arrangementDesApiConnector(arrangement.taxpayer, request.copy(letterAndControl = None)).flatMap(_ match {
+            case Right(r) => Future.successful(ttp)
+            case Left(e) => Future.failed(DesApiException(e.code, e.message))
+          })
+        }
+        else Future.failed(DesApiException(code, errorMessage))
+      }
 
     (for {
       response <- arrangementDesApiConnector(arrangement.taxpayer, request)
       ttp <- saveArrangement(arrangement, request)
     } yield (response, ttp)).flatMap {
       result =>
-        result._1.fold(error => Future.failed(DesApiException(error.code, error.message)),
-          success => Future.successful(result._2))
+        result._1.fold(error => Future.failed(DesApiException(error.code, error.message)), success => Future.successful(result._2)).recoverWith {
+          case apiErrorResponse:DesApiException =>
+            submitOnValError(apiErrorResponse.code,apiErrorResponse.message,result._2)
+        }
     }
   }
-
   private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[TTPArrangement]] = {
     val toSave = arrangement.copy(id = Some(UUID.randomUUID().toString),
       createdOn = Some(LocalDateTime.now()),

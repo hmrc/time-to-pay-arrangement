@@ -100,7 +100,7 @@ case class LetterAndControl(customerName: String,
                             exceptionReason: Option[String] = None
                            )
 
-case class DesSubmissionRequest(ttpArrangement: DesTTPArrangement, letterAndControl: LetterAndControl)
+case class DesSubmissionRequest(ttpArrangement: DesTTPArrangement, letterAndControl: Option[LetterAndControl] = None)
 
 object modelFormat {
 
