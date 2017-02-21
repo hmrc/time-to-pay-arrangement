@@ -44,6 +44,10 @@ class TTPArrangementService(arrangementDesApiConnector: ((Taxpayer, DesSubmissio
 
     val request: DesSubmissionRequest = DesSubmissionRequest(desTTPArrangement, letterAndControl)
 
+    //save arrangement
+    //call des submission actor
+    //return result
+
     (for {
       response <- arrangementDesApiConnector(arrangement.taxpayer, request)
       ttp <- saveArrangement(arrangement, request)

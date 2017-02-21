@@ -24,6 +24,7 @@ private object AppDependencies {
   private val hmrcTestVersion = "1.9.0"
   private val scalaTestVersion = "2.2.6"
   private val pegdownVersion = "1.6.0"
+  private val akkaVersion = "2.4.3"
 
   private val playReactivemongoVersion = "4.8.0"
 
@@ -36,7 +37,11 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-url-binders" % playUrlBindersVersion,
     "uk.gov.hmrc" %% "play-config" % playConfigVersion,
     "uk.gov.hmrc" %% "play-json-logger" % playJsonLoggerVersion,
-    "uk.gov.hmrc" %% "domain" % domainVersion
+    "uk.gov.hmrc" %% "domain" % domainVersion,
+    "com.typesafe.akka" %% "akka-actor" % akkaVersion,
+    "com.typesafe.akka" %% "akka-stream" % akkaVersion,
+    "com.typesafe.akka" %% "akka-http-experimental" % akkaVersion,
+    "com.typesafe.akka" %% "akka-http-spray-json-experimental" % akkaVersion
   )
 
   trait TestDependencies {
