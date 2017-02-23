@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
+import javax.inject.Inject
+
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -27,7 +29,7 @@ import uk.gov.hmrc.timetopay.arrangement.resources._
 
 import scala.concurrent.Future
 
-class TTPArrangementServiceSpec extends UnitSpec with MockFactory with WithFakeApplication with ScalaFutures {
+class TTPArrangementServiceSpec extends UnitSpec with MockFactory  with ScalaFutures {
 
   val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement]
   val savedArrangement = ttparrangementResponse.as[TTPArrangement]

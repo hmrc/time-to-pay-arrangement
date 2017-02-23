@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
+import javax.inject.Inject
+
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
 import play.api.http.Status
@@ -28,7 +30,7 @@ import uk.gov.hmrc.timetopay.arrangement.resources._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-
+@Inject()
 class DesArrangementServiceSpec extends UnitSpec with ScalaFutures with MockFactory  {
   implicit val headerCarrier = HeaderCarrier()
 
