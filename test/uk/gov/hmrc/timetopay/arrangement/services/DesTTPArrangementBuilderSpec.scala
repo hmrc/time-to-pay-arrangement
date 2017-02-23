@@ -17,6 +17,7 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
 import java.time.LocalDate
+import javax.inject.Inject
 
 import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
@@ -26,7 +27,7 @@ import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 
-class DesTTPArrangementBuilderSpec extends UnitSpec with WithFakeApplication with ScalaFutures {
+class DesTTPArrangementBuilderSpec extends UnitSpec  with ScalaFutures {
 
 
   val desTTPArrangementService = new DesTTPArrangementBuilder

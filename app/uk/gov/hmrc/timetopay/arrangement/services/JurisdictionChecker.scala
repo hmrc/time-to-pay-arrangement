@@ -24,14 +24,13 @@ object JurisdictionType extends Enumeration  {
   type JurisdictionType = Value
   val English, Scottish, Welsh = Value
 }
-
-object JurisdictionChecker {
+import play.api.Play.current
+object JurisdictionChecker  {
   import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType._
-  import play.api.Play.current
 
-  val scottishPostCodeRegex = application.configuration.getString("scottish.postcode.prefix")
+  val scottishPostCodeRegex = Some("^(AB|DD|DG|EH|FK|G|HS|IV|KA|KW|KY|ML|PA|PH|TD|ZE)[0-9].*")
     .getOrElse(throw new RuntimeException("Scottish postcode prefix needed")).r
-  val welshPostCodeRegex = application.configuration.getString("welsh.postcode.prefix")
+  val welshPostCodeRegex = Some(("^(LL|SY|LD|HR|NP|CF|SA)[0-9].*"))
     .getOrElse(throw new RuntimeException("Welsh postcode prefix needed")).r
 
   def addressType(address: Address): JurisdictionType = {

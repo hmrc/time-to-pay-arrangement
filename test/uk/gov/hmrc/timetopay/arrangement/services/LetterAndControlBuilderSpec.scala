@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
+import javax.inject.Inject
+
 import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import uk.gov.hmrc.timetopay.arrangement.config.LetterAndControlConfig
@@ -24,7 +26,7 @@ import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
 import org.scalatest.prop.TableDrivenPropertyChecks._
 
-class LetterAndControlBuilderSpec extends UnitSpec with WithFakeApplication with ScalaFutures {
+class LetterAndControlBuilderSpec extends UnitSpec  with ScalaFutures {
 
   val letterAndControlConfig = LetterAndControlConfig("Dear", "XXXX","XXXX","XXXX","XXXX","XXXX","XXXX", "XXXX","XXXX")
 
