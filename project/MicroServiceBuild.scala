@@ -16,7 +16,6 @@ private object AppDependencies {
   private val pegdownVersion = "1.6.0"
 
   private val playReactivemongoVersion = "4.8.0"
-  //todo hook em back in
   val compile = Seq(
     "uk.gov.hmrc" %% "play-reactivemongo" % "4.8.0",
     ws,
