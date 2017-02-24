@@ -11,21 +11,14 @@ private object AppDependencies {
   import play.sbt.PlayImport._
   import play.core.PlayVersion
 
-  private val microserviceBootstrapVersion = "5.12.0"
-  private val playAuthVersion = "4.3.0"
-  private val playHealthVersion = "2.1.0"
-  private val playUrlBindersVersion = "2.1.0"
-  private val playConfigVersion = "4.1.0"
-  private val playJsonLoggerVersion = "3.1.0"
-  private val domainVersion = "4.1.0"
-  private val hmrcTestVersion = "1.9.0"
+
   private val scalaTestVersion = "2.2.6"
   private val pegdownVersion = "1.6.0"
 
   private val playReactivemongoVersion = "4.8.0"
   //todo hook em back in
   val compile = Seq(
-    "uk.gov.hmrc" %% "play-reactivemongo" % playReactivemongoVersion,
+    "uk.gov.hmrc" %% "play-reactivemongo" % "4.8.0",
     ws,
     "uk.gov.hmrc" %% "microservice-bootstrap" %  "5.12.0",
     "uk.gov.hmrc" %% "play-authorisation" %  "4.3.0",

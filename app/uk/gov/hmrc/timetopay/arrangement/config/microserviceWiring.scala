@@ -27,7 +27,7 @@ import uk.gov.hmrc.play.http.{HttpGet, HttpPost}
 import uk.gov.hmrc.play.http.hooks.HttpHook
 import uk.gov.hmrc.play.http.ws._
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.services.{DesTTPArrangementBuilder, _}
+import uk.gov.hmrc.timetopay.arrangement.services._
 
 import scala.concurrent.Future
 
@@ -69,7 +69,7 @@ trait ServiceRegistry extends ServicesConfig {
 
   import play.api.Play.current
   lazy val JurisdictionCheckerService = new JurisdictionChecker(JurisdictionCheckerConfig.create(configuration.getConfig("jurisdictionChecker")
-    .getOrElse(throw new RuntimeException("LetterAndControl configuration required"))))
+    .getOrElse(throw new RuntimeException("Jurisdiction checker configuration required"))))
 
   lazy val letterAndControlService = new LetterAndControlBuilder(LetterAndControlConfig.create(configuration.getConfig("letterAndControl")
     .getOrElse(throw new RuntimeException("LetterAndControl configuration required"))),JurisdictionCheckerService) {}

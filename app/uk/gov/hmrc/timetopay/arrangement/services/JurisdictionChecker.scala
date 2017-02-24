@@ -28,8 +28,8 @@ object JurisdictionType extends Enumeration  {
 class JurisdictionChecker(config : JurisdictionCheckerConfig) {
   import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType._
 
-  val scottishPostCodeRegex = config.stotishPrefix.r
-  val welshPostCodeRegex = config.welsePrefix.r
+  val scottishPostCodeRegex = config.scottishPrefix.r
+  val welshPostCodeRegex = config.welshPrefix.r
 
   def addressType(address: Address): JurisdictionType = {
      address.postcode match {

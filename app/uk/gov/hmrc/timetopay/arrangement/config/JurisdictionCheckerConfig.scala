@@ -19,7 +19,7 @@ package uk.gov.hmrc.timetopay.arrangement.config
 import play.api.Configuration
 
 
-case class JurisdictionCheckerConfig(stotishPrefix:String , welsePrefix:String)
+case class JurisdictionCheckerConfig(scottishPrefix:String , welshPrefix:String)
 
 object JurisdictionCheckerConfig {
 
