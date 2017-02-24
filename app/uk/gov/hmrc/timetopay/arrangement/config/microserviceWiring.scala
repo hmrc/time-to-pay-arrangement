@@ -23,11 +23,11 @@ import uk.gov.hmrc.play.audit.http.config.LoadAuditingConfig
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.auth.microservice.connectors.AuthConnector
 import uk.gov.hmrc.play.config.{AppName, RunMode, ServicesConfig}
-import uk.gov.hmrc.play.http.{HttpPost, HttpGet}
+import uk.gov.hmrc.play.http.{HttpGet, HttpPost}
 import uk.gov.hmrc.play.http.hooks.HttpHook
 import uk.gov.hmrc.play.http.ws._
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.services._
+import uk.gov.hmrc.timetopay.arrangement.services.{DesTTPArrangementBuilder, _}
 
 import scala.concurrent.Future
 
@@ -51,7 +51,7 @@ object DesArrangementApiService extends DesArrangementService with ServicesConfi
   override val http: HttpGet with HttpPost = WSHttp
 }
 
-object DesTTPArrangementBuilder extends DesTTPArrangementBuilder {}
+
 
 object RepositoryConfig  {
   private implicit val connection = {
@@ -68,10 +68,13 @@ trait ServiceRegistry extends ServicesConfig {
   lazy val arrangementDesApiConnector = DesArrangementApiService
 
   import play.api.Play.current
-  lazy val letterAndControlService = new LetterAndControlBuilder(LetterAndControlConfig.create(configuration.getConfig("letterAndControl")
-    .getOrElse(throw new RuntimeException("LetterAndControl configuration required")))) {}
+  lazy val JurisdictionCheckerService = new JurisdictionChecker(JurisdictionCheckerConfig.create(configuration.getConfig("jurisdictionChecker")
+    .getOrElse(throw new RuntimeException("LetterAndControl configuration required"))))
 
-  lazy val desTTPArrangementService = DesTTPArrangementBuilder
+  lazy val letterAndControlService = new LetterAndControlBuilder(LetterAndControlConfig.create(configuration.getConfig("letterAndControl")
+    .getOrElse(throw new RuntimeException("LetterAndControl configuration required"))),JurisdictionCheckerService) {}
+
+  lazy val desTTPArrangementService = new DesTTPArrangementBuilder(JurisdictionCheckerService)
 
   lazy val letterAndControl: (TTPArrangement => LetterAndControl) = arrangement => letterAndControlService.create(arrangement)
   lazy val desArrangement: (TTPArrangement => DesTTPArrangement) = arrangement => desTTPArrangementService.create(arrangement)

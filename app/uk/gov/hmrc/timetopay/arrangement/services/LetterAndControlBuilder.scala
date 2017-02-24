@@ -25,7 +25,7 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 
-class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
+class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig, jurisdictionChecker: JurisdictionChecker) {
 
   type AddressResult = (Address, Option[LetterError])
 
@@ -109,7 +109,7 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
 
   private def multipleAddresses(implicit taxpayer: Taxpayer) = {
     val uniqueAddressTypes: List[JurisdictionType] = taxpayer.addresses.map {
-      JurisdictionChecker.addressType
+      jurisdictionChecker.addressType
     }.distinct
 
     uniqueAddressTypes match {

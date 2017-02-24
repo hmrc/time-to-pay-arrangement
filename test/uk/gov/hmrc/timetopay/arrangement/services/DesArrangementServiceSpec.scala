@@ -30,8 +30,8 @@ import uk.gov.hmrc.timetopay.arrangement.resources._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-@Inject()
-class DesArrangementServiceSpec extends UnitSpec with ScalaFutures with MockFactory  {
+
+class DesArrangementServiceSpec extends UnitSpec  with ScalaFutures with MockFactory  {
   implicit val headerCarrier = HeaderCarrier()
 
   val mockHttp: HttpGet with HttpPost = mock[WSHttp]

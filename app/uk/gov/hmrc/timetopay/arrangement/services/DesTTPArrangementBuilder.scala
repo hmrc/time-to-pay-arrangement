@@ -23,7 +23,7 @@ import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType.{JurisdictionType, Scottish}
 
 
-class DesTTPArrangementBuilder {
+class DesTTPArrangementBuilder(jurisdictionChecker: JurisdictionChecker) {
   val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
   def create(implicit ttpArrangement: TTPArrangement): DesTTPArrangement =  {
@@ -47,7 +47,7 @@ class DesTTPArrangementBuilder {
 
   def enforcementFlag(taxpayer: Taxpayer): String= {
     val addressTypes: List[JurisdictionType] = taxpayer.addresses.map {
-      JurisdictionChecker.addressType
+      jurisdictionChecker.addressType
     }.distinct
 
     addressTypes match {
