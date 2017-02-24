@@ -16,16 +16,15 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import javax.inject.Inject
 
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
-import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig, LetterAndControlConfig}
-import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.resources._
-import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
 import org.scalatest.prop.TableDrivenPropertyChecks._
+import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.timetopay.arrangement._
+import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig, LetterAndControlConfig}
+import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
+import uk.gov.hmrc.timetopay.arrangement.resources._
 
 class LetterAndControlBuilderSpec extends UnitSpec with MockFactory   with ScalaFutures {
 

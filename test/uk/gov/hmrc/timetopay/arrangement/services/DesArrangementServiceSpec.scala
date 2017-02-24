@@ -16,8 +16,6 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import javax.inject.Inject
-
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
 import play.api.http.Status

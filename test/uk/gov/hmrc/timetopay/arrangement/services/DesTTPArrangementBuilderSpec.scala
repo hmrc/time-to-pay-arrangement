@@ -17,17 +17,16 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
 import java.time.LocalDate
-import javax.inject.Inject
 
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import org.scalatest.prop.TableDrivenPropertyChecks._
+import uk.gov.hmrc.play.test.UnitSpec
 import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
 import uk.gov.hmrc.timetopay.arrangement.config.JurisdictionCheckerConfig
+import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
 import uk.gov.hmrc.timetopay.arrangement.resources._
-import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 
 class DesTTPArrangementBuilderSpec extends UnitSpec  with MockFactory  with ScalaFutures {
 
