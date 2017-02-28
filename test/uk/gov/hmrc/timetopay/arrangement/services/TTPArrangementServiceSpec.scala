@@ -18,15 +18,16 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatestplus.play.OneAppPerSuite
 import uk.gov.hmrc.play.http.HeaderCarrier
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.resources._
 
 import scala.concurrent.Future
 
-class TTPArrangementServiceSpec extends UnitSpec with MockFactory  with ScalaFutures {
+class TTPArrangementServiceSpec extends UnitSpec with MockFactory  with ScalaFutures with OneAppPerSuite{
 
   val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement]
   val savedArrangement = ttparrangementResponse.as[TTPArrangement]

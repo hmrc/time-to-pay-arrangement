@@ -16,17 +16,19 @@
 
 package uk.gov.hmrc.timetopay.arrangement
 
+import javax.inject.Inject
+
 import play.api.Logger
 import play.api.libs.json.Json.toJson
-import play.api.mvc.{Result, Action, RequestHeader}
+import play.api.mvc.{Action, RequestHeader, Result}
 import uk.gov.hmrc.play.microservice.controller.BaseController
 import uk.gov.hmrc.timetopay.arrangement.services.{DesApiException, TTPArrangementService}
 
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.Future._
 import modelFormat._
 
-class TTPArrangementController(arrangementService: TTPArrangementService)(implicit ec: ExecutionContext) extends BaseController {
+class TTPArrangementController @Inject()(val arrangementService: TTPArrangementService)(implicit ec: ExecutionContext) extends BaseController {
 
   def createdNoLocation = Future.successful[Result](Created)
   def createdWithLocation(id: String)(implicit reqHead: RequestHeader) = Future.successful[Result](Created.withHeaders(LOCATION -> s"$protocol://${reqHead.host}/ttparrangements/$id"))

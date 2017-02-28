@@ -21,14 +21,15 @@ import java.time.LocalDate
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.prop.TableDrivenPropertyChecks._
-import uk.gov.hmrc.play.test.UnitSpec
+import org.scalatestplus.play.OneAppPerSuite
+import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
 import uk.gov.hmrc.timetopay.arrangement.config.JurisdictionCheckerConfig
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
 import uk.gov.hmrc.timetopay.arrangement.resources._
 
-class DesTTPArrangementBuilderSpec extends UnitSpec  with MockFactory  with ScalaFutures {
+class DesTTPArrangementBuilderSpec extends UnitSpec  with MockFactory  with ScalaFutures with OneAppPerSuite {
 
   val  jurisdictionConfig = JurisdictionCheckerConfig("^(AB|DD|DG|EH|FK|G|HS|IV|KA|KW|KY|ML|PA|PH|TD|ZE)[0-9].*",
     "^(LL|SY|LD|HR|NP|CF|SA)[0-9].*")

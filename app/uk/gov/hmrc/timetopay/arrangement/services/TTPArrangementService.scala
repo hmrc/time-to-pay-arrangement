@@ -18,6 +18,7 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import java.time.LocalDateTime
 import java.util.UUID
+import javax.inject.Inject
 
 import play.api.Logger
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -27,11 +28,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Try
 
-class TTPArrangementService(arrangementDesApiConnector: ((Taxpayer, DesSubmissionRequest) => Future[Either[SubmissionError, SubmissionSuccess]]),
-                            desTTPArrangementService: (TTPArrangement => DesTTPArrangement),
-                            letterAndControlService: (TTPArrangement => LetterAndControl),
-                            arrangementSave: (TTPArrangement => Future[Option[TTPArrangement]]),
-                            arrangementGet: (String => Future[Option[TTPArrangement]])) {
+class TTPArrangementService @Inject()( arrangementDesApiConnector: ((Taxpayer, DesSubmissionRequest) => Future[Either[SubmissionError, SubmissionSuccess]]),
+                                       desTTPArrangementService: (TTPArrangement => DesTTPArrangement),
+                                       letterAndControlService: (TTPArrangement => LetterAndControl),
+                                       arrangementSave: (TTPArrangement => Future[Option[TTPArrangement]]),
+                                       arrangementGet: (String => Future[Option[TTPArrangement]])) {
 
   def byId(id: String): Future[Option[TTPArrangement]] = arrangementGet(id)
 

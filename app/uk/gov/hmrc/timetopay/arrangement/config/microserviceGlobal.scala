@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.timetopay.arrangement.config
 import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
-import akka.stream.Materializer
 import com.typesafe.config.Config
 import net.ceedubs.ficus.Ficus._
 import play.api.{Application, Configuration, Play}
@@ -51,7 +50,7 @@ object MicroserviceAuthFilter extends AuthorisationFilter   with MicroserviceFil
   override def controllerNeedsAuth(controllerName: String): Boolean = ControllerConfiguration.paramsForController(controllerName).needsAuth
 }
 
-trait MicroserviceGlobal extends DefaultMicroserviceGlobal with RunMode with ServiceRegistry with ControllerRegistry with MicroserviceFilterSupport {
+object MicroserviceGlobal extends DefaultMicroserviceGlobal with RunMode  with MicroserviceFilterSupport {
   override val auditConnector = MicroserviceAuditConnector
 
   override def microserviceMetricsConfig(implicit app: Application): Option[Configuration] = app.configuration.getConfig(s"$env.microservice.metrics")
@@ -61,9 +60,5 @@ trait MicroserviceGlobal extends DefaultMicroserviceGlobal with RunMode with Ser
   override val microserviceAuditFilter = MicroserviceAuditFilter
 
   override val authFilter = Some(MicroserviceAuthFilter)
-
-   def getControllerInstance[A](controllerClass: Class[A]): A = {
-    getController(controllerClass)
-  }
 }
 
