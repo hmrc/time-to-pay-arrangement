@@ -16,20 +16,22 @@
 
 package uk.gov.hmrc.timetopay.arrangement.config
 
-import play.api.Play.configuration
+import play.api.Play.{configuration, current}
 import play.api.mvc.Controller
-import play.modules.reactivemongo.ReactiveMongoPlugin
+import reactivemongo.api.MongoConnection.ParsedURI
+import reactivemongo.api.{DB, MongoConnection, MongoDriver}
 import uk.gov.hmrc.play.audit.http.config.LoadAuditingConfig
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.auth.microservice.connectors.AuthConnector
 import uk.gov.hmrc.play.config.{AppName, RunMode, ServicesConfig}
-import uk.gov.hmrc.play.http.{HttpGet, HttpPost}
 import uk.gov.hmrc.play.http.hooks.HttpHook
 import uk.gov.hmrc.play.http.ws._
+import uk.gov.hmrc.play.http.{HttpGet, HttpPost}
 import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.services._
 
 import scala.concurrent.Future
+import scala.util.Try
 
 object WSHttp extends WSGet with WSPut with WSPost with WSDelete with WSPatch with AppName {
   override val hooks: Seq[HttpHook] = NoneRequired
@@ -51,15 +53,14 @@ object DesArrangementApiService extends DesArrangementService with ServicesConfi
   override val http: HttpGet with HttpPost = WSHttp
 }
 
-
-
-object RepositoryConfig  {
-  private implicit val connection = {
-    import play.api.Play.current
-    ReactiveMongoPlugin.mongoConnector.db
+object RepositoryConfig extends ServicesConfig {
+  val driver = MongoDriver()
+  val parsedUri: Try[ParsedURI] = MongoConnection.parseURI(baseUrl("mongodb.uri"))
+  val connection: MongoConnection = parsedUri.map(driver.connection(_)).get
+  implicit private val db: () => DB = {
+    () => DB("time-to-pay-arrangement", connection)
   }
-  lazy val TTPArrangementRepository = new TTPArrangementRepository
-
+  val TTPArrangementRepository: TTPArrangementRepository = new TTPArrangementRepository()(db)
 }
 
 trait ServiceRegistry extends ServicesConfig {
@@ -67,7 +68,6 @@ trait ServiceRegistry extends ServicesConfig {
   import scala.concurrent.ExecutionContext.Implicits.global
   lazy val arrangementDesApiConnector = DesArrangementApiService
 
-  import play.api.Play.current
   lazy val JurisdictionCheckerService = new JurisdictionChecker(JurisdictionCheckerConfig.create(configuration.getConfig("jurisdictionChecker")
     .getOrElse(throw new RuntimeException("Jurisdiction checker configuration required"))))
 
@@ -76,16 +76,14 @@ trait ServiceRegistry extends ServicesConfig {
 
   lazy val desTTPArrangementService = new DesTTPArrangementBuilder(JurisdictionCheckerService)
 
-  lazy val letterAndControl: (TTPArrangement => LetterAndControl) = arrangement => letterAndControlService.create(arrangement)
+  lazy val desArrangementApi: ((Taxpayer, DesSubmissionRequest) => Future[Either[SubmissionError, SubmissionSuccess]])
+  = (taxpayer, desSubmissionRequest) => arrangementDesApiConnector.submitArrangement(taxpayer, desSubmissionRequest)
   lazy val desArrangement: (TTPArrangement => DesTTPArrangement) = arrangement => desTTPArrangementService.create(arrangement)
+  lazy val letterAndControlCreate: (TTPArrangement => LetterAndControl) = arrangement => letterAndControlService.create(arrangement)
   lazy val arrangementSave: (TTPArrangement => Future[Option[TTPArrangement]]) = arrangement => RepositoryConfig.TTPArrangementRepository.save(arrangement)
   lazy val arrangementGet: (String => Future[Option[TTPArrangement]]) = id => RepositoryConfig.TTPArrangementRepository.findById(id)
-  lazy val desArrangementApi: ((Taxpayer, DesSubmissionRequest) => Future[Either[SubmissionError, SubmissionSuccess]])
-        = (taxpayer, desSubmissionRequest) => arrangementDesApiConnector.submitArrangement(taxpayer, desSubmissionRequest)
 
-  lazy val arrangementService: TTPArrangementService = new TTPArrangementService(
-    desArrangementApi, desArrangement, letterAndControl, arrangementSave, arrangementGet
-  )
+  def arrangementService: TTPArrangementService = new TTPArrangementService()
 }
 
 trait ControllerRegistry {

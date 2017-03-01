@@ -18,21 +18,17 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import java.time.LocalDateTime
 import java.util.UUID
-import javax.inject.Inject
 
 import play.api.Logger
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.timetopay.arrangement._
+import uk.gov.hmrc.timetopay.arrangement.config.ServiceRegistry
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Try
 
-class TTPArrangementService @Inject()( arrangementDesApiConnector: ((Taxpayer, DesSubmissionRequest) => Future[Either[SubmissionError, SubmissionSuccess]]),
-                                       desTTPArrangementService: (TTPArrangement => DesTTPArrangement),
-                                       letterAndControlService: (TTPArrangement => LetterAndControl),
-                                       arrangementSave: (TTPArrangement => Future[Option[TTPArrangement]]),
-                                       arrangementGet: (String => Future[Option[TTPArrangement]])) {
+class TTPArrangementService extends ServiceRegistry {
 
   def byId(id: String): Future[Option[TTPArrangement]] = arrangementGet(id)
 
@@ -40,13 +36,13 @@ class TTPArrangementService @Inject()( arrangementDesApiConnector: ((Taxpayer, D
     Logger.info(s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' " +
       s"and PP '${arrangement.paymentPlanReference}'")
 
-    val letterAndControl = letterAndControlService(arrangement)
-    val desTTPArrangement = desTTPArrangementService(arrangement)
+    val letterAndControl = letterAndControlCreate(arrangement)
+    val desTTPArrangement = desArrangement(arrangement)
 
     val request: DesSubmissionRequest = DesSubmissionRequest(desTTPArrangement, letterAndControl)
 
     (for {
-      response <- arrangementDesApiConnector(arrangement.taxpayer, request)
+      response <- desArrangementApi(arrangement.taxpayer, request)
       ttp <- saveArrangement(arrangement, request)
     } yield (response, ttp)).flatMap {
       result =>

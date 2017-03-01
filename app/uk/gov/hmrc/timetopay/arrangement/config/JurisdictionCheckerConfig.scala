@@ -29,7 +29,7 @@ object JurisdictionCheckerConfig {
       .getOrElse(throw new IllegalArgumentException(s"Missing $key"))
 
     JurisdictionCheckerConfig(getConfig("scottish.postcode.prefix"),
-      getConfig("Welsh postcode prefix needed")
+      getConfig("welsh.postcode.prefix")
     )
 
   }

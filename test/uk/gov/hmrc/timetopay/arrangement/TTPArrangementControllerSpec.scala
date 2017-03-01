@@ -32,7 +32,7 @@ import uk.gov.hmrc.timetopay.arrangement.services.{DesApiException, TTPArrangeme
 import scala.concurrent.Future
 class TTPArrangementControllerSpec @Inject()(implicit val mat: Materializer) extends UnitSpec with MockFactory with ScalaFutures {
 
-  class MockService  extends TTPArrangementService(null,null,null,null, null){}
+  class MockService  extends TTPArrangementService(){}
 
   val arrangementServiceStub = stub[MockService]
   implicit val ec =  scala.concurrent.ExecutionContext.Implicits.global

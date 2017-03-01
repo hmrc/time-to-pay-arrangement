@@ -37,11 +37,7 @@ class TTPArrangementServiceSpec extends UnitSpec with MockFactory  with ScalaFut
   val getArrangement = mockFunction[String, Future[Option[TTPArrangement]]]
   val desSubmissionApi = mockFunction[Taxpayer, DesSubmissionRequest, Future[Either[SubmissionError, SubmissionSuccess]]]
 
-  val arrangementService = new TTPArrangementService(desSubmissionApi, desArrangementFunction,
-    letterAndControlFunction,
-    saveArrangement,
-    getArrangement
-  )
+  val arrangementService = new TTPArrangementService()
   private val ttpArrangement: DesTTPArrangement = savedArrangement.desArrangement.get.ttpArrangement
   private val letter: LetterAndControl = savedArrangement.desArrangement.get.letterAndControl
   val request = DesSubmissionRequest(ttpArrangement, letter)
