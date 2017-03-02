@@ -47,7 +47,7 @@ object MicroserviceAuthConnector extends AuthConnector with ServicesConfig {
   override val authBaseUrl = baseUrl("auth")
 }
 
-object DesArrangementApiService extends DesArrangementService with ServicesConfig {
+class DesArrangementApiService() extends DesArrangementService with ServicesConfig {
   override val desArrangementUrl: String = baseUrl("des-arrangement-api")
   override val serviceEnvironment: String = getConfString("des-arrangement-api.environment", "unknown")
   override val authorisationToken: String = getConfString("des-arrangement-api.authorization-token", "not-found")
@@ -61,7 +61,7 @@ trait ServiceRegistry extends ServicesConfig with MongoDbConnection {
     new TTPArrangementRepository()(db)
 
   import scala.concurrent.ExecutionContext.Implicits.global
-  lazy val arrangementDesApiConnector = DesArrangementApiService
+  lazy val arrangementDesApiConnector = new DesArrangementApiService()
 
   lazy val JurisdictionCheckerService = new JurisdictionChecker(JurisdictionCheckerConfig.create(configuration.getConfig("jurisdictionChecker")
     .getOrElse(throw new RuntimeException("Jurisdiction checker configuration required"))))
@@ -71,14 +71,13 @@ trait ServiceRegistry extends ServicesConfig with MongoDbConnection {
 
   lazy val desTTPArrangementService = new DesTTPArrangementBuilder(JurisdictionCheckerService)
 
-  lazy val desArrangementApi: ((Taxpayer, DesSubmissionRequest) => Future[Either[SubmissionError, SubmissionSuccess]])
-  = (taxpayer, desSubmissionRequest) => arrangementDesApiConnector.submitArrangement(taxpayer, desSubmissionRequest)
+
   lazy val desArrangement: (TTPArrangement => DesTTPArrangement) = arrangement => desTTPArrangementService.create(arrangement)
   lazy val letterAndControlCreate: (TTPArrangement => LetterAndControl) = arrangement => letterAndControlService.create(arrangement)
   lazy val arrangementSave: (TTPArrangement => Future[Option[TTPArrangement]]) = arrangement => TTPArrangementRepository.save(arrangement)
   lazy val arrangementGet: (String => Future[Option[TTPArrangement]]) = id => TTPArrangementRepository.findById(id)
 
-  def arrangementService: TTPArrangementService = new TTPArrangementService()
+  def arrangementService: TTPArrangementService = new TTPArrangementService(arrangementDesApiConnector)
 }
 
 trait ControllerRegistry {

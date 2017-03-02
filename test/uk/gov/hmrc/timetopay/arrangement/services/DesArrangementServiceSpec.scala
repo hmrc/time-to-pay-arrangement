@@ -21,10 +21,9 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.http.Status
 import play.api.libs.json.Writes
-import play.api.test.FakeApplication
 import uk.gov.hmrc.play.http._
 import uk.gov.hmrc.play.http.ws.WSHttp
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import uk.gov.hmrc.play.test.UnitSpec
 import uk.gov.hmrc.timetopay.arrangement.DesSubmissionRequest
 import uk.gov.hmrc.timetopay.arrangement.resources._
 

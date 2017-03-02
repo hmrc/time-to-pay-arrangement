@@ -28,7 +28,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Try
 
-class TTPArrangementService extends ServiceRegistry {
+class TTPArrangementService(arrangementDesApiConnectorInstance:DesArrangementService) extends ServiceRegistry {
 
   def byId(id: String): Future[Option[TTPArrangement]] = arrangementGet(id)
 
@@ -42,7 +42,7 @@ class TTPArrangementService extends ServiceRegistry {
     val request: DesSubmissionRequest = DesSubmissionRequest(desTTPArrangement, letterAndControl)
 
     (for {
-      response <- desArrangementApi(arrangement.taxpayer, request)
+      response <- arrangementDesApiConnectorInstance.submitArrangement(arrangement.taxpayer, request)
       ttp <- saveArrangement(arrangement, request)
     } yield (response, ttp)).flatMap {
       result =>

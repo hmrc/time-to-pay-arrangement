@@ -49,7 +49,6 @@ trait DesArrangementService {
     val serviceUrl = s"time-to-pay/taxpayers/${taxpayer.selfAssessment.utr}/arrangements"
 
     Logger.debug(s"Header carrier ${hc.headers}")
-
     http.POST[DesSubmissionRequest, HttpResponse](s"$desArrangementUrl/$serviceUrl", desSubmissionRequest)
       .map(_ => {
         Logger.info(s"Submission successful for '${taxpayer.selfAssessment.utr}'")

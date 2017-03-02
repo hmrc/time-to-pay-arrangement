@@ -41,7 +41,8 @@ private object AppDependencies {
         "org.scalatest" %% "scalatest" % scalaTestVersion % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
         "com.typesafe.play" %% "play-test" % "2.5.8" % scope,
-        "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % scope
+        "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % scope,
+      "org.mockito" % "mockito-core" % "1.10.19"
       )
     }.test
   }
@@ -57,7 +58,8 @@ private object AppDependencies {
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
         "com.typesafe.play" %% "play-test" % "2.5.8" % scope,
         "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % scope,
-        "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % scope
+        "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % scope,
+        "org.mockito" % "mockito-core" % "1.10.19"
       )
     }.test
   }
