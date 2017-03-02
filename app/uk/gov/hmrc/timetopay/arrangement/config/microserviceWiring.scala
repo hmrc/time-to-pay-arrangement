@@ -20,6 +20,7 @@ import play.api.Play.{configuration, current}
 import play.api.mvc.Controller
 import reactivemongo.api.MongoConnection.ParsedURI
 import reactivemongo.api.{DB, MongoConnection, MongoDriver}
+import play.modules.reactivemongo.MongoDbConnection
 import uk.gov.hmrc.play.audit.http.config.LoadAuditingConfig
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.auth.microservice.connectors.AuthConnector
@@ -29,6 +30,7 @@ import uk.gov.hmrc.play.http.ws._
 import uk.gov.hmrc.play.http.{HttpGet, HttpPost}
 import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.services._
+import uk.gov.hmrc.mongo.{ReactiveRepository, Repository}
 
 import scala.concurrent.Future
 import scala.util.Try
@@ -53,17 +55,10 @@ object DesArrangementApiService extends DesArrangementService with ServicesConfi
   override val http: HttpGet with HttpPost = WSHttp
 }
 
-object RepositoryConfig extends ServicesConfig {
-  val driver = MongoDriver()
-  val parsedUri: Try[ParsedURI] = MongoConnection.parseURI(baseUrl("mongodb.uri"))
-  val connection: MongoConnection = parsedUri.map(driver.connection(_)).get
-  implicit private val db: () => DB = {
-    () => DB("time-to-pay-arrangement", connection)
-  }
-  val TTPArrangementRepository: TTPArrangementRepository = new TTPArrangementRepository()(db)
-}
+trait ServiceRegistry extends ServicesConfig with MongoDbConnection {
 
-trait ServiceRegistry extends ServicesConfig {
+  val TTPArrangementRepository: TTPArrangementRepository =
+    new TTPArrangementRepository()(db)
 
   import scala.concurrent.ExecutionContext.Implicits.global
   lazy val arrangementDesApiConnector = DesArrangementApiService
@@ -80,8 +75,8 @@ trait ServiceRegistry extends ServicesConfig {
   = (taxpayer, desSubmissionRequest) => arrangementDesApiConnector.submitArrangement(taxpayer, desSubmissionRequest)
   lazy val desArrangement: (TTPArrangement => DesTTPArrangement) = arrangement => desTTPArrangementService.create(arrangement)
   lazy val letterAndControlCreate: (TTPArrangement => LetterAndControl) = arrangement => letterAndControlService.create(arrangement)
-  lazy val arrangementSave: (TTPArrangement => Future[Option[TTPArrangement]]) = arrangement => RepositoryConfig.TTPArrangementRepository.save(arrangement)
-  lazy val arrangementGet: (String => Future[Option[TTPArrangement]]) = id => RepositoryConfig.TTPArrangementRepository.findById(id)
+  lazy val arrangementSave: (TTPArrangement => Future[Option[TTPArrangement]]) = arrangement => TTPArrangementRepository.save(arrangement)
+  lazy val arrangementGet: (String => Future[Option[TTPArrangement]]) = id => TTPArrangementRepository.findById(id)
 
   def arrangementService: TTPArrangementService = new TTPArrangementService()
 }

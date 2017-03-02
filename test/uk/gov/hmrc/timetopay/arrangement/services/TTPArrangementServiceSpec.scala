@@ -18,7 +18,7 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatestplus.play._
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import uk.gov.hmrc.timetopay.arrangement._
@@ -27,7 +27,7 @@ import uk.gov.hmrc.timetopay.arrangement.resources._
 
 import scala.concurrent.Future
 
-class TTPArrangementServiceSpec extends UnitSpec with MockFactory  with ScalaFutures with OneAppPerSuite{
+class TTPArrangementServiceSpec extends PlaySpec with MockFactory with OneAppPerSuite {
 
   val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement]
   val savedArrangement = ttparrangementResponse.as[TTPArrangement]
@@ -37,7 +37,7 @@ class TTPArrangementServiceSpec extends UnitSpec with MockFactory  with ScalaFut
   val getArrangement = mockFunction[String, Future[Option[TTPArrangement]]]
   val desSubmissionApi = mockFunction[Taxpayer, DesSubmissionRequest, Future[Either[SubmissionError, SubmissionSuccess]]]
 
-  val arrangementService = new TTPArrangementService()
+  lazy val arrangementService = new TTPArrangementService()
   private val ttpArrangement: DesTTPArrangement = savedArrangement.desArrangement.get.ttpArrangement
   private val letter: LetterAndControl = savedArrangement.desArrangement.get.letterAndControl
   val request = DesSubmissionRequest(ttpArrangement, letter)
@@ -57,10 +57,10 @@ class TTPArrangementServiceSpec extends UnitSpec with MockFactory  with ScalaFut
       ScalaFutures.whenReady(response) { r =>
         val desSubmissionRequest = r.get.desArrangement.get
 
-        desSubmissionRequest.ttpArrangement.firstPaymentAmount shouldBe "1248.95"
-        desSubmissionRequest.ttpArrangement.enforcementAction shouldBe "Distraint"
-        desSubmissionRequest.ttpArrangement.regularPaymentAmount shouldBe "1248.95"
-        desSubmissionRequest.letterAndControl.clmPymtString shouldBe s"Initial payment of ${arrangement.schedule.initialPayment} then ${arrangement.schedule.instalments.size - 1} payments of ${arrangement.schedule.instalments.head.amount} and final payment of " +
+        desSubmissionRequest.ttpArrangement.firstPaymentAmount mustBe "1248.95"
+        desSubmissionRequest.ttpArrangement.enforcementAction mustBe "Distraint"
+        desSubmissionRequest.ttpArrangement.regularPaymentAmount mustBe "1248.95"
+        desSubmissionRequest.letterAndControl.clmPymtString mustBe s"Initial payment of ${arrangement.schedule.initialPayment} then ${arrangement.schedule.instalments.size - 1} payments of ${arrangement.schedule.instalments.head.amount} and final payment of " +
           s"${arrangement.schedule.instalments.last.amount}"
       }
     }
@@ -77,8 +77,8 @@ class TTPArrangementServiceSpec extends UnitSpec with MockFactory  with ScalaFut
       val response = arrangementService.submit(arrangement)(headerCarrier)
 
       ScalaFutures.whenReady(response.failed) { e =>
-        e shouldBe a [DesApiException]
-        e.getMessage shouldBe "DES httpCode: 400, reason: Bad JSON"
+        e mustBe a [DesApiException]
+        e.getMessage mustBe "DES httpCode: 400, reason: Bad JSON"
       }
     }
 
@@ -94,7 +94,7 @@ class TTPArrangementServiceSpec extends UnitSpec with MockFactory  with ScalaFut
       val response = arrangementService.submit(arrangement)(headerCarrier)
 
       ScalaFutures.whenReady(response) {
-        r => r shouldBe None
+        r => r mustBe None
       }
     }
 
@@ -110,7 +110,7 @@ class TTPArrangementServiceSpec extends UnitSpec with MockFactory  with ScalaFut
       val response = arrangementService.submit(arrangement)(headerCarrier)
 
       ScalaFutures.whenReady(response) {
-        r => r shouldBe None
+        r => r mustBe None
       }
     }
 
@@ -124,7 +124,7 @@ class TTPArrangementServiceSpec extends UnitSpec with MockFactory  with ScalaFut
           arrangementService.submit(arrangement)(headerCarrier)
         }
 
-      exception.getMessage shouldBe "Failed to create letter and control"
+      exception.getMessage mustBe "Failed to create letter and control"
     }
   }
 
