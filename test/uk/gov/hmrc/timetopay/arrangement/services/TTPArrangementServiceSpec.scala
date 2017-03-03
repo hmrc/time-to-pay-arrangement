@@ -24,39 +24,38 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatestplus.play._
 import uk.gov.hmrc.play.http.HeaderCarrier
-import uk.gov.hmrc.timetopay.arrangement._
+import uk.gov.hmrc.timetopay.arrangement.{TTPArrangementRepository, _}
+import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiService
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.resources._
-
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent._
 
-class TTPArrangementServiceSpec extends PlaySpec with MockFactory with OneAppPerSuite with MockitoSugar {
+class TTPArrangementServiceSpec extends PlaySpec  with OneAppPerSuite with MockitoSugar {
   implicit val defaultPatience = ScalaFutures.PatienceConfig(timeout = Span(5, Seconds), interval = Span(500, Millis))
-  val mockDesAPi = MockitoSugar.mock[DesArrangementService]
-
+  val mockDesAPi = mock[DesArrangementService]
+  val mockTTpRepo=  mock[TTPArrangementRepository]
 
   val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement]
   val savedArrangement = ttparrangementResponse.as[TTPArrangement]
-  val letterAndControlFunction = mockFunction[TTPArrangement, LetterAndControl]
-  val desArrangementFunction = mockFunction[TTPArrangement, DesTTPArrangement]
-  val saveArrangement = mockFunction[TTPArrangement, Future[Option[TTPArrangement]]]
-  val getArrangement = mockFunction[String, Future[Option[TTPArrangement]]]
 
+  val letterAndControlMock = mock[LetterAndControlBuilder]
+  val desTTPArrangementBuilderMock = mock[DesTTPArrangementBuilder]
+  val ttpArrangementRepository = mock[TTPArrangementRepository]
+  val desSubmissionApiMock= mock[DesArrangementApiService]
 
-  lazy val arrangementService = new TTPArrangementService(mockDesAPi)
+  lazy val arrangementService = new TTPArrangementService(desTTPArrangementBuilderMock,desSubmissionApiMock,ttpArrangementRepository,letterAndControlMock)
+
   private val ttpArrangement: DesTTPArrangement = savedArrangement.desArrangement.get.ttpArrangement
   private val letter: LetterAndControl = savedArrangement.desArrangement.get.letterAndControl
   val request = DesSubmissionRequest(ttpArrangement, letter)
 
   "TTPArrangementService" should {
     "submit arrangement to DES and save the response/request combined" in {
-      desArrangementFunction.expects(arrangement).returning(ttpArrangement)
-
-      letterAndControlFunction.expects(arrangement).returning(letter)
-
-      when(mockDesAPi.submitArrangement(any(),any())(any[ExecutionContext])).thenReturn(Future.successful(Right(SubmissionSuccess())))
-
-      saveArrangement expects * returning Future.successful(Some(savedArrangement))
+      when(letterAndControlMock.create(arrangement)).thenReturn(letter)
+      when(desTTPArrangementBuilderMock.create(arrangement)).thenReturn(ttpArrangement)
+      when(desSubmissionApiMock.submitArrangement(arrangement.taxpayer,request)).thenReturn(Future.successful(Right(SubmissionSuccess())))
+      when(ttpArrangementRepository.save(any())).thenReturn(Future.successful(Some(savedArrangement)))
 
       val response = arrangementService.submit(arrangement)(new HeaderCarrier)
 
@@ -70,14 +69,13 @@ class TTPArrangementServiceSpec extends PlaySpec with MockFactory with OneAppPer
           s"${arrangement.schedule.instalments.last.amount}"
       }
     }
-/*
+
     "return failed future for DES Bad request" in {
-      desArrangementFunction.expects(arrangement).returning(ttpArrangement)
-      letterAndControlFunction.expects(arrangement).returning(letter)
 
-      desSubmissionApi.expects(arrangement.taxpayer, request).returning(Future.successful(Left(SubmissionError(400, "Bad JSON"))))
-
-      saveArrangement expects * returning Future.successful(Some(savedArrangement))
+      when(letterAndControlMock.create(arrangement)).thenReturn(letter)
+      when(desTTPArrangementBuilderMock.create(arrangement)).thenReturn(ttpArrangement)
+      when(desSubmissionApiMock.submitArrangement(arrangement.taxpayer,request)).thenReturn(Future.successful(Left(SubmissionError(400, "Bad JSON"))))
+      when(ttpArrangementRepository.save(any())).thenReturn(Future.successful(Some(savedArrangement)))
 
       val headerCarrier = new HeaderCarrier
       val response = arrangementService.submit(arrangement)(headerCarrier)
@@ -89,12 +87,10 @@ class TTPArrangementServiceSpec extends PlaySpec with MockFactory with OneAppPer
     }
 
     "return No arrangement if saving fails" in {
-      desArrangementFunction.expects(arrangement).returning(ttpArrangement)
-      letterAndControlFunction.expects(arrangement).returning(letter)
-
-      desSubmissionApi.expects(arrangement.taxpayer, request).returning(Future.successful(Right(SubmissionSuccess())))
-
-      saveArrangement expects * returning Future.successful(None)
+      when(letterAndControlMock.create(arrangement)).thenReturn(letter)
+      when(desTTPArrangementBuilderMock.create(arrangement)).thenReturn(ttpArrangement)
+      when(desSubmissionApiMock.submitArrangement(arrangement.taxpayer,request)).thenReturn(Future.successful(Right(SubmissionSuccess())))
+      when(ttpArrangementRepository.save(any())).thenReturn(Future.successful(None))
 
       val headerCarrier = new HeaderCarrier
       val response = arrangementService.submit(arrangement)(headerCarrier)
@@ -104,26 +100,11 @@ class TTPArrangementServiceSpec extends PlaySpec with MockFactory with OneAppPer
       }
     }
 
-    "return No arrangement if DB connection fails" in {
-      desArrangementFunction.expects(arrangement).returning(ttpArrangement)
-      letterAndControlFunction.expects(arrangement).returning(letter)
-
-      desSubmissionApi.expects(arrangement.taxpayer, request).returning(Future.successful(Right(SubmissionSuccess())))
-
-      saveArrangement expects * throwing new RuntimeException("Couldn't connect to mongo")
-
-      val headerCarrier = new HeaderCarrier
-      val response = arrangementService.submit(arrangement)(headerCarrier)
-
-      ScalaFutures.whenReady(response) {
-        r => r mustBe None
-      }
-    }
 
 
 
     "return failed future for internal exception" in {
-      letterAndControlFunction.expects(arrangement).throwing(new RuntimeException("Failed to create letter and control"))
+      when(letterAndControlMock.create(arrangement)).thenThrow(new RuntimeException("Failed to create letter and control"))
       val exception =
         intercept[RuntimeException] {
           val headerCarrier = new HeaderCarrier
@@ -131,7 +112,7 @@ class TTPArrangementServiceSpec extends PlaySpec with MockFactory with OneAppPer
         }
 
       exception.getMessage mustBe "Failed to create letter and control"
-    }*/
+    }
   }
 
 }

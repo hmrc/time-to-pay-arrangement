@@ -31,7 +31,7 @@ import uk.gov.hmrc.timetopay.arrangement.resources._
 
 class DesTTPArrangementBuilderSpec extends UnitSpec  with MockFactory  with ScalaFutures with OneAppPerSuite {
 
-  val  jurisdictionConfig = JurisdictionCheckerConfig("^(AB|DD|DG|EH|FK|G|HS|IV|KA|KW|KY|ML|PA|PH|TD|ZE)[0-9].*",
+  val jurisdictionConfig = JurisdictionCheckerConfig("^(AB|DD|DG|EH|FK|G|HS|IV|KA|KW|KY|ML|PA|PH|TD|ZE)[0-9].*",
     "^(LL|SY|LD|HR|NP|CF|SA)[0-9].*")
   val mockJurisdictionChecker = new JurisdictionChecker(jurisdictionConfig)
   val desTTPArrangementService = new DesTTPArrangementBuilder(mockJurisdictionChecker)

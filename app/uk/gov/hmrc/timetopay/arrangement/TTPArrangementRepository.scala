@@ -16,17 +16,21 @@
 
 package uk.gov.hmrc.timetopay.arrangement
 
+import javax.inject.Inject
+
+import com.google.inject.{ImplementedBy, Singleton}
 import play.api.Logger
 import play.api.libs.json.{Format, Json}
+import play.modules.reactivemongo.MongoDbConnection
 import reactivemongo.api.DB
 import reactivemongo.api.commands.DefaultWriteResult
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.BSONDocument
 import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+
 
 object TTPArrangementMongoFormats {
   import modelFormat._
@@ -36,8 +40,8 @@ object TTPArrangementMongoFormats {
   val id = "_id"
 }
 
-
-class TTPArrangementRepository(implicit mongo: () => DB) extends ReactiveRepository[TTPArrangement, String]("ttparrangements", mongo, TTPArrangementMongoFormats.format, implicitly[Format[String]]) {
+class TTPArrangementRepository @Inject()(mongo: DB)
+  extends ReactiveRepository[TTPArrangement, String]("ttparrangements",() => mongo, TTPArrangementMongoFormats.format, implicitly[Format[String]]){
 
   def save(ttpArrangement: TTPArrangement) : Future[Option[TTPArrangement]] = {
     Logger.debug("Saving ttparrangement record")

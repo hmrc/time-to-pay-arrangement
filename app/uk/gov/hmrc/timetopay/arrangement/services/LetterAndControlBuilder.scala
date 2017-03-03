@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
+import javax.inject.Inject
+
 import play.api.Logger
 import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.config.LetterAndControlConfig
@@ -25,7 +27,7 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 
-class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig, jurisdictionChecker: JurisdictionChecker) {
+class LetterAndControlBuilder @Inject()(letterAndControlConfig: LetterAndControlConfig, jurisdictionChecker: JurisdictionChecker) {
 
   type AddressResult = (Address, Option[LetterError])
 

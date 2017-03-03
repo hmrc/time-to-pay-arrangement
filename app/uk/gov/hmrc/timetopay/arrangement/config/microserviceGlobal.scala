@@ -15,9 +15,15 @@
  */
 
 package uk.gov.hmrc.timetopay.arrangement.config
+import javax.inject.{Inject, Provider}
+
+import com.google.inject.AbstractModule
 import com.typesafe.config.Config
 import net.ceedubs.ficus.Ficus._
 import play.api.{Application, Configuration, Play}
+import play.modules.reactivemongo.{MongoDbConnection, ReactiveMongoComponent}
+import reactivemongo.api.DB
+import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.play.audit.filters.AuditFilter
 import uk.gov.hmrc.play.auth.controllers.AuthParamsControllerConfig
 import uk.gov.hmrc.play.auth.microservice.filters.AuthorisationFilter
@@ -25,6 +31,7 @@ import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode}
 import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
 import uk.gov.hmrc.play.http.logging.filters.LoggingFilter
 import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
+import uk.gov.hmrc.timetopay.arrangement.TTPArrangementRepository
 
 object ControllerConfiguration extends ControllerConfig {
   lazy val controllerConfigs = Play.current.configuration.underlying.as[Config]("controllers")
@@ -48,6 +55,16 @@ object MicroserviceAuthFilter extends AuthorisationFilter   with MicroserviceFil
   override lazy val authParamsConfig = AuthParamsControllerConfiguration
   override lazy val authConnector = MicroserviceAuthConnector
   override def controllerNeedsAuth(controllerName: String): Boolean = ControllerConfiguration.paramsForController(controllerName).needsAuth
+}
+import uk.gov.hmrc.play.config.ServicesConfig
+class  GuiceModule extends AbstractModule with ServicesConfig {
+  override def configure(): Unit = {
+    bind(classOf[DB]).toProvider(classOf[MongoDbProvider])
+  }
+}
+
+class MongoDbProvider @Inject() (reactiveMongoComponent: ReactiveMongoComponent) extends Provider[DB] {
+  def get = reactiveMongoComponent.mongoConnector.db()
 }
 
 object MicroserviceGlobal extends DefaultMicroserviceGlobal with RunMode  with MicroserviceFilterSupport {

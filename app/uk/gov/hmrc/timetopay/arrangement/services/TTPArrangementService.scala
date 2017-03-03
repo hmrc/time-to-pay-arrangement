@@ -18,32 +18,37 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import java.time.LocalDateTime
 import java.util.UUID
+import javax.inject.Inject
 
 import play.api.Logger
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.config.ServiceRegistry
+import uk.gov.hmrc.timetopay.arrangement.config.{DesArrangementApiService, ServiceRegistry}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Try
 
-class TTPArrangementService(arrangementDesApiConnectorInstance:DesArrangementService) extends ServiceRegistry {
+class TTPArrangementService @Inject()(desTTPArrangementBuilder:DesTTPArrangementBuilder,
+                            desArrangementApiService:DesArrangementApiService,
+                            ttpArrangementRepository:TTPArrangementRepository,
+                            letterAndControlBuilder:LetterAndControlBuilder)  {
 
-  def byId(id: String): Future[Option[TTPArrangement]] = arrangementGet(id)
+  def byId(id: String): Future[Option[TTPArrangement]] = ttpArrangementRepository.findById(id)
 
   def submit(arrangement: TTPArrangement)(implicit hc: HeaderCarrier): Future[Option[TTPArrangement]] = {
     Logger.info(s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' " +
       s"and PP '${arrangement.paymentPlanReference}'")
 
-    val letterAndControl = letterAndControlCreate(arrangement)
-    val desTTPArrangement = desArrangement(arrangement)
+    val letterAndControl = letterAndControlBuilder.create(arrangement)
+    val desTTPArrangement = desTTPArrangementBuilder.create(arrangement)
 
     val request: DesSubmissionRequest = DesSubmissionRequest(desTTPArrangement, letterAndControl)
-
+    println("requestrequest " + request)
     (for {
-      response <- arrangementDesApiConnectorInstance.submitArrangement(arrangement.taxpayer, request)
+      response <- desArrangementApiService.submitArrangement(arrangement.taxpayer, request)
       ttp <- saveArrangement(arrangement, request)
+      _ = Logger.info("ttp " + ttp)
     } yield (response, ttp)).flatMap {
       result =>
         result._1.fold(error => Future.failed(DesApiException(error.code, error.message)),
@@ -56,7 +61,7 @@ class TTPArrangementService(arrangementDesApiConnectorInstance:DesArrangementSer
       createdOn = Some(LocalDateTime.now()),
       desArrangement = Some(desSubmissionRequest))
 
-    Try(arrangementSave(toSave)).getOrElse(Future.successful(None))
+    Try(ttpArrangementRepository.save(toSave)).getOrElse(Future.successful(None))
   }
 
 }

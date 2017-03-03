@@ -16,10 +16,12 @@
 
 package uk.gov.hmrc.timetopay.arrangement.config
 
+import javax.inject.Inject
+
 import play.api.Configuration
 
 
-case class JurisdictionCheckerConfig(scottishPrefix:String , welshPrefix:String)
+case class JurisdictionCheckerConfig @Inject()(scottishPrefix:String , welshPrefix:String)
 
 object JurisdictionCheckerConfig {
 

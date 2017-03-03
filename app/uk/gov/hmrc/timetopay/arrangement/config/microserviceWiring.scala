@@ -28,7 +28,7 @@ import uk.gov.hmrc.play.config.{AppName, RunMode, ServicesConfig}
 import uk.gov.hmrc.play.http.hooks.HttpHook
 import uk.gov.hmrc.play.http.ws._
 import uk.gov.hmrc.play.http.{HttpGet, HttpPost}
-import uk.gov.hmrc.timetopay.arrangement._
+import uk.gov.hmrc.timetopay.arrangement.{TTPArrangementRepository, _}
 import uk.gov.hmrc.timetopay.arrangement.services._
 import uk.gov.hmrc.mongo.{ReactiveRepository, Repository}
 
@@ -55,12 +55,11 @@ class DesArrangementApiService() extends DesArrangementService with ServicesConf
   override val http: HttpGet with HttpPost = WSHttp
 }
 
-trait ServiceRegistry extends ServicesConfig with MongoDbConnection {
 
-  val TTPArrangementRepository: TTPArrangementRepository =
-    new TTPArrangementRepository()(db)
+trait ServiceRegistry extends ServicesConfig with MongoDbConnection{
 
-  import scala.concurrent.ExecutionContext.Implicits.global
+  lazy val TTPArrangementRepository: TTPArrangementRepository =new TTPArrangementRepository(db.apply())
+
   lazy val arrangementDesApiConnector = new DesArrangementApiService()
 
   lazy val JurisdictionCheckerService = new JurisdictionChecker(JurisdictionCheckerConfig.create(configuration.getConfig("jurisdictionChecker")
@@ -72,12 +71,8 @@ trait ServiceRegistry extends ServicesConfig with MongoDbConnection {
   lazy val desTTPArrangementService = new DesTTPArrangementBuilder(JurisdictionCheckerService)
 
 
-  lazy val desArrangement: (TTPArrangement => DesTTPArrangement) = arrangement => desTTPArrangementService.create(arrangement)
-  lazy val letterAndControlCreate: (TTPArrangement => LetterAndControl) = arrangement => letterAndControlService.create(arrangement)
-  lazy val arrangementSave: (TTPArrangement => Future[Option[TTPArrangement]]) = arrangement => TTPArrangementRepository.save(arrangement)
-  lazy val arrangementGet: (String => Future[Option[TTPArrangement]]) = id => TTPArrangementRepository.findById(id)
-
-  def arrangementService: TTPArrangementService = new TTPArrangementService(arrangementDesApiConnector)
+  def arrangementService: TTPArrangementService = new TTPArrangementService(desTTPArrangementService,
+    arrangementDesApiConnector,TTPArrangementRepository,letterAndControlService)
 }
 
 trait ControllerRegistry {
