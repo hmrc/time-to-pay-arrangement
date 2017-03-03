@@ -26,9 +26,7 @@ import scala.util.Try
 
 class LetterAndControlBuilder @Inject()(letterAndControlAndJurisdictionCHecker:LetterAndControlAndJurisdictionChecker)   {
   type AddressResult = (Address, Option[LetterError])
-  println("bangsdfsdfdsfs")
   val LetterAndControlConfig = letterAndControlAndJurisdictionCHecker.createLetterAndControlConfig
-  println("bang")
   val jurisdictionChecker  = letterAndControlAndJurisdictionCHecker.createJurisdictionCheckerConfig
   case class LetterError (code: Int, message: String)
 
@@ -42,7 +40,6 @@ class LetterAndControlBuilder @Inject()(letterAndControlAndJurisdictionCHecker:L
   }
 
   def create(ttpArrangement: TTPArrangement): LetterAndControl =  {
-    println("I was called")
     val taxpayer = ttpArrangement.taxpayer
 
     val correspondence: AddressResult = resolveAddress(ttpArrangement)
