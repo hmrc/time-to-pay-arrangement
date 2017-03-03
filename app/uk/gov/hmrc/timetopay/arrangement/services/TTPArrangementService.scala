@@ -44,11 +44,9 @@ class TTPArrangementService @Inject()(desTTPArrangementBuilder:DesTTPArrangement
     val desTTPArrangement = desTTPArrangementBuilder.create(arrangement)
 
     val request: DesSubmissionRequest = DesSubmissionRequest(desTTPArrangement, letterAndControl)
-    println("requestrequest " + request)
     (for {
       response <- desArrangementApiService.submitArrangement(arrangement.taxpayer, request)
       ttp <- saveArrangement(arrangement, request)
-      _ = Logger.info("ttp " + ttp)
     } yield (response, ttp)).flatMap {
       result =>
         result._1.fold(error => Future.failed(DesApiException(error.code, error.message)),

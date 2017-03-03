@@ -20,11 +20,11 @@ import javax.inject.Inject
 
 import play.api.Logger
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.config.{LetterAndControlConfig, LetterAndControlAndJurisdictionCHecker}
+import uk.gov.hmrc.timetopay.arrangement.config.{LetterAndControlConfig, LetterAndControlAndJurisdictionChecker}
 import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType.JurisdictionType
 import scala.util.Try
 
-class LetterAndControlBuilder @Inject()(letterAndControlAndJurisdictionCHecker:LetterAndControlAndJurisdictionCHecker)   {
+class LetterAndControlBuilder @Inject()(letterAndControlAndJurisdictionCHecker:LetterAndControlAndJurisdictionChecker)   {
   type AddressResult = (Address, Option[LetterError])
   println("bangsdfsdfdsfs")
   val LetterAndControlConfig = letterAndControlAndJurisdictionCHecker.createLetterAndControlConfig

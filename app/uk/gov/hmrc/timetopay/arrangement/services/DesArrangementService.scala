@@ -53,7 +53,6 @@ trait DesArrangementService {
         Right(SubmissionSuccess())
       }).recover {
       case e: Throwable =>
-        println("We have an error " + e)
         onError(e)
     }
   }

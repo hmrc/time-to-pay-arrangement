@@ -25,7 +25,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatestplus.play.OneAppPerSuite
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
-import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig, LetterAndControlAndJurisdictionCHecker}
+import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig, LetterAndControlAndJurisdictionChecker}
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
 import uk.gov.hmrc.timetopay.arrangement.resources._
@@ -34,7 +34,7 @@ class DesTTPArrangementBuilderSpec extends UnitSpec  with MockFactory  with Scal
 
   val jurisdictionConfig = JurisdictionCheckerConfig("^(AB|DD|DG|EH|FK|G|HS|IV|KA|KW|KY|ML|PA|PH|TD|ZE)[0-9].*",
     "^(LL|SY|LD|HR|NP|CF|SA)[0-9].*")
-   val  LetterAndControlConfigInject = MockitoSugar.mock[LetterAndControlAndJurisdictionCHecker]
+   val  LetterAndControlConfigInject = MockitoSugar.mock[LetterAndControlAndJurisdictionChecker]
   when(LetterAndControlConfigInject.createJurisdictionCheckerConfig).thenReturn(new JurisdictionChecker(jurisdictionConfig))
   val desTTPArrangementService = new DesTTPArrangementBuilder(LetterAndControlConfigInject)
 

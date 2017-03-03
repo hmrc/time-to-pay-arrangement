@@ -47,7 +47,7 @@ class DesArrangementApiService() extends DesArrangementService with ServicesConf
   override val http: HttpGet with HttpPost = WSHttp
 }
 
-class LetterAndControlAndJurisdictionCHecker extends ServicesConfig {
+class LetterAndControlAndJurisdictionChecker extends ServicesConfig {
   def createLetterAndControlConfig:LetterAndControlConfig = {
     LetterAndControlConfig(
       getConfString("letterAndControl.salutation", "sfsds"),
@@ -70,11 +70,11 @@ class LetterAndControlAndJurisdictionCHecker extends ServicesConfig {
 }
 
 trait ServiceRegistry extends ServicesConfig with MongoDbConnection{
-  val test = new LetterAndControlAndJurisdictionCHecker()
+  val letterAndJurisction = new LetterAndControlAndJurisdictionChecker()
    val TTPArrangementRepository: TTPArrangementRepository =new TTPArrangementRepository(db.apply())
    val arrangementDesApiConnector = new DesArrangementApiService()
-   val letterAndControlService = new LetterAndControlBuilder(test)
-   val desTTPArrangementService = new DesTTPArrangementBuilder(test)
+   val letterAndControlService = new LetterAndControlBuilder(letterAndJurisction)
+   val desTTPArrangementService = new DesTTPArrangementBuilder(letterAndJurisction)
 
 }
 
