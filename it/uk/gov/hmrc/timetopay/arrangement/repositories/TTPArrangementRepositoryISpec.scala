@@ -26,9 +26,9 @@ class TTPArrangementRepositoryISpec extends FunSpec with BeforeAndAfter with Giv
   private def databaseName = "test-" + this.getClass.getSimpleName
   private def mongoUri: String = s"mongodb://127.0.0.1:27017/$databaseName"
   implicit val mongoConnectorForTest = new MongoConnector(mongoUri)
-  implicit val mongo = mongoConnectorForTest.db
+   val mongo = mongoConnectorForTest.db
 
-  val repository =  new TTPArrangementRepository
+  val repository =  new TTPArrangementRepository(mongo.apply())
 
   before {
     clear()
