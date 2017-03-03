@@ -27,8 +27,7 @@ object JurisdictionCheckerConfig {
 
   def create(configuration: Configuration) = {
 
-    def getConfig(key: String) = configuration.getString(key)
-      .getOrElse(throw new IllegalArgumentException(s"Missing $key"))
+    def getConfig(key: String) = configuration.getString(key).getOrElse("")
 
     JurisdictionCheckerConfig(getConfig("scottish.postcode.prefix"),
       getConfig("welsh.postcode.prefix")

@@ -17,23 +17,30 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
 
+import org.mockito.Mockito.when
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.prop.TableDrivenPropertyChecks._
-import org.scalatestplus.play.OneAppPerSuite
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import uk.gov.hmrc.play.test.UnitSpec
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig, LetterAndControlConfig}
+import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig, LetterAndControlConfig, LetterAndControlAndJurisdictionCHecker}
 import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
 import uk.gov.hmrc.timetopay.arrangement.resources._
 
-class LetterAndControlBuilderSpec extends UnitSpec with MockFactory   with ScalaFutures with OneAppPerSuite {
+class LetterAndControlBuilderSpec extends UnitSpec with MockFactory   with ScalaFutures  {
 
   val letterAndControlConfig = LetterAndControlConfig("Dear", "XXXX","XXXX","XXXX","XXXX","XXXX","XXXX", "XXXX","XXXX")
   val  jurisdictionConfig = JurisdictionCheckerConfig("^(AB|DD|DG|EH|FK|G|HS|IV|KA|KW|KY|ML|PA|PH|TD|ZE)[0-9].*",
     "^(LL|SY|LD|HR|NP|CF|SA)[0-9].*")
-  val  jurisdictionChecker = new JurisdictionChecker(jurisdictionConfig)
-  val letterAndControlService = new LetterAndControlBuilder(letterAndControlConfig,jurisdictionChecker)
+  println("sadasdsad")
+  val  LetterAndControlConfigInject = mock[LetterAndControlAndJurisdictionCHecker]
+  println("sadasdsad")
+  when(LetterAndControlConfigInject.createLetterAndControlConfig).thenReturn(letterAndControlConfig)
+  println("sadasdsad")
+  when(LetterAndControlConfigInject.createJurisdictionCheckerConfig).thenReturn(new JurisdictionChecker(jurisdictionConfig))
+  println("sadasdsad")
+  println("sadasdsad")
+  val letterAndControlService = new LetterAndControlBuilder(LetterAndControlConfigInject)
 
   val taxPayerData = Table(
     ("taxPayer", "exceptionCode", "exceptionReason", "message"),

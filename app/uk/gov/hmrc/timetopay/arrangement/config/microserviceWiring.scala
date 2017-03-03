@@ -15,11 +15,8 @@
  */
 
 package uk.gov.hmrc.timetopay.arrangement.config
-
-import play.api.Play.{configuration, current}
+import play.api.Play
 import play.api.mvc.Controller
-import reactivemongo.api.MongoConnection.ParsedURI
-import reactivemongo.api.{DB, MongoConnection, MongoDriver}
 import play.modules.reactivemongo.MongoDbConnection
 import uk.gov.hmrc.play.audit.http.config.LoadAuditingConfig
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -28,13 +25,8 @@ import uk.gov.hmrc.play.config.{AppName, RunMode, ServicesConfig}
 import uk.gov.hmrc.play.http.hooks.HttpHook
 import uk.gov.hmrc.play.http.ws._
 import uk.gov.hmrc.play.http.{HttpGet, HttpPost}
-import uk.gov.hmrc.timetopay.arrangement.{TTPArrangementRepository, _}
 import uk.gov.hmrc.timetopay.arrangement.services._
-import uk.gov.hmrc.mongo.{ReactiveRepository, Repository}
-
-import scala.concurrent.Future
-import scala.util.Try
-
+import uk.gov.hmrc.timetopay.arrangement.{TTPArrangementRepository, _}
 object WSHttp extends WSGet with WSPut with WSPost with WSDelete with WSPatch with AppName {
   override val hooks: Seq[HttpHook] = NoneRequired
 }
@@ -55,32 +47,43 @@ class DesArrangementApiService() extends DesArrangementService with ServicesConf
   override val http: HttpGet with HttpPost = WSHttp
 }
 
-
-trait ServiceRegistry extends ServicesConfig with MongoDbConnection{
-
-  lazy val TTPArrangementRepository: TTPArrangementRepository =new TTPArrangementRepository(db.apply())
-
-  lazy val arrangementDesApiConnector = new DesArrangementApiService()
-
-  lazy val JurisdictionCheckerService = new JurisdictionChecker(JurisdictionCheckerConfig.create(configuration.getConfig("jurisdictionChecker")
-    .getOrElse(throw new RuntimeException("Jurisdiction checker configuration required"))))
-
-  lazy val letterAndControlService = new LetterAndControlBuilder(LetterAndControlConfig.create(configuration.getConfig("letterAndControl")
-    .getOrElse(throw new RuntimeException("LetterAndControl configuration required"))),JurisdictionCheckerService) {}
-
-  lazy val desTTPArrangementService = new DesTTPArrangementBuilder(JurisdictionCheckerService)
-
-
-  def arrangementService: TTPArrangementService = new TTPArrangementService(desTTPArrangementService,
-    arrangementDesApiConnector,TTPArrangementRepository,letterAndControlService)
+class LetterAndControlAndJurisdictionCHecker extends ServicesConfig {
+  def createLetterAndControlConfig:LetterAndControlConfig = {
+    LetterAndControlConfig(
+      getConfString("letterAndControl.salutation", "sfsds"),
+      getConfString("letterAndControl.claimIndicateInt", "sfsds"),
+      getConfString("letterAndControl.template", "sfsds"),
+      getConfString("letterAndControl.office.officeName1", "sfsds"),
+      getConfString("letterAndControl.office.officeName2", "sfsds"),
+      getConfString("letterAndControl.office.officePostCode", "sfsds"),
+      getConfString("letterAndControl.office.officePhone", "sfsds"),
+      getConfString("letterAndControl.office.officeFax", "sfsds"),
+      getConfString("letterAndControl.office.officeOpeningHours", "sfsds")
+    )
+  }
+  def createJurisdictionCheckerConfig:JurisdictionChecker = {
+    new JurisdictionChecker(JurisdictionCheckerConfig(
+      getConfString("jurisdictionChecker.scottish.postcode.prefix ", "sfsds"),
+      getConfString("jurisdictionChecker.welsh.postcode.prefix", "sfsds")
+    ))
+  }
 }
 
-trait ControllerRegistry {
-  registry: ServiceRegistry =>
+trait ServiceRegistry extends ServicesConfig with MongoDbConnection{
+  val test = new LetterAndControlAndJurisdictionCHecker()
+   val TTPArrangementRepository: TTPArrangementRepository =new TTPArrangementRepository(db.apply())
+   val arrangementDesApiConnector = new DesArrangementApiService()
+   val letterAndControlService = new LetterAndControlBuilder(test)
+   val desTTPArrangementService = new DesTTPArrangementBuilder(test)
+
+}
+
+trait ControllerRegistry extends ServiceRegistry {
 
   implicit val ec =  scala.concurrent.ExecutionContext.Implicits.global
   private lazy val controllers = Map[Class[_], Controller](
-    classOf[TTPArrangementController] -> new TTPArrangementController(arrangementService)
+    classOf[TTPArrangementController] -> new TTPArrangementController(new TTPArrangementService(desTTPArrangementService,
+      arrangementDesApiConnector,TTPArrangementRepository,letterAndControlService))
   )
 
   def getController[A](controllerClass: Class[A]): A = controllers(controllerClass).asInstanceOf[A]

@@ -21,10 +21,12 @@ import javax.inject.Inject
 
 import play.api.Logger
 import uk.gov.hmrc.timetopay.arrangement._
+import uk.gov.hmrc.timetopay.arrangement.config.LetterAndControlAndJurisdictionCHecker
 import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType.{JurisdictionType, Scottish}
 
 
-class DesTTPArrangementBuilder @Inject()(jurisdictionChecker: JurisdictionChecker) {
+class DesTTPArrangementBuilder @Inject()(l:LetterAndControlAndJurisdictionCHecker){
+  val jurisdictionChecker = l.createJurisdictionCheckerConfig
   val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
   def create(implicit ttpArrangement: TTPArrangement): DesTTPArrangement =  {

@@ -17,7 +17,6 @@
 package uk.gov.hmrc.timetopay.arrangement.config
 
 import com.google.inject.Inject
-import play.api.Configuration
 
 case class LetterAndControlConfig @Inject()(salutation: String,
                                    claimIndicateInt: String,
@@ -29,23 +28,4 @@ case class LetterAndControlConfig @Inject()(salutation: String,
                                    officeFax: String,
                                    officeOpeningHours: String ){
 }
-object LetterAndControlConfig {
 
-  def create(configuration: Configuration) = {
-
-    def getConfig(key: String) = configuration.getString(key)
-      .getOrElse(throw new IllegalArgumentException(s"Missing $key"))
-
-    LetterAndControlConfig(getConfig("salutation"),
-      getConfig("claimIndicateInt") ,
-      getConfig("template"),
-      getConfig("office.officeName1"),
-      getConfig("office.officeName2"),
-      getConfig("office.officePostCode"),
-      getConfig("office.officePhone"),
-      getConfig("office.officeFax"),
-      getConfig("office.officeOpeningHours")
-    )
-
-  }
-}
