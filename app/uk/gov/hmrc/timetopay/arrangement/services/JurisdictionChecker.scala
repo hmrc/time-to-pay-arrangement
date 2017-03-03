@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import play.api.Play.application
 import uk.gov.hmrc.timetopay.arrangement.Address
+import uk.gov.hmrc.timetopay.arrangement.config.JurisdictionCheckerConfig
 
 
 object JurisdictionType extends Enumeration  {
@@ -25,14 +25,10 @@ object JurisdictionType extends Enumeration  {
   val English, Scottish, Welsh = Value
 }
 
-object JurisdictionChecker {
+class JurisdictionChecker(config: JurisdictionCheckerConfig){
   import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType._
-  import play.api.Play.current
-
-  val scottishPostCodeRegex = application.configuration.getString("scottish.postcode.prefix")
-    .getOrElse(throw new RuntimeException("Scottish postcode prefix needed")).r
-  val welshPostCodeRegex = application.configuration.getString("welsh.postcode.prefix")
-    .getOrElse(throw new RuntimeException("Welsh postcode prefix needed")).r
+  val scottishPostCodeRegex = config.scottishPrefix.r
+  val welshPostCodeRegex = config.welshPrefix.r
 
   def addressType(address: Address): JurisdictionType = {
      address.postcode match {

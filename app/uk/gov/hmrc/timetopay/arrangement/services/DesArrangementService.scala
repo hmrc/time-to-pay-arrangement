@@ -18,7 +18,6 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import play.api.Logger
 import play.api.http.Status
-import play.api.libs.json.Json
 import uk.gov.hmrc.play.http._
 import uk.gov.hmrc.play.http.logging.Authorization
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
@@ -45,17 +44,15 @@ trait DesArrangementService {
 
   def submitArrangement(taxpayer: Taxpayer, desSubmissionRequest: DesSubmissionRequest)(implicit ec: ExecutionContext): Future[SubmissionResult] = {
     implicit val hc: HeaderCarrier = desHeaderCarrier
-
     val serviceUrl = s"time-to-pay/taxpayers/${taxpayer.selfAssessment.utr}/arrangements"
 
     Logger.debug(s"Header carrier ${hc.headers}")
-
     http.POST[DesSubmissionRequest, HttpResponse](s"$desArrangementUrl/$serviceUrl", desSubmissionRequest)
       .map(_ => {
-        Logger.info(s"Submission successful for '${taxpayer.selfAssessment.utr}'")
         Right(SubmissionSuccess())
       }).recover {
-      case e: Throwable => onError(e)
+      case e: Throwable =>
+        onError(e)
     }
   }
 

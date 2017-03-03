@@ -16,19 +16,19 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
+import javax.inject.Inject
+
 import play.api.Logger
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.config.LetterAndControlConfig
+import uk.gov.hmrc.timetopay.arrangement.config.LetterAndControlAndJurisdictionChecker
 import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType.JurisdictionType
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 
-class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
-
+class LetterAndControlBuilder @Inject()(letterAndControlAndJurisdictionCHecker:LetterAndControlAndJurisdictionChecker)   {
   type AddressResult = (Address, Option[LetterError])
-
+  val LetterAndControlConfig = letterAndControlAndJurisdictionCHecker.createLetterAndControlConfig
+  val jurisdictionChecker  = letterAndControlAndJurisdictionCHecker.createJurisdictionCheckerConfig
   case class LetterError (code: Int, message: String)
 
   object LetterError {
@@ -59,7 +59,7 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
     val customerName = taxpayer.customerName
     LetterAndControl(
       customerName = customerName,
-      salutation = s"${letterAndControlConfig.salutation} $customerName",
+      salutation = s"${LetterAndControlConfig.salutation} $customerName",
       addressLine1 = address.addressLine1,
       addressLine2 = address.addressLine2,
       addressLine3 = address.addressLine3,
@@ -68,14 +68,14 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
       postCode = address.postcode,
       totalAll = ttpArrangement.schedule.amountToPay.setScale(2).toString(),
       clmPymtString = paymentMessage(ttpArrangement.schedule),
-      clmIndicateInt= letterAndControlConfig.claimIndicateInt,
-      template = letterAndControlConfig.template,
-      officeName1 = letterAndControlConfig.officeName1,
-      officeName2 = letterAndControlConfig.officeName2,
-      officePostcode = letterAndControlConfig.officePostCode,
-      officePhone = letterAndControlConfig.officePhone,
-      officeFax = letterAndControlConfig.officeFax,
-      officeOpeningHours = letterAndControlConfig.officeOpeningHours,
+      clmIndicateInt= LetterAndControlConfig.claimIndicateInt,
+      template = LetterAndControlConfig.template,
+      officeName1 = LetterAndControlConfig.officeName1,
+      officeName2 = LetterAndControlConfig.officeName2,
+      officePostcode = LetterAndControlConfig.officePostCode,
+      officePhone = LetterAndControlConfig.officePhone,
+      officeFax = LetterAndControlConfig.officeFax,
+      officeOpeningHours = LetterAndControlConfig.officeOpeningHours,
       exceptionType = exception._1,
       exceptionReason = exception._2
     )
@@ -109,7 +109,7 @@ class LetterAndControlBuilder(letterAndControlConfig: LetterAndControlConfig) {
 
   private def multipleAddresses(implicit taxpayer: Taxpayer) = {
     val uniqueAddressTypes: List[JurisdictionType] = taxpayer.addresses.map {
-      JurisdictionChecker.addressType
+      jurisdictionChecker.addressType
     }.distinct
 
     uniqueAddressTypes match {

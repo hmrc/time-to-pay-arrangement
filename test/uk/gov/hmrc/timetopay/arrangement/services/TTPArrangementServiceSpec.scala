@@ -16,119 +16,102 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import org.scalamock.scalatest.MockFactory
+import org.mockito.Matchers.any
+import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.mock.MockitoSugar
+import org.scalatest.time.{Millis, Seconds, Span}
+import org.scalatestplus.play._
 import uk.gov.hmrc.play.http.HeaderCarrier
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
-import uk.gov.hmrc.timetopay.arrangement.services.SubmissionError
-import uk.gov.hmrc.timetopay.arrangement._
+import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiService
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.resources._
+import uk.gov.hmrc.timetopay.arrangement.{TTPArrangementRepository, _}
 
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent._
 
-class TTPArrangementServiceSpec extends UnitSpec with MockFactory with WithFakeApplication with ScalaFutures {
+class TTPArrangementServiceSpec extends PlaySpec  with OneAppPerSuite with MockitoSugar {
+  implicit val defaultPatience = ScalaFutures.PatienceConfig(timeout = Span(5, Seconds), interval = Span(500, Millis))
+  val mockDesAPi = mock[DesArrangementService]
+  val mockTTpRepo=  mock[TTPArrangementRepository]
 
   val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement]
   val savedArrangement = ttparrangementResponse.as[TTPArrangement]
-  val letterAndControlFunction = mockFunction[TTPArrangement, LetterAndControl]
-  val desArrangementFunction = mockFunction[TTPArrangement, DesTTPArrangement]
-  val saveArrangement = mockFunction[TTPArrangement, Future[Option[TTPArrangement]]]
-  val getArrangement = mockFunction[String, Future[Option[TTPArrangement]]]
-  val desSubmissionApi = mockFunction[Taxpayer, DesSubmissionRequest, Future[Either[SubmissionError, SubmissionSuccess]]]
 
-  val arrangementService = new TTPArrangementService(desSubmissionApi, desArrangementFunction,
-    letterAndControlFunction,
-    saveArrangement,
-    getArrangement
-  )
+  val letterAndControlMock = mock[LetterAndControlBuilder]
+  val desTTPArrangementBuilderMock = mock[DesTTPArrangementBuilder]
+  val ttpArrangementRepository = mock[TTPArrangementRepository]
+  val desSubmissionApiMock= mock[DesArrangementApiService]
+
+  lazy val arrangementService = new TTPArrangementService(desTTPArrangementBuilderMock,desSubmissionApiMock,ttpArrangementRepository,letterAndControlMock)
+
   private val ttpArrangement: DesTTPArrangement = savedArrangement.desArrangement.get.ttpArrangement
   private val letter: LetterAndControl = savedArrangement.desArrangement.get.letterAndControl
   val request = DesSubmissionRequest(ttpArrangement, letter)
 
   "TTPArrangementService" should {
     "submit arrangement to DES and save the response/request combined" in {
-      desArrangementFunction.expects(arrangement).returning(ttpArrangement)
-
-      letterAndControlFunction.expects(arrangement).returning(letter)
-
-      desSubmissionApi.expects(arrangement.taxpayer, request).returning(Future.successful(Right(SubmissionSuccess())))
-
-      saveArrangement expects * returning Future.successful(Some(savedArrangement))
+      when(letterAndControlMock.create(arrangement)).thenReturn(letter)
+      when(desTTPArrangementBuilderMock.create(arrangement)).thenReturn(ttpArrangement)
+      when(desSubmissionApiMock.submitArrangement(arrangement.taxpayer,request)).thenReturn(Future.successful(Right(SubmissionSuccess())))
+      when(ttpArrangementRepository.save(any())).thenReturn(Future.successful(Some(savedArrangement)))
 
       val response = arrangementService.submit(arrangement)(new HeaderCarrier)
 
       ScalaFutures.whenReady(response) { r =>
         val desSubmissionRequest = r.get.desArrangement.get
 
-        desSubmissionRequest.ttpArrangement.firstPaymentAmount shouldBe "1248.95"
-        desSubmissionRequest.ttpArrangement.enforcementAction shouldBe "Distraint"
-        desSubmissionRequest.ttpArrangement.regularPaymentAmount shouldBe "1248.95"
-        desSubmissionRequest.letterAndControl.clmPymtString shouldBe s"Initial payment of ${arrangement.schedule.initialPayment} then ${arrangement.schedule.instalments.size - 1} payments of ${arrangement.schedule.instalments.head.amount} and final payment of " +
+        desSubmissionRequest.ttpArrangement.firstPaymentAmount mustBe "1248.95"
+        desSubmissionRequest.ttpArrangement.enforcementAction mustBe "Distraint"
+        desSubmissionRequest.ttpArrangement.regularPaymentAmount mustBe "1248.95"
+        desSubmissionRequest.letterAndControl.clmPymtString mustBe s"Initial payment of ${arrangement.schedule.initialPayment} then ${arrangement.schedule.instalments.size - 1} payments of ${arrangement.schedule.instalments.head.amount} and final payment of " +
           s"${arrangement.schedule.instalments.last.amount}"
       }
     }
 
     "return failed future for DES Bad request" in {
-      desArrangementFunction.expects(arrangement).returning(ttpArrangement)
-      letterAndControlFunction.expects(arrangement).returning(letter)
 
-      desSubmissionApi.expects(arrangement.taxpayer, request).returning(Future.successful(Left(SubmissionError(400, "Bad JSON"))))
-
-      saveArrangement expects * returning Future.successful(Some(savedArrangement))
+      when(letterAndControlMock.create(arrangement)).thenReturn(letter)
+      when(desTTPArrangementBuilderMock.create(arrangement)).thenReturn(ttpArrangement)
+      when(desSubmissionApiMock.submitArrangement(arrangement.taxpayer,request)).thenReturn(Future.successful(Left(SubmissionError(400, "Bad JSON"))))
+      when(ttpArrangementRepository.save(any())).thenReturn(Future.successful(Some(savedArrangement)))
 
       val headerCarrier = new HeaderCarrier
       val response = arrangementService.submit(arrangement)(headerCarrier)
 
       ScalaFutures.whenReady(response.failed) { e =>
-        e shouldBe a [DesApiException]
-        e.getMessage shouldBe "DES httpCode: 400, reason: Bad JSON"
+        e mustBe a [DesApiException]
+        e.getMessage mustBe "DES httpCode: 400, reason: Bad JSON"
       }
     }
 
     "return No arrangement if saving fails" in {
-      desArrangementFunction.expects(arrangement).returning(ttpArrangement)
-      letterAndControlFunction.expects(arrangement).returning(letter)
-
-      desSubmissionApi.expects(arrangement.taxpayer, request).returning(Future.successful(Right(SubmissionSuccess())))
-
-      saveArrangement expects * returning Future.successful(None)
+      when(letterAndControlMock.create(arrangement)).thenReturn(letter)
+      when(desTTPArrangementBuilderMock.create(arrangement)).thenReturn(ttpArrangement)
+      when(desSubmissionApiMock.submitArrangement(arrangement.taxpayer,request)).thenReturn(Future.successful(Right(SubmissionSuccess())))
+      when(ttpArrangementRepository.save(any())).thenReturn(Future.successful(None))
 
       val headerCarrier = new HeaderCarrier
       val response = arrangementService.submit(arrangement)(headerCarrier)
 
       ScalaFutures.whenReady(response) {
-        r => r shouldBe None
+        r => r mustBe None
       }
     }
 
-    "return No arrangement if DB connection fails" in {
-      desArrangementFunction.expects(arrangement).returning(ttpArrangement)
-      letterAndControlFunction.expects(arrangement).returning(letter)
-
-      desSubmissionApi.expects(arrangement.taxpayer, request).returning(Future.successful(Right(SubmissionSuccess())))
-
-      saveArrangement expects * throwing new RuntimeException("Couldn't connect to mongo")
-
-      val headerCarrier = new HeaderCarrier
-      val response = arrangementService.submit(arrangement)(headerCarrier)
-
-      ScalaFutures.whenReady(response) {
-        r => r shouldBe None
-      }
-    }
 
 
 
     "return failed future for internal exception" in {
-      letterAndControlFunction.expects(arrangement).throwing(new RuntimeException("Failed to create letter and control"))
+      when(letterAndControlMock.create(arrangement)).thenThrow(new RuntimeException("Failed to create letter and control"))
       val exception =
         intercept[RuntimeException] {
           val headerCarrier = new HeaderCarrier
           arrangementService.submit(arrangement)(headerCarrier)
         }
 
-      exception.getMessage shouldBe "Failed to create letter and control"
+      exception.getMessage mustBe "Failed to create letter and control"
     }
   }
 

@@ -15,17 +15,21 @@
  */
 
 package uk.gov.hmrc.timetopay.arrangement.config
+import javax.inject.{Inject, Provider}
 
+import com.google.inject.AbstractModule
 import com.typesafe.config.Config
 import net.ceedubs.ficus.Ficus._
 import play.api.{Application, Configuration, Play}
+import play.modules.reactivemongo.ReactiveMongoComponent
+import reactivemongo.api.DB
 import uk.gov.hmrc.play.audit.filters.AuditFilter
 import uk.gov.hmrc.play.auth.controllers.AuthParamsControllerConfig
 import uk.gov.hmrc.play.auth.microservice.filters.AuthorisationFilter
-import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode}
+import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode, ServicesConfig}
+import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
 import uk.gov.hmrc.play.http.logging.filters.LoggingFilter
 import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
-
 object ControllerConfiguration extends ControllerConfig {
   lazy val controllerConfigs = Play.current.configuration.underlying.as[Config]("controllers")
 }
@@ -34,22 +38,32 @@ object AuthParamsControllerConfiguration extends AuthParamsControllerConfig {
   lazy val controllerConfigs = ControllerConfiguration.controllerConfigs
 }
 
-object MicroserviceAuditFilter extends AuditFilter with AppName {
+object MicroserviceAuditFilter extends AuditFilter with AppName  with MicroserviceFilterSupport {
   override val auditConnector = MicroserviceAuditConnector
   override def controllerNeedsAuditing(controllerName: String) = ControllerConfiguration.paramsForController(controllerName).needsAuditing
+
 }
 
-object MicroserviceLoggingFilter extends LoggingFilter {
+object MicroserviceLoggingFilter extends LoggingFilter  with MicroserviceFilterSupport {
   override def controllerNeedsLogging(controllerName: String) = ControllerConfiguration.paramsForController(controllerName).needsLogging
 }
 
-object MicroserviceAuthFilter extends AuthorisationFilter {
+object MicroserviceAuthFilter extends AuthorisationFilter   with MicroserviceFilterSupport {
   override lazy val authParamsConfig = AuthParamsControllerConfiguration
   override lazy val authConnector = MicroserviceAuthConnector
   override def controllerNeedsAuth(controllerName: String): Boolean = ControllerConfiguration.paramsForController(controllerName).needsAuth
 }
+class GuiceModule extends AbstractModule with ServicesConfig {
+  override def configure(): Unit = {
+    bind(classOf[DB]).toProvider(classOf[MongoDbProvider])
+  }
+}
 
-trait MicroserviceGlobal extends DefaultMicroserviceGlobal with RunMode with ServiceRegistry with ControllerRegistry {
+class MongoDbProvider @Inject() (reactiveMongoComponent: ReactiveMongoComponent) extends Provider[DB] {
+  def get = reactiveMongoComponent.mongoConnector.db()
+}
+
+object MicroserviceGlobal extends DefaultMicroserviceGlobal with RunMode  with MicroserviceFilterSupport {
   override val auditConnector = MicroserviceAuditConnector
 
   override def microserviceMetricsConfig(implicit app: Application): Option[Configuration] = app.configuration.getConfig(s"$env.microservice.metrics")
@@ -59,10 +73,5 @@ trait MicroserviceGlobal extends DefaultMicroserviceGlobal with RunMode with Ser
   override val microserviceAuditFilter = MicroserviceAuditFilter
 
   override val authFilter = Some(MicroserviceAuthFilter)
-
-  override def getControllerInstance[A](controllerClass: Class[A]): A = {
-    getController(controllerClass)
-  }
 }
 
-object MicroserviceGlobal extends MicroserviceGlobal

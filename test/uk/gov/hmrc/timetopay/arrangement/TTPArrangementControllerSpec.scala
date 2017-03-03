@@ -16,23 +16,26 @@
 
 package uk.gov.hmrc.timetopay.arrangement
 
+import javax.inject.Inject
+
+import akka.stream.Materializer
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
 import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.play.http.ws.WSHttp
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpPost}
 import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiService
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.resources._
-import uk.gov.hmrc.timetopay.arrangement.services.{DesApiException, TTPArrangementService}
+import uk.gov.hmrc.timetopay.arrangement.services._
 
 import scala.concurrent.Future
+class TTPArrangementControllerSpec @Inject()(implicit val mat: Materializer) extends UnitSpec with MockFactory with ScalaFutures {
 
-class TTPArrangementControllerSpec extends UnitSpec with MockFactory with ScalaFutures {
-
-  class MockService extends TTPArrangementService(null,null,null,null, null) {}
-
+  class MockService extends TTPArrangementService(null,null,null,null) {}
   val arrangementServiceStub = stub[MockService]
   implicit val ec =  scala.concurrent.ExecutionContext.Implicits.global
   val arrangementController = new TTPArrangementController(arrangementServiceStub)
