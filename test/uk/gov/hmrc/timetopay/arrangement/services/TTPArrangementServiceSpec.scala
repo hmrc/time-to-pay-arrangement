@@ -18,16 +18,16 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import org.mockito.Matchers.any
 import org.mockito.Mockito._
-import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatestplus.play._
 import uk.gov.hmrc.play.http.HeaderCarrier
-import uk.gov.hmrc.timetopay.arrangement.{TTPArrangementRepository, _}
 import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiService
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.resources._
+import uk.gov.hmrc.timetopay.arrangement.{TTPArrangementRepository, _}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent._
 

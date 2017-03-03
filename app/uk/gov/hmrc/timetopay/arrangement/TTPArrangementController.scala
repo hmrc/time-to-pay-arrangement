@@ -22,11 +22,11 @@ import play.api.Logger
 import play.api.libs.json.Json.toJson
 import play.api.mvc.{Action, RequestHeader, Result}
 import uk.gov.hmrc.play.microservice.controller.BaseController
+import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.services.{DesApiException, TTPArrangementService}
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.Future._
-import modelFormat._
+import scala.concurrent.{ExecutionContext, Future}
 
 class TTPArrangementController @Inject()(val arrangementService: TTPArrangementService)(implicit ec: ExecutionContext) extends BaseController {
 
