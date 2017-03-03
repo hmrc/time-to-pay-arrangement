@@ -49,21 +49,21 @@ class DesArrangementApiService() extends DesArrangementService with ServicesConf
 class LetterAndControlAndJurisdictionChecker extends ServicesConfig {
   def createLetterAndControlConfig:LetterAndControlConfig = {
     LetterAndControlConfig(
-      getConfString("letterAndControl.salutation", "sfsds"),
-      getConfString("letterAndControl.claimIndicateInt", "sfsds"),
-      getConfString("letterAndControl.template", "sfsds"),
-      getConfString("letterAndControl.office.officeName1", "sfsds"),
-      getConfString("letterAndControl.office.officeName2", "sfsds"),
-      getConfString("letterAndControl.office.officePostCode", "sfsds"),
-      getConfString("letterAndControl.office.officePhone", "sfsds"),
-      getConfString("letterAndControl.office.officeFax", "sfsds"),
-      getConfString("letterAndControl.office.officeOpeningHours", "sfsds")
+      getConfString("letterAndControl.salutation", ""),
+      getConfString("letterAndControl.claimIndicateInt", ""),
+      getConfString("letterAndControl.template", ""),
+      getConfString("letterAndControl.office.officeName1", ""),
+      getConfString("letterAndControl.office.officeName2", ""),
+      getConfString("letterAndControl.office.officePostCode", ""),
+      getConfString("letterAndControl.office.officePhone", ""),
+      getConfString("letterAndControl.office.officeFax", ""),
+      getConfString("letterAndControl.office.officeOpeningHours", "")
     )
   }
   def createJurisdictionCheckerConfig:JurisdictionChecker = {
     new JurisdictionChecker(JurisdictionCheckerConfig(
-      getConfString("jurisdictionChecker.scottish.postcode.prefix ", "sfsds"),
-      getConfString("jurisdictionChecker.welsh.postcode.prefix", "sfsds")
+      getConfString("jurisdictionChecker.scottish.postcode.prefix ", ""),
+      getConfString("jurisdictionChecker.welsh.postcode.prefix", "")
     ))
   }
 }
