@@ -16,10 +16,8 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import javax.inject.Inject
-
 import uk.gov.hmrc.timetopay.arrangement.Address
-import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig}
+import uk.gov.hmrc.timetopay.arrangement.config.JurisdictionCheckerConfig
 
 
 object JurisdictionType extends Enumeration  {

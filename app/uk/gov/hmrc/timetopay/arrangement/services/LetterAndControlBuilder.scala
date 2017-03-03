@@ -20,8 +20,9 @@ import javax.inject.Inject
 
 import play.api.Logger
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.config.{LetterAndControlConfig, LetterAndControlAndJurisdictionChecker}
+import uk.gov.hmrc.timetopay.arrangement.config.LetterAndControlAndJurisdictionChecker
 import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType.JurisdictionType
+
 import scala.util.Try
 
 class LetterAndControlBuilder @Inject()(letterAndControlAndJurisdictionCHecker:LetterAndControlAndJurisdictionChecker)   {

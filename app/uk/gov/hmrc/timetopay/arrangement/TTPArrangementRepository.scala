@@ -18,10 +18,8 @@ package uk.gov.hmrc.timetopay.arrangement
 
 import javax.inject.Inject
 
-import com.google.inject.{ImplementedBy, Singleton}
 import play.api.Logger
 import play.api.libs.json.{Format, Json}
-import play.modules.reactivemongo.MongoDbConnection
 import reactivemongo.api.DB
 import reactivemongo.api.commands.DefaultWriteResult
 import reactivemongo.api.indexes.{Index, IndexType}

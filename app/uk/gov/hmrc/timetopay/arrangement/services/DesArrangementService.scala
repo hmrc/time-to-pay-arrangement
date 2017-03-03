@@ -18,7 +18,6 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import play.api.Logger
 import play.api.http.Status
-import play.api.libs.json.Json
 import uk.gov.hmrc.play.http._
 import uk.gov.hmrc.play.http.logging.Authorization
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._

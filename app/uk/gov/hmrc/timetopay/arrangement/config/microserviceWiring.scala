@@ -15,7 +15,6 @@
  */
 
 package uk.gov.hmrc.timetopay.arrangement.config
-import play.api.Play
 import play.api.mvc.Controller
 import play.modules.reactivemongo.MongoDbConnection
 import uk.gov.hmrc.play.audit.http.config.LoadAuditingConfig

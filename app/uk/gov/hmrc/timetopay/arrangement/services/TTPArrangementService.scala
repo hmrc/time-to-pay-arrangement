@@ -23,7 +23,7 @@ import javax.inject.Inject
 import play.api.Logger
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.config.{DesArrangementApiService, ServiceRegistry}
+import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
