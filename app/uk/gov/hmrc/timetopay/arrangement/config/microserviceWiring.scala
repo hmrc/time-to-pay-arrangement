@@ -47,6 +47,12 @@ class DesArrangementApiService() extends DesArrangementService with ServicesConf
 }
 
 class LetterAndControlAndJurisdictionChecker extends ServicesConfig {
+  override def getConfString(confKey: String, defString: => String) = {
+    runModeConfiguration.getString(s"$confKey").
+      getOrElse(runModeConfiguration.getString(s"$confKey").
+        getOrElse(runModeConfiguration.getString(s"$confKey").
+          getOrElse(defString)))
+  }
   def createLetterAndControlConfig:LetterAndControlConfig = {
     LetterAndControlConfig(
       getConfString("letterAndControl.salutation", ""),
