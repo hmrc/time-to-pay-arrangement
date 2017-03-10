@@ -46,7 +46,7 @@ trait DesArrangementService {
     implicit val hc: HeaderCarrier = desHeaderCarrier
     val serviceUrl = s"time-to-pay/taxpayers/${taxpayer.selfAssessment.utr}/arrangements"
 
-    Logger.debug(s"Header carrier ${hc.headers}")
+    Logger.logger.debug(s"Header carrier ${hc.headers}")
     http.POST[DesSubmissionRequest, HttpResponse](s"$desArrangementUrl/$serviceUrl", desSubmissionRequest)
       .map(_ => {
         Right(SubmissionSuccess())
@@ -66,7 +66,7 @@ trait DesArrangementService {
       case e: Throwable => (Status.INTERNAL_SERVER_ERROR, e.getMessage)
     }
 
-    Logger.error(s"Failure from DES, code $code and body $message")
+    Logger.logger.error(s"Failure from DES, code $code and body $message")
     Left(SubmissionError(code, message))
   }
 

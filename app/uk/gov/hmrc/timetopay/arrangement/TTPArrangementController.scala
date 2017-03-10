@@ -42,10 +42,10 @@ class TTPArrangementController @Inject()(val arrangementService: TTPArrangementS
           }.recover {
             case desApiException: DesApiException =>
               val desFailureMessage: String = s"Submission to DES failed, status code [${desApiException.code}] and response [${desApiException.message}]"
-              Logger.error(desFailureMessage)
+              Logger.logger.error(desFailureMessage)
               InternalServerError(s"$desFailureMessage")
             case failure: Throwable =>
-              Logger.error(s"Failed to submit arrangement $failure")
+              Logger.logger.error(s"Failed to submit arrangement $failure")
               InternalServerError(failure.getMessage)
           }
       }
@@ -54,7 +54,7 @@ class TTPArrangementController @Inject()(val arrangementService: TTPArrangementS
 
   def arrangement(id: String) = Action.async {
     implicit request =>
-      Logger.debug(s"Requested arrangement $id")
+      Logger.logger.debug(s"Requested arrangement $id")
       arrangementService.byId(id).flatMap {
         _.fold(successful(NotFound(s"arrangement with $id does not exist")))(r => successful(Ok(toJson(r))))
       }

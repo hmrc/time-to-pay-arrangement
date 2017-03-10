@@ -37,7 +37,7 @@ class TTPArrangementService @Inject()(desTTPArrangementBuilder:DesTTPArrangement
   def byId(id: String): Future[Option[TTPArrangement]] = ttpArrangementRepository.findById(id)
 
   def submit(arrangement: TTPArrangement)(implicit hc: HeaderCarrier): Future[Option[TTPArrangement]] = {
-    Logger.info(s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' " +
+    Logger.logger.info(s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' " +
       s"and PP '${arrangement.paymentPlanReference}'")
 
     val letterAndControl = letterAndControlBuilder.create(arrangement)
