@@ -59,7 +59,7 @@ class DesTTPArrangementBuilder @Inject()(l:LetterAndControlAndJurisdictionChecke
         case _ => "Distraint"
       }
       case _ =>
-        Logger.info(s"Unable to determine enforcement flag as multiple mixed or no jurisdictions detected $addressTypes")
+        Logger.logger.info(s"Unable to determine enforcement flag as multiple mixed or no jurisdictions detected $addressTypes")
         "Other"
     }
   }
