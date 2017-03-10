@@ -30,6 +30,7 @@ import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode, ServicesConf
 import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
 import uk.gov.hmrc.play.http.logging.filters.LoggingFilter
 import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
+
 object ControllerConfiguration extends ControllerConfig {
   lazy val controllerConfigs = Play.current.configuration.underlying.as[Config]("controllers")
 }
@@ -38,21 +39,21 @@ object AuthParamsControllerConfiguration extends AuthParamsControllerConfig {
   lazy val controllerConfigs = ControllerConfiguration.controllerConfigs
 }
 
-object MicroserviceAuditFilter extends AuditFilter with AppName  with MicroserviceFilterSupport {
+object MicroserviceAuditFilter extends AuditFilter with AppName with MicroserviceFilterSupport {
   override val auditConnector = MicroserviceAuditConnector
   override def controllerNeedsAuditing(controllerName: String) = ControllerConfiguration.paramsForController(controllerName).needsAuditing
-
 }
 
-object MicroserviceLoggingFilter extends LoggingFilter  with MicroserviceFilterSupport {
+object MicroserviceLoggingFilter extends LoggingFilter with MicroserviceFilterSupport {
   override def controllerNeedsLogging(controllerName: String) = ControllerConfiguration.paramsForController(controllerName).needsLogging
 }
 
-object MicroserviceAuthFilter extends AuthorisationFilter   with MicroserviceFilterSupport {
+object MicroserviceAuthFilter extends AuthorisationFilter with MicroserviceFilterSupport {
   override lazy val authParamsConfig = AuthParamsControllerConfiguration
   override lazy val authConnector = MicroserviceAuthConnector
   override def controllerNeedsAuth(controllerName: String): Boolean = ControllerConfiguration.paramsForController(controllerName).needsAuth
 }
+
 class GuiceModule extends AbstractModule with ServicesConfig {
   override def configure(): Unit = {
     bind(classOf[DB]).toProvider(classOf[MongoDbProvider])
