@@ -95,13 +95,13 @@ class LetterAndControlBuilder @Inject()(letterAndControlAndJurisdictionCHecker:L
     implicit val taxpayer: Taxpayer = ttpArrangement.taxpayer
     taxpayer.addresses match {
       case Nil =>
-        Logger.debug("No address found in Digital")
+        Logger.logger.debug("No address found in Digital")
         (Address(),Some(LetterError(8, "no address")))
       case x::Nil =>
-        Logger.debug("Found single address")
+        Logger.logger.debug("Found single address")
         validate(x)
       case _ =>
-        Logger.debug("Found multiple addresses")
+        Logger.logger.debug("Found multiple addresses")
         multipleAddresses
     }
   }
@@ -114,10 +114,10 @@ class LetterAndControlBuilder @Inject()(letterAndControlAndJurisdictionCHecker:L
 
     uniqueAddressTypes match {
       case x::Nil =>
-        Logger.trace("Found single unique address type found")
+        Logger.logger.trace("Found single unique address type found")
         validate(taxpayer.addresses.head)
       case _ =>
-        Logger.trace(s"Customer has addresses in ${uniqueAddressTypes.mkString(" and")} jurisdictions")
+        Logger.logger.trace(s"Customer has addresses in ${uniqueAddressTypes.mkString(" and")} jurisdictions")
         (Address(),Some(LetterError(1, "address jurisdiction conflict")))
     }
   }
@@ -148,22 +148,22 @@ class LetterAndControlBuilder @Inject()(letterAndControlAndJurisdictionCHecker:L
 
   private def commsPrefException(commsPrefs: CommunicationPreferences): Option[LetterError] = commsPrefs match {
       case CommunicationPreferences(true, _, true, _) =>
-        Logger.debug(s"Exception found in LetterAndControl - Code: 5 Reason: Welsh large print required")
+        Logger.logger.debug(s"Exception found in LetterAndControl - Code: 5 Reason: Welsh large print required")
         Some(LetterError.welshLargePrint())
       case CommunicationPreferences(true, true, _, _) =>
-        Logger.debug(s"Exception found in LetterAndControl - Code: 7 Reason: Audio Welsh required")
+        Logger.logger.debug(s"Exception found in LetterAndControl - Code: 7 Reason: Audio Welsh required")
         Some(LetterError.welshAudio())
       case CommunicationPreferences(true, _, _, _) =>
-        Logger.debug(s"Exception found in LetterAndControl - Code: 4 Reason: Welsh required")
+        Logger.logger.debug(s"Exception found in LetterAndControl - Code: 4 Reason: Welsh required")
         Some(LetterError.welsh())
       case CommunicationPreferences(_, _, _, true) =>
-        Logger.debug(s"Exception found in LetterAndControl - Code: 2 Reason: Braille required")
+        Logger.logger.debug(s"Exception found in LetterAndControl - Code: 2 Reason: Braille required")
         Some(LetterError.braille())
       case CommunicationPreferences(_, true, _, _) =>
-        Logger.debug(s"Exception found in LetterAndControl - Code: 6 Reason: Audio required")
+        Logger.logger.debug(s"Exception found in LetterAndControl - Code: 6 Reason: Audio required")
         Some(LetterError.audio())
       case CommunicationPreferences(_, _, true, _) =>
-        Logger.debug(s"Exception found in LetterAndControl - Code: 3 Reason: Large print required")
+        Logger.logger.debug(s"Exception found in LetterAndControl - Code: 3 Reason: Large print required")
         Some(LetterError.largePrint())
       case _ => None
     }
