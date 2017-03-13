@@ -26,7 +26,7 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiService
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.resources._
-import uk.gov.hmrc.timetopay.arrangement.{TTPArrangementRepository, _}
+import uk.gov.hmrc.timetopay.arrangement._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent._
@@ -100,9 +100,6 @@ class TTPArrangementServiceSpec extends PlaySpec  with OneAppPerSuite with Mocki
       }
     }
 
-
-
-
     "return failed future for internal exception" in {
       when(letterAndControlMock.create(arrangement)).thenThrow(new RuntimeException("Failed to create letter and control"))
       val exception =
@@ -114,5 +111,4 @@ class TTPArrangementServiceSpec extends PlaySpec  with OneAppPerSuite with Mocki
       exception.getMessage mustBe "Failed to create letter and control"
     }
   }
-
 }

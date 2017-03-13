@@ -42,12 +42,12 @@ class TTPArrangementRepository @Inject()(mongo: DB)
   extends ReactiveRepository[TTPArrangement, String]("ttparrangements",() => mongo, TTPArrangementMongoFormats.format, implicitly[Format[String]]){
 
   def save(ttpArrangement: TTPArrangement) : Future[Option[TTPArrangement]] = {
-    Logger.debug("Saving ttparrangement record")
+    Logger.logger.debug("Saving ttparrangement record")
     insert(ttpArrangement)
       .collect {
-        case DefaultWriteResult(true, 1, Seq(), None, _, None) => Logger.info(s"Arrangement record persisted ID: ${ttpArrangement.id}"); Some(ttpArrangement)
+        case DefaultWriteResult(true, 1, Seq(), None, _, None) => Logger.logger.info(s"Arrangement record persisted ID: ${ttpArrangement.id}"); Some(ttpArrangement)
         case DefaultWriteResult(false, 1, Seq(), None, _, Some(msg)) =>
-          Logger.error(s"An error occurred saving record: $msg")
+          Logger.logger.error(s"An error occurred saving record: $msg")
           None
       }
   }

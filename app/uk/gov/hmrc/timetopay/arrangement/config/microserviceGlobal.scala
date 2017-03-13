@@ -36,29 +36,28 @@ class ControllerConfiguration @Inject()(configuration:Configuration) extends Con
   lazy val controllerConfigs = configuration.underlying.as[Config]("controllers")
 }
 
-object ControllerConfigurationObject  {
+object ControllerConfigurationObject {
   lazy val controllerConfiguration = new ControllerConfiguration(Configuration.load(play.Environment.simple().underlying()))
 }
-
 object AuthParamsControllerConfiguration extends AuthParamsControllerConfig {
   lazy val controllerConfigs = ControllerConfigurationObject.controllerConfiguration.controllerConfigs
 }
 
-object MicroserviceAuditFilter extends AuditFilter with AppName  with MicroserviceFilterSupport {
+object MicroserviceAuditFilter extends AuditFilter with AppName with MicroserviceFilterSupport {
   override val auditConnector = MicroserviceAuditConnector
   override def controllerNeedsAuditing(controllerName: String) = ControllerConfigurationObject.controllerConfiguration.paramsForController(controllerName).needsAuditing
-
 }
 
 object MicroserviceLoggingFilter extends LoggingFilter  with MicroserviceFilterSupport {
   override def controllerNeedsLogging(controllerName: String) = ControllerConfigurationObject.controllerConfiguration.paramsForController(controllerName).needsLogging
 }
 
-object MicroserviceAuthFilter extends AuthorisationFilter   with MicroserviceFilterSupport {
+object MicroserviceAuthFilter extends AuthorisationFilter with MicroserviceFilterSupport {
   override lazy val authParamsConfig = AuthParamsControllerConfiguration
   override lazy val authConnector = MicroserviceAuthConnector
   override def controllerNeedsAuth(controllerName: String): Boolean = ControllerConfigurationObject.controllerConfiguration.paramsForController(controllerName).needsAuth
 }
+
 class GuiceModule extends AbstractModule with ServicesConfig {
   override def configure: Unit = {
     bind(classOf[DB]).toProvider(classOf[MongoDbProvider])

@@ -25,7 +25,8 @@ import uk.gov.hmrc.play.http.hooks.HttpHook
 import uk.gov.hmrc.play.http.ws._
 import uk.gov.hmrc.play.http.{HttpGet, HttpPost}
 import uk.gov.hmrc.timetopay.arrangement.services._
-import uk.gov.hmrc.timetopay.arrangement.{TTPArrangementRepository, _}
+import uk.gov.hmrc.timetopay.arrangement._
+
 object WSHttp extends WSGet with WSPut with WSPost with WSDelete with WSPatch with AppName {
   override val hooks: Seq[HttpHook] = NoneRequired
 }
@@ -74,13 +75,12 @@ class LetterAndControlAndJurisdictionChecker extends ServicesConfig {
   }
 }
 
-trait ServiceRegistry extends ServicesConfig with MongoDbConnection{
+trait ServiceRegistry extends ServicesConfig with MongoDbConnection {
   val letterAndJurisction = new LetterAndControlAndJurisdictionChecker()
    val TTPArrangementRepository: TTPArrangementRepository =new TTPArrangementRepository(db.apply())
    val arrangementDesApiConnector = new DesArrangementApiService()
    val letterAndControlService = new LetterAndControlBuilder(letterAndJurisction)
    val desTTPArrangementService = new DesTTPArrangementBuilder(letterAndJurisction)
-
 }
 
 trait ControllerRegistry extends ServiceRegistry {
