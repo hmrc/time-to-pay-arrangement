@@ -46,7 +46,7 @@ trait MicroService {
       libraryDependencies ++= appDependencies,
       retrieveManaged := true,
       evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
-        routesGenerator := StaticRoutesGenerator,
+      routesGenerator := StaticRoutesGenerator,
       scalacOptions += "-feature",
       scalacOptions in (Compile, compile) ++= Seq(
         "-Ywarn-dead-code",
