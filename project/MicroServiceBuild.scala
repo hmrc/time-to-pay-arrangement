@@ -39,7 +39,6 @@ private object AppDependencies {
         "uk.gov.hmrc" %% "hmrctest" %  "2.3.0",
         "org.scalatest" %% "scalatest" % scalaTestVersion % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
-        "com.typesafe.play" %% "play-test" % "2.5.12" % scope,
         "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % scope,
       "org.mockito" % "mockito-core" % "1.10.19"
       )
@@ -55,7 +54,6 @@ private object AppDependencies {
         "uk.gov.hmrc" %% "hmrctest" %  "2.3.0",
         "org.scalatest" %% "scalatest" % scalaTestVersion % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
-        "com.typesafe.play" %% "play-test" % "2.5.12" % scope,
         "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % scope,
         "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % scope,
         "org.mockito" % "mockito-core" % "1.10.19"

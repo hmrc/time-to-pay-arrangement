@@ -49,6 +49,7 @@ trait DesArrangementService {
     Logger.logger.debug(s"Header carrier ${hc.headers}")
     http.POST[DesSubmissionRequest, HttpResponse](s"$desArrangementUrl/$serviceUrl", desSubmissionRequest)
       .map(_ => {
+        Logger.logger.info(s"Submission successful for '${taxpayer.selfAssessment.utr}'")
         Right(SubmissionSuccess())
       }).recover {
       case e: Throwable =>
