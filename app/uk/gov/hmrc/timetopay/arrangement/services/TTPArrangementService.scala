@@ -21,6 +21,7 @@ import java.util.UUID
 import javax.inject.Inject
 
 import play.api.Logger
+import play.api.libs.json.{JsObject, JsValue}
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiService
@@ -34,7 +35,7 @@ class TTPArrangementService @Inject()(desTTPArrangementBuilder:DesTTPArrangement
                             ttpArrangementRepository:TTPArrangementRepository,
                             letterAndControlBuilder:LetterAndControlBuilder)  {
 
-  def byId(id: String): Future[Option[TTPArrangement]] = ttpArrangementRepository.findById(id)
+  def byId(id: String): Future[Option[JsValue]] = ttpArrangementRepository.findByIdLocal(id)
 
   def submit(arrangement: TTPArrangement)(implicit hc: HeaderCarrier): Future[Option[TTPArrangement]] = {
     Logger.logger.info(s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' " +
