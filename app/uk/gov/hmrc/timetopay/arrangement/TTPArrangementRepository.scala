@@ -17,29 +17,65 @@
 package uk.gov.hmrc.timetopay.arrangement
 
 import javax.inject.Inject
-
 import play.api.Logger
-import play.api.libs.json.{Format, Json}
-import reactivemongo.api.DB
+import play.api.libs.json._
+import reactivemongo.api.{DB, ReadPreference}
 import reactivemongo.api.commands.DefaultWriteResult
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.BSONDocument
 import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-
+import scala.concurrent.{ExecutionContext, Future}
 
 object TTPArrangementMongoFormats {
   import modelFormat._
+     implicit val customWriterTTPArrangementMongo: Writes[TTPArrangement] = {
+       val pathToPersonalInfo = Seq((__ \ "taxpayer" \ "customerName").json.prune,
+         (__ \ "taxpayer" \ "addresses").json.prune,
+         (__ \ "taxpayer"  \ "selfAssessment" \ "communicationPreferences").json.prune,
+         (__ \ "taxpayer" \ "selfAssessment" \ "debits").json.prune,
+         (__ \ "desArrangement" \ "letterAndControl" \ "customerName").json.prune,
+         (__ \ "desArrangement" \ "letterAndControl" \ "salutation").json.prune,
+         (__ \ "desArrangement" \ "letterAndControl" \ "addressLine1").json.prune,
+         (__ \ "desArrangement" \ "letterAndControl" \ "addressLine2").json.prune,
+         (__ \ "desArrangement" \ "letterAndControl" \ "addressLine3").json.prune,
+         (__ \ "desArrangement" \ "letterAndControl" \ "addressLine4").json.prune,
+         (__ \ "desArrangement" \ "letterAndControl" \ "addressLine5").json.prune,
+         (__ \ "desArrangement" \ "letterAndControl" \ "postCode").json.prune,
+         (__ \ "desArrangement" \ "letterAndControl" \ "totalAll").json.prune,
+         (__ \ "desArrangement" \ "letterAndControl" \ "clmIndicateInt").json.prune,
+         (__ \ "desArrangement" \ "letterAndControl" \ "clmPymtString").json.prune,
+         (__ \ "desArrangement" \ "letterAndControl" \ "officeName1").json.prune,
+         (__ \ "desArrangement" \ "letterAndControl" \ "officeName2").json.prune,
+         (__ \ "desArrangement" \ "letterAndControl" \ "officePostcode").json.prune,
+         (__ \ "desArrangement" \ "letterAndControl" \ "officePhone").json.prune,
+         (__ \ "desArrangement" \ "letterAndControl" \ "officeFax").json.prune,
+         (__ \ "desArrangement" \ "letterAndControl" \ "officeOpeningHours").json.prune,
+         (__ \ "desArrangement" \ "letterAndControl" \ "template").json.prune)
+       def pruneAll(jspaths: Seq[Reads[JsObject]],jsObject: JsObject):JsObject ={
+       jspaths.foldLeft(jsObject){(acc,path)=> acc.transform(path).get}
+       }
+       Json.writes[TTPArrangement].transform { json: JsValue =>
+         json match {
+           case obj: JsObject =>
+             pruneAll(pathToPersonalInfo,obj)
+           case other => other
+         }
+       }
+     }
   implicit val format = ReactiveMongoFormats.mongoEntity({
-    Format(Json.reads[TTPArrangement], Json.writes[TTPArrangement])
+    Format(Json.reads[TTPArrangement],customWriterTTPArrangementMongo)
   })
   val id = "_id"
 }
 
 class TTPArrangementRepository @Inject()(mongo: DB)
   extends ReactiveRepository[TTPArrangement, String]("ttparrangements",() => mongo, TTPArrangementMongoFormats.format, implicitly[Format[String]]){
+
+    def findByIdLocal(id: String, readPreference: ReadPreference = ReadPreference.primaryPreferred)(implicit ec: ExecutionContext): Future[Option[JsValue]] = {
+    collection.find(_id(id)).one[JsValue](readPreference)
+  }
 
   def save(ttpArrangement: TTPArrangement) : Future[Option[TTPArrangement]] = {
     Logger.logger.debug("Saving ttparrangement record")
