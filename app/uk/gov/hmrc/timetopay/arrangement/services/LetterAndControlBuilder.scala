@@ -66,7 +66,7 @@ class LetterAndControlBuilder @Inject()(letterAndControlAndJurisdictionCHecker:L
       addressLine4 = address.addressLine4,
       addressLine5 = address.addressLine5,
       postCode = address.postcode,
-      totalAll = ttpArrangement.schedule.amountToPay.setScale(2).toString(),
+      totalAll = ttpArrangement.schedule.totalPayable.setScale(2).toString(),
       clmPymtString = paymentMessage(ttpArrangement.schedule),
       clmIndicateInt= LetterAndControlConfig.claimIndicateInt,
       template = LetterAndControlConfig.template,
@@ -134,13 +134,12 @@ class LetterAndControlBuilder @Inject()(letterAndControlAndJurisdictionCHecker:L
     val instalmentSize = schedule.instalments.size - 2
     val regularPaymentAmount = schedule.instalments.head.amount.setScale(2)
     val lastPaymentAmount = schedule.instalments.last.amount.setScale(2)
-
     val initialPayment = (Try(schedule.initialPayment).getOrElse(BigDecimal(0.0)) + schedule.instalments.head.amount).setScale(2)
 
     instalmentSize match {
-      case 0 => s"Initial payment of $initialPayment then a final payment of " + s"$lastPaymentAmount"
-      case _ => s"Initial payment of $initialPayment then $instalmentSize payments of $regularPaymentAmount and final payment of " +
-        s"$lastPaymentAmount"
+      case 0 => f"Initial payment of £$initialPayment%,.2f then a final payment of £" + s"$lastPaymentAmount%,.2f"
+      case _ => f"Initial payment of £$initialPayment%,.2f then $instalmentSize payments of £$regularPaymentAmount%,.2f and final payment of £" +
+        f"$lastPaymentAmount%,.2f"
     }
 
 
