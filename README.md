@@ -2,6 +2,17 @@
 
 [![Build Status](https://travis-ci.org/hmrc/time-to-pay-arrangement.svg)](https://travis-ci.org/hmrc/time-to-pay-arrangement) [ ![Download](https://api.bintray.com/packages/hmrc/releases/time-to-pay-arrangement/images/download.svg) ](https://bintray.com/hmrc/releases/time-to-pay-arrangement/_latestVersion)
 
+### About
+The Arrangement service is used in the SSTTP project for Pay What You Owe In Instalments. It takes a POST request and builds a DES submission request using the provided data.
+Before sending to DES the arrangement is saved to a local mongo database and provides a GET request in the response header that can be used to retrieve the data.
+Below is a diagram showing where the arrangement service fits into the SSTTP project.
+
+<a href="https://github.com/hmrc/self-service-time-to-pay-frontend">
+     <p align="center">
+       <img src="https://raw.githubusercontent.com/hmrc/time-to-pay-arrangement/master/public/arrangement.png" alt="ArrangementOverview">
+     </p>
+ </a>
+
 #### POST /ttparrangements
 
 Sets up a new time to pay arrangement based on the arrangement submitted. 
@@ -15,12 +26,12 @@ Input
    "customerName": "Customer name",
    "addresses": [
            {
-             "addressLine1": "",
-             "addressLine2": "",
-             "addressLine3": "",
-             "addressLine4": "",
-             "addressLine5": "",
-             "postcode": ""
+             "addressLine1": "addressLine1",
+             "addressLine2": "addressLine2",
+             "addressLine3": "addressLine3",
+             "addressLine4": "addressLine4",
+             "addressLine5": "UK",
+             "postcode": "AB1 2DC"
            }
          ],
     "selfAssessment": {
@@ -80,21 +91,21 @@ Returns a specific arrangement based on the identifier. This api is for internal
 
 ```    
 {
-  "id" : "XXX-XXX-XXX",
-  "createdOn" : "2016-08-09",
+  "id": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
+  "createdOn": "2017-03-23T11:11:38.964",
   "paymentPlanReference": "1234567890",
   "directDebitReference": "1234567890",
   "taxpayer": {
     "customerName": "Customer name",
     "addresses": [
-            {
-              "addressLine1": "",
-              "addressLine2": "",
-              "addressLine3": "",
-              "addressLine4": "",
-              "addressLine5": "",
-              "postcode": ""
-            }
+      {
+        "addressLine1": "addressLine1",
+        "addressLine2": "addressLine2",
+        "addressLine3": "addressLine3",
+        "addressLine4": "addressLine4",
+        "addressLine5": "UK",
+        "postcode": "AB1 2DC"
+      }
     ],
     "selfAssessment": {
       "utr": "1234567890",
@@ -141,48 +152,45 @@ Returns a specific arrangement based on the identifier. This api is for internal
   },
   "desArrangement": {
     "ttpArrangement": {
-      "startDate": "2016-08-09",
-      "endDate": "2016-09-16",
-      "firstPaymentDate": "2016-08-09",
-      "firstPaymentAmount": "1248.95",
+      "startDate": "2016-09-01",
+      "endDate": "2017-08-01",
+      "firstPaymentDate": "2016-10-01",
+      "firstPaymentAmount": "1298.95",
       "regularPaymentAmount": "1248.95",
       "regularPaymentFrequency": "Monthly",
-      "reviewDate": "2016-08-09",
-      "initials": "DOM",
-      "enforcementAction": "Distraint",
+      "reviewDate": "2017-01-22",
+      "initials": "ZZZ",
+      "enforcementAction": "Summary Warrant",
       "directDebit": true,
       "debitDetails": [
         {
-          "originCode": "IN2",
+          "debitType": "IN2",
           "dueDate": "2004-07-31"
         }
       ],
-      "saNote": "SA Note Text Here"
+      "saNote": "DDI 1234567890, PP 1234567890, First Payment Due Date 01/10/2016, First Payment £1298.95, Regular Payment £1248.95, Frequency Monthly, Final Payment £1248.95, Review Date 22/08/2017"
     },
     "letterAndControl": {
-      "customerName": "Customer Name",
-      "salutation": "Dear Sir or Madam",
-      "addressLine1": "Plaza 2",
-      "addressLine2": "Ironmasters Way",
-      "addressLine3": "Telford",
-      "addressLine4": "Shropshire",
+      "customerName": "Customer name",
+      "salutation": "Dear  Customer name",
+      "addressLine1": "addressLine1",
+      "addressLine2": "addressLine2",
+      "addressLine3": "addressLine3",
+      "addressLine4": "addressLine4",
       "addressLine5": "UK",
-      "postCode": "TF3 4NA",
-      "totalAll": "50000",
-      "clmIndicateInt": "Interest is due",
-      "clmPymtString": "Initial payment of 50 then 3 payments of 1248.95 and final payment of 1248.95",
-      "officeName1": "office name 1",
-      "officeName2": "office name 2",
-      "officePostcode": "TF2 8JU",
-      "officePhone": "1234567",
-      "officeFax": "12345678",
-      "officeOpeningHours": "9-5",
-      "template": "template",
-      "exceptionType": "2",
-      "exceptionReason": "Customer requires Large Format printing"
+      "postCode": "AB1 2DC",
+      "totalAll": "5000.00",
+      "clmIndicateInt": "Including interest due",
+      "clmPymtString": "Initial payment of 1298.95 then 2 payments of 1248.95 and final payment of 1248.95",
+      "officeName1": "HMRC",
+      "officeName2": "DM 440",
+      "officePostcode": "BX5 5AB",
+      "officePhone": "0300 200 3822",
+      "officeFax": "01708 707502",
+      "officeOpeningHours": "Monday - Friday 08.00 to 20.00",
+      "template": "DMTC13"
     }
   }
-
 }
 ```
 
