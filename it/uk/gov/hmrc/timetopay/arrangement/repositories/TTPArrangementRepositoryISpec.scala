@@ -152,17 +152,24 @@ class TTPArrangementRepositoryISpec extends FunSpec with BeforeAndAfter with Giv
   it("should add save a TTPArrangement") {
 
     val result = repository.save(arrangement).waitFor()
-
-    result.get.taxpayer.customerName mustBe arrangement.taxpayer.customerName
+    result.get.taxpayer.selfAssessment.utr mustBe arrangement.taxpayer.selfAssessment.utr
 
   }
 
   it("should get a TTPArrangement for given id") {
     repository.save(arrangement).waitFor()
 
-    val loaded = repository.findById(arrangement.id.get).waitFor().get
-    loaded.id.get mustBe arrangement.id.get
+    val loaded = repository.findByIdLocal(arrangement.id.get).waitFor().get
+      loaded.toString must not contain "XXX-XXX-XXX"
 
   }
 
+  it("should not save any personal data in  "){
+    repository.save(arrangement).waitFor()
+
+    val loaded = repository.findByIdLocal(arrangement.id.get).waitFor().get
+
+      loaded.toString must not contain  "Customer Name"
+     loaded.toString must not contain  "addresses"
+  }
 }
