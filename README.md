@@ -7,11 +7,14 @@ The Arrangement service is used in the SSTTP project for Pay What You Owe In Ins
 Before sending to DES the arrangement is saved to a local mongo database and provides a GET request in the response header that can be used to retrieve the data.
 Below is a diagram showing where the arrangement service fits into the SSTTP project.
 
-<a href="https://github.com/hmrc/self-service-time-to-pay-frontend">
+<a href="https://github.com/hmrc/time-to-pay-arrangement">
      <p align="center">
        <img src="https://raw.githubusercontent.com/hmrc/time-to-pay-arrangement/master/public/arrangement.png" alt="ArrangementOverview">
      </p>
  </a>
+
+#### Service Definitions
+The default port for this service is 8889
 
 #### POST /ttparrangements
 
