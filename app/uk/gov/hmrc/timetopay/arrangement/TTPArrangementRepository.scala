@@ -17,8 +17,6 @@
 package uk.gov.hmrc.timetopay.arrangement
 
 import javax.inject.Inject
-
-import org.joda.time.LocalDateTime
 import play.api.Logger
 import play.api.libs.json._
 import reactivemongo.api.{DB, ReadPreference}
@@ -27,10 +25,8 @@ import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.BSONDocument
 import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
-
 
 object TTPArrangementMongoFormats {
   import modelFormat._
