@@ -41,6 +41,7 @@ object TTPArrangementMongoFormats {
 class TTPArrangementRepository @Inject()(mongo: DB)
   extends ReactiveRepository[TTPArrangement, String]("ttparrangements",() => mongo, TTPArrangementMongoFormats.format, implicitly[Format[String]]){
 
+
   def save(ttpArrangement: TTPArrangement) : Future[Option[TTPArrangement]] = {
     Logger.logger.debug("Saving ttparrangement record")
     insert(ttpArrangement)
