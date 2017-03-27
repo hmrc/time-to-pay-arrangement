@@ -15,20 +15,24 @@ import scala.concurrent.duration._
 
 
 trait FutureHelpers {
+
   implicit class futureHelpers[T](f: Future[T]) {
     def waitFor(timeout: FiniteDuration = 10 seconds) = Await.result(f, timeout)
   }
+
 }
 
 
 class TTPArrangementRepositoryISpec extends FunSpec with BeforeAndAfter with GivenWhenThen with FutureHelpers with MustMatchers {
 
   private def databaseName = "test-" + this.getClass.getSimpleName
-  private def mongoUri: String = s"mongodb://127.0.0.1:27017/$databaseName"
-  implicit val mongoConnectorForTest = new MongoConnector(mongoUri)
-   val mongo = mongoConnectorForTest.db
 
-  val repository =  new TTPArrangementRepository(mongo.apply())
+  private def mongoUri: String = s"mongodb://127.0.0.1:27017/$databaseName"
+
+  implicit val mongoConnectorForTest = new MongoConnector(mongoUri)
+  val mongo = mongoConnectorForTest.db
+
+  val repository = new TTPArrangementRepository(mongo.apply())
 
   before {
     clear()
@@ -39,115 +43,116 @@ class TTPArrangementRepositoryISpec extends FunSpec with BeforeAndAfter with Giv
   }
 
   def clear(): Unit = {
-   repository.removeAll().waitFor()
+    repository.removeAll().waitFor()
   }
 
-  val arrangement = Json.parse(s"""
-              |{
-              |  "id" : "XXX-XXX-XXX",
-              |  "createdOn" : "2016-11-07T18:15:57.581",
-              |  "paymentPlanReference": "1234567890",
-              |  "directDebitReference": "1234567890",
-              |  "taxpayer": {
-              |    "customerName" : "Customer Name",
-              |    "addresses": [
-              |      {
-              |        "addressLine1": "",
-              |        "addressLine2": "",
-              |        "addressLine3": "",
-              |        "addressLine4": "",
-              |        "addressLine5": "",
-              |        "postcode": ""
-              |      }
-              |    ],
-              |    "selfAssessment": {
-              |      "utr": "1234567890",
-              |
+  val arrangement = Json.parse(
+    s"""
+       |{
+       |  "id" : "XXX-XXX-XXX",
+       |  "createdOn" : "2016-11-07T18:15:57.581",
+       |  "paymentPlanReference": "1234567890",
+       |  "directDebitReference": "1234567890",
+       |  "taxpayer": {
+       |    "customerName" : "Customer Name",
+       |    "addresses": [
+       |      {
+       |        "addressLine1": "",
+       |        "addressLine2": "",
+       |        "addressLine3": "",
+       |        "addressLine4": "",
+       |        "addressLine5": "",
+       |        "postcode": ""
+       |      }
+       |    ],
+       |    "selfAssessment": {
+       |      "utr": "1234567890",
+       |
               |      "communicationPreferences": {
-              |        "welshLanguageIndicator": false,
-              |        "audioIndicator": false,
-              |        "largePrintIndicator": false,
-              |        "brailleIndicator": false
-              |      },
-              |      "debits": [
-              |        {
-              |          "originCode": "IN2",
-              |          "dueDate": "2004-07-31"
-              |        }
-              |      ]
-              |    }
-              |  },
-              |  "schedule": {
-              |    "startDate": "2016-09-01",
-              |    "endDate": "2017-08-01",
-              |    "initialPayment": 50,
-              |    "amountToPay": 5000,
-              |    "instalmentBalance": 4950,
-              |    "totalInterestCharged": 45.83,
-              |    "totalPayable": 5045.83,
-              |    "instalments": [
-              |      {
-              |        "paymentDate": "2016-10-01",
-              |        "amount": 1248.95
-              |      },
-              |      {
-              |        "paymentDate": "2016-11-01",
-              |        "amount": 1248.95
-              |      },
-              |      {
-              |        "paymentDate": "2016-12-01",
-              |        "amount": 1248.95
-              |      },
-              |      {
-              |        "paymentDate": "2017-01-01",
-              |        "amount": 1248.95
-              |      }
-              |    ]
-              |  },
-              |  "desArrangement": {
-              |    "ttpArrangement": {
-              |      "startDate": "2016-08-09",
-              |      "endDate": "2016-09-16",
-              |      "firstPaymentDate": "2016-08-09",
-              |      "firstPaymentAmount": "1248.95",
-              |      "regularPaymentAmount": "1248.95",
-              |      "regularPaymentFrequency": "Monthly",
-              |      "reviewDate": "2016-08-09",
-              |      "initials": "DOM",
-              |      "enforcementAction": "Distraint",
-              |      "directDebit": true,
-              |      "debitDetails": [
-              |        {
-              |          "debitType": "IN2",
-              |          "dueDate": "2004-07-31"
-              |        }
-              |      ],
-              |      "saNote": "SA Note Text Here"
-              |    },
-              |    "letterAndControl": {
-              |      "customerName": "Customer Name",
-              |      "salutation": "Dear Sir or Madam",
-              |      "addressLine1": "Plaza 2",
-              |      "addressLine2": "Ironmasters Way",
-              |      "addressLine3": "Telford",
-              |      "addressLine4": "Shropshire",
-              |      "addressLine5": "UK",
-              |      "postCode": "TF3 4NA",
-              |      "totalAll": "50000",
-              |      "clmIndicateInt": "Interest is due",
-              |      "clmPymtString": "Initial payment of 50 then 3 payments of 1248.95 and final payment of 1248.95",
-              |      "officeName1": "office name 1",
-              |      "officeName2": "office name 2",
-              |      "officePostcode": "TF2 8JU",
-              |      "officePhone": "1234567",
-              |      "officeFax": "12345678",
-              |      "officeOpeningHours": "9-5",
-              |      "template": "template",
-              |      "exceptionType": "2",
-              |      "exceptionReason": "Customer requires Large Format printing"
-              |    }
-              |  }
-              |}""".stripMargin).as[TTPArrangement]
+       |        "welshLanguageIndicator": false,
+       |        "audioIndicator": false,
+       |        "largePrintIndicator": false,
+       |        "brailleIndicator": false
+       |      },
+       |      "debits": [
+       |        {
+       |          "originCode": "IN2",
+       |          "dueDate": "2004-07-31"
+       |        }
+       |      ]
+       |    }
+       |  },
+       |  "schedule": {
+       |    "startDate": "2016-09-01",
+       |    "endDate": "2017-08-01",
+       |    "initialPayment": 50,
+       |    "amountToPay": 5000,
+       |    "instalmentBalance": 4950,
+       |    "totalInterestCharged": 45.83,
+       |    "totalPayable": 5045.83,
+       |    "instalments": [
+       |      {
+       |        "paymentDate": "2016-10-01",
+       |        "amount": 1248.95
+       |      },
+       |      {
+       |        "paymentDate": "2016-11-01",
+       |        "amount": 1248.95
+       |      },
+       |      {
+       |        "paymentDate": "2016-12-01",
+       |        "amount": 1248.95
+       |      },
+       |      {
+       |        "paymentDate": "2017-01-01",
+       |        "amount": 1248.95
+       |      }
+       |    ]
+       |  },
+       |  "desArrangement": {
+       |    "ttpArrangement": {
+       |      "startDate": "2016-08-09",
+       |      "endDate": "2016-09-16",
+       |      "firstPaymentDate": "2016-08-09",
+       |      "firstPaymentAmount": "1248.95",
+       |      "regularPaymentAmount": "1248.95",
+       |      "regularPaymentFrequency": "Monthly",
+       |      "reviewDate": "2016-08-09",
+       |      "initials": "DOM",
+       |      "enforcementAction": "Distraint",
+       |      "directDebit": true,
+       |      "debitDetails": [
+       |        {
+       |          "debitType": "IN2",
+       |          "dueDate": "2004-07-31"
+       |        }
+       |      ],
+       |      "saNote": "SA Note Text Here"
+       |    },
+       |    "letterAndControl": {
+       |      "customerName": "Customer Name",
+       |      "salutation": "Dear Sir or Madam",
+       |      "addressLine1": "Plaza 2",
+       |      "addressLine2": "Ironmasters Way",
+       |      "addressLine3": "Telford",
+       |      "addressLine4": "Shropshire",
+       |      "addressLine5": "UK",
+       |      "postCode": "TF3 4NA",
+       |      "totalAll": "50000",
+       |      "clmIndicateInt": "Interest is due",
+       |      "clmPymtString": "Initial payment of 50 then 3 payments of 1248.95 and final payment of 1248.95",
+       |      "officeName1": "office name 1",
+       |      "officeName2": "office name 2",
+       |      "officePostcode": "TF2 8JU",
+       |      "officePhone": "1234567",
+       |      "officeFax": "12345678",
+       |      "officeOpeningHours": "9-5",
+       |      "template": "template",
+       |      "exceptionType": "2",
+       |      "exceptionReason": "Customer requires Large Format printing"
+       |    }
+       |  }
+       |}""".stripMargin).as[TTPArrangement]
 
   it("should add save a TTPArrangement") {
 
@@ -160,16 +165,15 @@ class TTPArrangementRepositoryISpec extends FunSpec with BeforeAndAfter with Giv
     repository.save(arrangement).waitFor()
 
     val loaded = repository.findByIdLocal(arrangement.id.get).waitFor().get
-      loaded.toString must not contain "XXX-XXX-XXX"
-
+    assert(loaded.toString.contains("desArrangement"))
+    assert(loaded.toString.contains("XXX-XXX-XXX"))
   }
 
-  it("should not save any personal data in  "){
+  it("should not save any personal data in  ") {
     repository.save(arrangement).waitFor()
 
     val loaded = repository.findByIdLocal(arrangement.id.get).waitFor().get
-
-      loaded.toString must not contain  "Customer Name"
-     loaded.toString must not contain  "addresses"
+    assert(!loaded.toString.contains("Customer Name"))
+    assert(!loaded.toString.contains("addresses"))
   }
 }
