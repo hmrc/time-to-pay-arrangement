@@ -33,6 +33,9 @@ class TTPArrangementController @Inject()(val arrangementService: TTPArrangementS
   def createdNoLocation = Future.successful[Result](Created)
   def createdWithLocation(id: String)(implicit reqHead: RequestHeader) = Future.successful[Result](Created.withHeaders(LOCATION -> s"$protocol://${reqHead.host}/ttparrangements/$id"))
 
+  /** Turns the json into our representation of a TTPArrangement
+    * It calls the submit method and applys a location to the returning result.
+    */
   def create() = Action.async(parse.json) {
     implicit request =>
       withJsonBody[TTPArrangement] {
