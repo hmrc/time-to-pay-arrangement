@@ -78,6 +78,9 @@ class TTPArrangementRepository @Inject()(mongo: DB)
     collection.find(_id(id)).one[JsValue](readPreference)
   }
 
+  /** Saves the json to our mongoDb
+     * Note a custom writer is used to ensure no personal data is saved
+    * */
 
   def save(ttpArrangement: TTPArrangement) : Future[Option[TTPArrangement]] = {
     Logger.logger.debug("Saving ttparrangement record")
