@@ -73,9 +73,11 @@ object TTPArrangementMongoFormats {
 class TTPArrangementRepository @Inject()(mongo: DB)
   extends ReactiveRepository[TTPArrangement, String]("ttparrangements",() => mongo, TTPArrangementMongoFormats.format, implicitly[Format[String]]){
 
+
     def findByIdLocal(id: String, readPreference: ReadPreference = ReadPreference.primaryPreferred)(implicit ec: ExecutionContext): Future[Option[JsValue]] = {
     collection.find(_id(id)).one[JsValue](readPreference)
   }
+
 
   def save(ttpArrangement: TTPArrangement) : Future[Option[TTPArrangement]] = {
     Logger.logger.debug("Saving ttparrangement record")
