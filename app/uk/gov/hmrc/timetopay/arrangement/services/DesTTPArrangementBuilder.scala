@@ -25,11 +25,11 @@ import uk.gov.hmrc.timetopay.arrangement.config.LetterAndControlAndJurisdictionC
 import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType.{JurisdictionType, Scottish}
 
 
-class DesTTPArrangementBuilder @Inject()(l:LetterAndControlAndJurisdictionChecker){
+class DesTTPArrangementBuilder @Inject()(l: LetterAndControlAndJurisdictionChecker) {
   val jurisdictionChecker = l.createJurisdictionCheckerConfig
   val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
-  def create(implicit ttpArrangement: TTPArrangement): DesTTPArrangement =  {
+  def create(implicit ttpArrangement: TTPArrangement): DesTTPArrangement = {
     val schedule: Schedule = ttpArrangement.schedule
     val firstPaymentInstalment: Instalment = schedule.instalments.head
 
@@ -48,13 +48,19 @@ class DesTTPArrangementBuilder @Inject()(l:LetterAndControlAndJurisdictionChecke
     )
   }
 
-  def enforcementFlag(taxpayer: Taxpayer): String= {
+  /** Uses the taxpayers post code to set the enforcementFlag
+    * 1. If the tax payer's address is in England, enter "Distraint"
+    * 2. If the tax payer's address in in Scotland, enter "Summary Warrant"
+    * 3. If the tax payer has addresses in both regions, enter "Other"
+    * 4. If the tax payer's address is a bad address (so we can't determine the region), enter "Other"
+    */
+  def enforcementFlag(taxpayer: Taxpayer): String = {
     val addressTypes: List[JurisdictionType] = taxpayer.addresses.map {
       jurisdictionChecker.addressType
     }.distinct
 
     addressTypes match {
-      case x::Nil => x match {
+      case x :: Nil => x match {
         case Scottish => "Summary Warrant"
         case _ => "Distraint"
       }
@@ -81,9 +87,9 @@ class DesTTPArrangementBuilder @Inject()(l:LetterAndControlAndJurisdictionChecke
     val finalPayment = ttpArrangement.schedule.instalments.last.amount
 
     val saNotes = s"DDI $directDebitReference, PP $paymentPlanReference, " +
-        s"First Payment Due Date $initialPaymentDate, First Payment £$initialPayment, " +
-        s"Regular Payment £$regularPaymentAmount, Frequency Monthly, " +
-        s"Final Payment £$finalPayment, Review Date $reviewDate"
+      s"First Payment Due Date $initialPaymentDate, First Payment £$initialPayment, " +
+      s"Regular Payment £$regularPaymentAmount, Frequency Monthly, " +
+      s"Final Payment £$finalPayment, Review Date $reviewDate"
 
     saNotes.take(250)
   }

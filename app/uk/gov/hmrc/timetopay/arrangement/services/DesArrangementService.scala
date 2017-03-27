@@ -41,7 +41,6 @@ trait DesArrangementService {
   lazy val desHeaderCarrier: HeaderCarrier = HeaderCarrier(authorization = Some(Authorization(s"Bearer $authorisationToken")))
     .withExtraHeaders("Environment" -> serviceEnvironment)
 
-
   def submitArrangement(taxpayer: Taxpayer, desSubmissionRequest: DesSubmissionRequest)(implicit ec: ExecutionContext): Future[SubmissionResult] = {
     implicit val hc: HeaderCarrier = desHeaderCarrier
     val serviceUrl = s"time-to-pay/taxpayers/${taxpayer.selfAssessment.utr}/arrangements"
