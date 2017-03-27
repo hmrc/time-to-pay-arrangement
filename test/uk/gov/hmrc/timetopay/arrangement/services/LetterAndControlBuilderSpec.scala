@@ -17,6 +17,8 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
 
+import java.time.LocalDate
+
 import org.mockito.Mockito.when
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
@@ -68,6 +70,30 @@ class LetterAndControlBuilderSpec extends UnitSpec with MockFactory   with Scala
         result.exceptionType shouldBe exceptionCode
         result.exceptionReason shouldBe exceptionReason
       }
+    }
+    "Format the clmPymtString correctly" in {
+      val scheduleWithInstalments: Schedule = Schedule(LocalDate.now(), LocalDate.now(), 0.0, BigDecimal("100.98"), 100, 0.98, 100.98,
+        List(Instalment(LocalDate.now(), 10.0),
+          Instalment(LocalDate.now(), 10.0),
+          Instalment(LocalDate.now(), 10.0),
+          Instalment(LocalDate.now(), 10.0),
+          Instalment(LocalDate.now(), 10.0),
+          Instalment(LocalDate.now(), 10.0),
+          Instalment(LocalDate.now(), 10.0),
+          Instalment(LocalDate.now(), 10.0),
+          Instalment(LocalDate.now(), 10.0),
+          Instalment(LocalDate.now(), 10.98)))
+      val result = letterAndControlService.create(TTPArrangement(None, None, "XXX", "XXX", taxpayer, scheduleWithInstalments, None))
+      result.clmPymtString shouldBe "Initial payment of £10.00 then 8 payments of £10.00 and final payment of £10.98"
+      result.totalAll shouldBe "100.98"
+    }
+    "Format the clmPymtString correctly for large numbers in" in {
+      val scheduleWithInstalments: Schedule = Schedule(LocalDate.now(), LocalDate.now(), 5000000.0, BigDecimal("15000000.00"), 100, 0.00, 100.98,
+        List(Instalment(LocalDate.now(), 100000000.00),
+          Instalment(LocalDate.now(), 100000000.00),
+          Instalment(LocalDate.now(), 100000000.00)))
+      val result = letterAndControlService.create(TTPArrangement(None, None, "XXX", "XXX", taxpayer, scheduleWithInstalments, None))
+      result.clmPymtString shouldBe "Initial payment of £105,000,000.00 then 1 payments of £100,000,000.00 and final payment of £100,000,000.00"
     }
   }
 
