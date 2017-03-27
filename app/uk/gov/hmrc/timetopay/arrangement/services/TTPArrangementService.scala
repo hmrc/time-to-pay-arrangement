@@ -29,13 +29,16 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Try
 
-class TTPArrangementService @Inject()(desTTPArrangementBuilder:DesTTPArrangementBuilder,
-                            desArrangementApiService:DesArrangementApiService,
-                            ttpArrangementRepository:TTPArrangementRepository,
-                            letterAndControlBuilder:LetterAndControlBuilder)  {
+class TTPArrangementService @Inject()(desTTPArrangementBuilder: DesTTPArrangementBuilder,
+                                      desArrangementApiService: DesArrangementApiService,
+                                      ttpArrangementRepository: TTPArrangementRepository,
+                                      letterAndControlBuilder: LetterAndControlBuilder) {
 
   def byId(id: String): Future[Option[TTPArrangement]] = ttpArrangementRepository.findById(id)
 
+  /**
+    * Builds and submits the TTPArrangement to Des. Also saves to Mongo
+    */
   def submit(arrangement: TTPArrangement)(implicit hc: HeaderCarrier): Future[Option[TTPArrangement]] = {
     Logger.logger.info(s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' " +
       s"and PP '${arrangement.paymentPlanReference}'")
@@ -54,6 +57,9 @@ class TTPArrangementService @Inject()(desTTPArrangementBuilder:DesTTPArrangement
     }
   }
 
+  /**
+    * Saves the TTPArrangement to our mongoDB and adds in a Id
+    */
   private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[TTPArrangement]] = {
     val toSave = arrangement.copy(id = Some(UUID.randomUUID().toString),
       createdOn = Some(LocalDateTime.now()),
