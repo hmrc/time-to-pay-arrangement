@@ -85,7 +85,7 @@ class TTPArrangementControllerSpec @Inject()(implicit val mat: Materializer) ext
   "GET /ttparrangements" should {
     "return 200 for arrangement" in {
 
-      (arrangementServiceStub.byId(_: String)).when("XXX-XXX-XXX") returns Future.successful(Some(ttparrangementResponse.as[TTPArrangement]))
+      (arrangementServiceStub.byId(_: String)).when("XXX-XXX-XXX") returns Future.successful(Some(ttparrangementResponse))
 
       val fakeRequest = FakeRequest("GET", "/ttparrangements/XXX-XXX-XXX")
       val result = arrangementController.arrangement("XXX-XXX-XXX").apply(fakeRequest).futureValue
