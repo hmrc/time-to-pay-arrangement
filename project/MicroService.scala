@@ -1,10 +1,11 @@
 import sbt.Keys._
 import play.routes.compiler.StaticRoutesGenerator
-import sbt.Tests.{SubProcess, Group}
+import sbt.Tests.{Group, SubProcess}
 import sbt._
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 import play.sbt.routes.RoutesCompiler.autoImport._
 import TestPhases._
+import play.sbt.PlayImport.PlayKeys
 import uk.gov.hmrc.SbtAutoBuildPlugin
 import play.sbt.routes.RoutesKeys.routesGenerator
 trait MicroService {
@@ -39,6 +40,7 @@ trait MicroService {
     .enablePlugins(Seq(play.sbt.PlayScala,SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin) ++ plugins : _*)
     .settings(playSettings : _*)
     .settings(scoverageSettings: _*)
+    .settings(PlayKeys.playDefaultPort := 8889)
     .settings(scalaSettings: _*)
     .settings(publishingSettings: _*)
     .settings(defaultSettings(): _*)
