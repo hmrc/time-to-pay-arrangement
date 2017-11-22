@@ -15,18 +15,14 @@
  */
 
 package uk.gov.hmrc.timetopay.arrangement.config
-import javax.inject.{Inject, Provider}
-
 import com.typesafe.config.Config
 import net.ceedubs.ficus.Ficus._
-import play.api.{Application, Configuration, Play}
-import uk.gov.hmrc.play.audit.filters.AuditFilter
+import play.api.{Application, Configuration}
 import uk.gov.hmrc.play.auth.controllers.AuthParamsControllerConfig
 import uk.gov.hmrc.play.auth.microservice.filters.AuthorisationFilter
 import uk.gov.hmrc.play.config._
-import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
-import uk.gov.hmrc.play.http.logging.filters.LoggingFilter
 import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
+import uk.gov.hmrc.play.microservice.filters.{AuditFilter, LoggingFilter, MicroserviceFilterSupport}
 
 object MicroserviceGlobal extends DefaultMicroserviceGlobal
     with RunMode with MicroserviceFilterSupport
