@@ -18,8 +18,8 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import play.api.Logger
 import play.api.http.Status
-import uk.gov.hmrc.play.http._
-import uk.gov.hmrc.play.http.logging.Authorization
+import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.{DesSubmissionRequest, Taxpayer}
 

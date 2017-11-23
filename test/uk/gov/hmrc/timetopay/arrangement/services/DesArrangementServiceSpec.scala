@@ -21,19 +21,20 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.http.Status
 import play.api.libs.json.Writes
-import uk.gov.hmrc.play.http._
-import uk.gov.hmrc.play.http.ws.WSHttp
+import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.test.UnitSpec
 import uk.gov.hmrc.timetopay.arrangement.DesSubmissionRequest
+import uk.gov.hmrc.timetopay.arrangement.config.WSHttp
 import uk.gov.hmrc.timetopay.arrangement.resources._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
+
 
 class DesArrangementServiceSpec extends UnitSpec  with ScalaFutures with MockFactory  with OneAppPerSuite  {
   implicit val headerCarrier = HeaderCarrier()
 
-  val mockHttp: HttpGet with HttpPost = mock[WSHttp]
+  val mockHttp: WSHttp = mock[WSHttp]
 
   class TestDesArrangementApiService extends DesArrangementService {
     override val desArrangementUrl: String = "des-arrangement-api-url"
@@ -48,8 +49,8 @@ class DesArrangementServiceSpec extends UnitSpec  with ScalaFutures with MockFac
     val request: DesSubmissionRequest = DesSubmissionRequest(submitArrangementTTPArrangement, submitArrangementLetterAndControl)
     "return 202 accepted response" in {
 
-      (mockHttp.POST(_:String, _:DesSubmissionRequest, _:Seq[(String,String)])(_:Writes[DesSubmissionRequest], _:HttpReads[HttpResponse], _:HeaderCarrier))
-        .expects(*,*,*,*,*,*).returning(Future.successful(HttpResponse(Status.ACCEPTED)))
+      (mockHttp.POST(_:String, _:DesSubmissionRequest, _:Seq[(String,String)])(_:Writes[DesSubmissionRequest], _:HttpReads[HttpResponse], _:HeaderCarrier, _:ExecutionContext))
+        .expects(*,*,*,*,*,*,*).returning(Future.successful(HttpResponse(Status.ACCEPTED)))
 
       val result = connector.submitArrangement(taxpayer,  request).futureValue
 
@@ -60,8 +61,8 @@ class DesArrangementServiceSpec extends UnitSpec  with ScalaFutures with MockFac
 
       val response = HttpResponse(responseStatus = Status.BAD_REQUEST, responseString= Some("JSON Not valid"))
 
-      (mockHttp.POST(_:String, _:DesSubmissionRequest, _:Seq[(String,String)])(_:Writes[DesSubmissionRequest], _:HttpReads[HttpResponse], _:HeaderCarrier))
-        .expects(*,*,*,*,*,*).returning(Future.failed(Upstream4xxResponse("JSON Not valid", 400, 500, Map())))
+      (mockHttp.POST(_:String, _:DesSubmissionRequest, _:Seq[(String,String)])(_:Writes[DesSubmissionRequest], _:HttpReads[HttpResponse], _:HeaderCarrier, _:ExecutionContext))
+        .expects(*,*,*,*,*,*,*).returning(Future.failed(Upstream4xxResponse("JSON Not valid", 400, 500, Map())))
 
       val result = connector.submitArrangement(taxpayer, request).futureValue
 
