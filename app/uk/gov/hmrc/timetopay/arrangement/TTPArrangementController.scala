@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,9 @@
 package uk.gov.hmrc.timetopay.arrangement
 
 import javax.inject.Inject
-
 import play.api.Logger
 import play.api.libs.json.Json.toJson
-import play.api.mvc.{Action, RequestHeader, Result}
+import play.api.mvc.{Action, AnyContent, RequestHeader, Result}
 import uk.gov.hmrc.play.microservice.controller.BaseController
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.services.{DesApiException, TTPArrangementService}
@@ -30,8 +29,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class TTPArrangementController @Inject()(val arrangementService: TTPArrangementService)(implicit ec: ExecutionContext) extends BaseController {
 
-  def createdNoLocation = Future.successful[Result](Created)
-  def createdWithLocation(id: String)(implicit reqHead: RequestHeader) = Future.successful[Result](Created.withHeaders(LOCATION -> s"$protocol://${reqHead.host}/ttparrangements/$id"))
 
   /** Turns the json into our representation of a TTPArrangement
     * It calls the submit method and applys a location to the returning result.
@@ -55,7 +52,7 @@ class TTPArrangementController @Inject()(val arrangementService: TTPArrangementS
   }
 
 
-  def arrangement(id: String) = Action.async {
+  def arrangement(id: String): Action[AnyContent] = Action.async {
     implicit request =>
       Logger.logger.debug(s"Requested arrangement $id")
       arrangementService.byId(id).flatMap {
@@ -63,6 +60,9 @@ class TTPArrangementController @Inject()(val arrangementService: TTPArrangementS
       }
   }
 
-  def protocol(implicit reqHead: RequestHeader) = if (reqHead.secure) "https" else "http"
+  def protocol(implicit reqHead: RequestHeader): String = if (reqHead.secure) "https" else "http"
 
+  private def createdNoLocation = Future.successful[Result](Created)
+
+  private def createdWithLocation(id: String)(implicit reqHead: RequestHeader) = Future.successful[Result](Created.withHeaders(LOCATION -> s"$protocol://${reqHead.host}/ttparrangements/$id"))
 }
