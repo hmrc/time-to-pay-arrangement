@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,25 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.timetopay.arrangement
-
-import javax.inject.Inject
+package uk.gov.hmrc.timetopay.arrangement.controllers
 
 import akka.stream.Materializer
+import javax.inject.Inject
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
 import play.api.http.Status
 import play.api.libs.json.Json
+import play.api.mvc.Result
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.test.UnitSpec
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.services._
+import uk.gov.hmrc.timetopay.arrangement.{TTPArrangement, TTPArrangementController}
 
 import scala.concurrent.Future
-class TTPArrangementControllerSpec @Inject()(implicit val mat: Materializer) extends UnitSpec with MockFactory with ScalaFutures {
+class TTPArrangementControllerSpec extends UnitSpec with MockFactory with ScalaFutures {
 
   class MockService extends TTPArrangementService(null,null,null,null) {}
   val arrangementServiceStub = stub[MockService]
@@ -54,7 +55,7 @@ class TTPArrangementControllerSpec @Inject()(implicit val mat: Materializer) ext
       (arrangementServiceStub.submit(_: TTPArrangement)(_: HeaderCarrier)).when(ttparrangementRequest.as[TTPArrangement], *) returns None
 
       val fakeRequest = FakeRequest("POST", "/ttparrangements").withBody(ttparrangementRequest)
-      val result = arrangementController.create().apply(fakeRequest).futureValue
+      val result = arrangementController.create()(fakeRequest).futureValue
       status(result) shouldBe Status.CREATED
       result.header.headers.get("Location") shouldBe None
     }
@@ -64,9 +65,8 @@ class TTPArrangementControllerSpec @Inject()(implicit val mat: Materializer) ext
       (arrangementServiceStub.submit(_: TTPArrangement)(_: HeaderCarrier)).when(ttparrangementRequest.as[TTPArrangement], *) returns Future.failed(new RuntimeException("****Simulated exception**** Internal processing exception"))
 
       val fakeRequest = FakeRequest("POST", "/ttparrangements").withBody(ttparrangementRequest)
-      val result = arrangementController.create().apply(fakeRequest).futureValue
+      val result: Result = arrangementController.create()(fakeRequest).futureValue
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-      bodyOf(result) shouldBe "****Simulated exception**** Internal processing exception"
     }
 
     "return 500 if arrangement service throws desapiexception" in {
@@ -74,9 +74,8 @@ class TTPArrangementControllerSpec @Inject()(implicit val mat: Materializer) ext
       (arrangementServiceStub.submit(_: TTPArrangement)(_: HeaderCarrier)).when(ttparrangementRequest.as[TTPArrangement], *) returns Future.failed(new DesApiException(403, "Forbidden"))
 
       val fakeRequest = FakeRequest("POST", "/ttparrangements").withBody(ttparrangementRequest)
-      val result = arrangementController.create().apply(fakeRequest).futureValue
+      val result = arrangementController.create()(fakeRequest).futureValue
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-      bodyOf(result) shouldBe "Submission to DES failed, status code [403] and response [Forbidden]"
     }
   }
 
@@ -86,9 +85,8 @@ class TTPArrangementControllerSpec @Inject()(implicit val mat: Materializer) ext
       (arrangementServiceStub.byId(_: String)).when("XXX-XXX-XXX") returns Future.successful(Some(ttparrangementResponse))
 
       val fakeRequest = FakeRequest("GET", "/ttparrangements/XXX-XXX-XXX")
-      val result = arrangementController.arrangement("XXX-XXX-XXX").apply(fakeRequest).futureValue
+      val result = arrangementController.arrangement("XXX-XXX-XXX")(fakeRequest).futureValue
       status(result) shouldBe Status.OK
-      Json.parse(bodyOf(result)).as[TTPArrangement].desArrangement.get.ttpArrangement.saNote shouldBe "SA Note Text Here"
     }
 
     "return 404 for non existent arrangement" in {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import org.mockito.Matchers.any
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
@@ -27,7 +26,7 @@ import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiService
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement._
-
+import org.mockito.{ ArgumentMatchers => Args }
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent._
 
@@ -55,9 +54,9 @@ class TTPArrangementServiceSpec extends PlaySpec  with OneAppPerSuite with Mocki
       when(letterAndControlMock.create(arrangement)).thenReturn(letter)
       when(desTTPArrangementBuilderMock.create(arrangement)).thenReturn(ttpArrangement)
       when(desSubmissionApiMock.submitArrangement(arrangement.taxpayer,request)).thenReturn(Future.successful(Right(SubmissionSuccess())))
-      when(ttpArrangementRepository.save(any())).thenReturn(Future.successful(Some(savedArrangement)))
+      when(ttpArrangementRepository.save(Args.any[TTPArrangement])).thenReturn(Future.successful(Some(savedArrangement)))
 
-      val response = arrangementService.submit(arrangement)(new HeaderCarrier)
+      val response = arrangementService.submit(arrangement)(new HeaderCarrier())
 
       ScalaFutures.whenReady(response) { r =>
         val desSubmissionRequest = r.get.desArrangement.get
@@ -75,7 +74,7 @@ class TTPArrangementServiceSpec extends PlaySpec  with OneAppPerSuite with Mocki
       when(letterAndControlMock.create(arrangement)).thenReturn(letter)
       when(desTTPArrangementBuilderMock.create(arrangement)).thenReturn(ttpArrangement)
       when(desSubmissionApiMock.submitArrangement(arrangement.taxpayer,request)).thenReturn(Future.successful(Left(SubmissionError(400, "Bad JSON"))))
-      when(ttpArrangementRepository.save(any())).thenReturn(Future.successful(Some(savedArrangement)))
+      when(ttpArrangementRepository.save(Args.any[TTPArrangement])).thenReturn(Future.successful(Some(savedArrangement)))
 
       val headerCarrier = new HeaderCarrier
       val response = arrangementService.submit(arrangement)(headerCarrier)
@@ -90,7 +89,7 @@ class TTPArrangementServiceSpec extends PlaySpec  with OneAppPerSuite with Mocki
       when(letterAndControlMock.create(arrangement)).thenReturn(letter)
       when(desTTPArrangementBuilderMock.create(arrangement)).thenReturn(ttpArrangement)
       when(desSubmissionApiMock.submitArrangement(arrangement.taxpayer,request)).thenReturn(Future.successful(Right(SubmissionSuccess())))
-      when(ttpArrangementRepository.save(any())).thenReturn(Future.successful(None))
+      when(ttpArrangementRepository.save(Args.any[TTPArrangement])).thenReturn(Future.successful(None))
 
       val headerCarrier = new HeaderCarrier
       val response = arrangementService.submit(arrangement)(headerCarrier)

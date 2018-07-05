@@ -36,7 +36,7 @@ private object AppDependencies {
         "org.scalatest" %% "scalatest" % scalaTestVersion % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
         "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % scope,
-      "org.mockito" % "mockito-core" % "1.10.19"
+        "org.mockito" % "mockito-core" % "2.18.3" % "test,it"
       )
     }.test
   }
