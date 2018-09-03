@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.timetopay.arrangement
 
-import java.time.{LocalDateTime, LocalDate}
+import java.time.{LocalDate, LocalDateTime}
 
-import play.api.libs.json.{Json, JsResult, JsValue, Format}
+import play.api.libs.json.{Format, JsResult, JsValue, Json}
 
 
 case class Schedule(startDate: LocalDate,

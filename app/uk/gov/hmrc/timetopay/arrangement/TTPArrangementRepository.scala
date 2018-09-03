@@ -17,19 +17,21 @@
 package uk.gov.hmrc.timetopay.arrangement
 
 import javax.inject.Inject
+
 import play.api.Logger
 import play.api.libs.json._
-import reactivemongo.api.{DB, ReadPreference}
 import reactivemongo.api.commands.DefaultWriteResult
 import reactivemongo.api.indexes.{Index, IndexType}
+import reactivemongo.api.{DB, ReadPreference}
 import reactivemongo.bson.BSONDocument
+import reactivemongo.play.json.ImplicitBSONHandlers._
 import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 object TTPArrangementMongoFormats {
-  import modelFormat._
      implicit val customWriterTTPArrangementMongo: Writes[TTPArrangement] = {
        val pathToPersonalInfo = Seq((__ \ "taxpayer" \ "customerName").json.prune,
          (__ \ "taxpayer" \ "addresses").json.prune,
