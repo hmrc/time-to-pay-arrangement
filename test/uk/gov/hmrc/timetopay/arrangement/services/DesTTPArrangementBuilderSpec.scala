@@ -21,7 +21,7 @@ import java.time.LocalDate
 import org.mockito.Mockito._
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatestplus.play.OneAppPerSuite
 import uk.gov.hmrc.play.test.UnitSpec
@@ -34,7 +34,7 @@ class DesTTPArrangementBuilderSpec extends UnitSpec  with MockFactory  with Scal
 
   val jurisdictionConfig = JurisdictionCheckerConfig("^(AB|DD|DG|EH|FK|G|HS|IV|KA|KW|KY|ML|PA|PH|TD|ZE)[0-9].*",
     "^(LL|SY|LD|HR|NP|CF|SA)[0-9].*")
-   val  LetterAndControlConfigInject = MockitoSugar.mock[LetterAndControlAndJurisdictionChecker]
+   val  LetterAndControlConfigInject = org.scalatest.mockito.MockitoSugar.mock[LetterAndControlAndJurisdictionChecker]
   when(LetterAndControlConfigInject.createJurisdictionCheckerConfig).thenReturn(new JurisdictionChecker(jurisdictionConfig))
   val desTTPArrangementService = new DesTTPArrangementBuilder(LetterAndControlConfigInject)
 

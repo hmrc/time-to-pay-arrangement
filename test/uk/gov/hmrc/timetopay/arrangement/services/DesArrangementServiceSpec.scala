@@ -46,19 +46,19 @@ class DesArrangementServiceSpec extends UnitSpec  with ScalaFutures with MockFac
   val connector = new TestDesArrangementApiService
 
   "Calling submitArrangement" should {
+
     val request: DesSubmissionRequest = DesSubmissionRequest(submitArrangementTTPArrangement, submitArrangementLetterAndControl)
     "return 202 accepted response" in {
 
       (mockHttp.POST(_:String, _:DesSubmissionRequest, _:Seq[(String,String)])(_:Writes[DesSubmissionRequest], _:HttpReads[HttpResponse], _:HeaderCarrier, _:ExecutionContext))
-        .expects(*,*,*,*,*,*,*).returning(Future.successful(HttpResponse(Status.ACCEPTED)))
 
+        .expects(*,*,*,*,*,*,*).returning(Future.successful(HttpResponse(Status.ACCEPTED)))
       val result = connector.submitArrangement(taxpayer,  request).futureValue
 
       result.right.get shouldBe SubmissionSuccess()
 
     }
     "return 400 response" in {
-
       val response = HttpResponse(responseStatus = Status.BAD_REQUEST, responseString= Some("JSON Not valid"))
 
       (mockHttp.POST(_:String, _:DesSubmissionRequest, _:Seq[(String,String)])(_:Writes[DesSubmissionRequest], _:HttpReads[HttpResponse], _:HeaderCarrier, _:ExecutionContext))

@@ -15,15 +15,15 @@
  */
 
 package uk.gov.hmrc.timetopay.arrangement
-
 import javax.inject.Inject
-
 import play.api.Logger
+import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import play.api.libs.json._
 import reactivemongo.api.commands.DefaultWriteResult
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.api.{DB, ReadPreference}
 import reactivemongo.bson.BSONDocument
+import reactivemongo.play.json.ImplicitBSONHandlers._
 import reactivemongo.play.json.ImplicitBSONHandlers._
 import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
@@ -89,6 +89,7 @@ class TTPArrangementRepository @Inject()(mongo: DB)
         case DefaultWriteResult(false, 1, Seq(), None, _, Some(msg)) =>
           Logger.logger.error(s"An error occurred saving record: $msg")
           None
+
       }
   }
 
