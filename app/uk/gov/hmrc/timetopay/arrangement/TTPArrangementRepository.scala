@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 
 package uk.gov.hmrc.timetopay.arrangement
-
 import javax.inject.Inject
 import play.api.Logger
 import play.api.libs.json._
@@ -75,15 +74,17 @@ class TTPArrangementRepository @Inject()(mongo: DB)
 
 
     def findByIdLocal(id: String, readPreference: ReadPreference = ReadPreference.primaryPreferred)(implicit ec: ExecutionContext): Future[Option[JsValue]] = {
-    collection.find(_id(id)).one[JsValue](readPreference)
+    collection.find(id).one[JsValue](readPreference)
   }
 
 
   def save(ttpArrangement: TTPArrangement) : Future[Option[TTPArrangement]] = {
     Logger.logger.debug("Saving ttparrangement record")
     insert(ttpArrangement)
-      .collect {
-        case DefaultWriteResult(true, 1, Seq(), None, _, None) => Logger.logger.info(s"Arrangement record persisted ID: ${ttpArrangement.id}"); Some(ttpArrangement)
+      .collect{
+        case DefaultWriteResult(true, 1, Seq(), None, _, None) =>
+          Logger.logger.info(s"Arrangement record persisted ID: ${ttpArrangement.id}")
+          Some(ttpArrangement)
         case DefaultWriteResult(false, 1, Seq(), None, _, Some(msg)) =>
           Logger.logger.error(s"An error occurred saving record: $msg")
           None

@@ -15,11 +15,11 @@ private object AppDependencies {
 
   private val playReactivemongoVersion = "4.8.0"
   val compile = Seq(
-    "uk.gov.hmrc" %% "play-reactivemongo" % "5.2.0",
+    "uk.gov.hmrc" %% "play-reactivemongo" % "6.2.0",
     "org.reactivemongo" %% "play2-reactivemongo" % "0.12.0",
     ws,
-    "uk.gov.hmrc" %% "microservice-bootstrap" %  "6.18.0",
-    "uk.gov.hmrc" %% "play-ui" % "7.13.0",
+    "uk.gov.hmrc" %% "microservice-bootstrap" %  "9.1.0",
+    "uk.gov.hmrc" %% "play-ui" % "7.27.0-play-25",
     "uk.gov.hmrc" %% "domain" %  "4.1.0"
   )
 
@@ -32,7 +32,7 @@ private object AppDependencies {
     def apply() = new TestDependencies {
       override lazy val test = Seq(
         "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1",
-        "uk.gov.hmrc" %% "hmrctest" %  "2.3.0",
+        "uk.gov.hmrc" %% "hmrctest" %  "3.3.0",
         "org.scalatest" %% "scalatest" % scalaTestVersion % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
         "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % scope,
@@ -47,7 +47,7 @@ private object AppDependencies {
       override lazy val scope: String = "it"
 
       override lazy val test = Seq(
-        "uk.gov.hmrc" %% "hmrctest" %  "2.3.0",
+        "uk.gov.hmrc" %% "hmrctest" %  "3.3.0",
         "org.scalatest" %% "scalatest" % scalaTestVersion % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
         "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % scope,
