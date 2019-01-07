@@ -26,6 +26,8 @@ import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
+//import play.modules.reactivemongo.json._,
+import reactivemongo.play.json.JSONSerializationPack._
 
 object TTPArrangementMongoFormats {
   import modelFormat._
@@ -74,7 +76,8 @@ class TTPArrangementRepository @Inject()(mongo: DB)
 
 
     def findByIdLocal(id: String, readPreference: ReadPreference = ReadPreference.primaryPreferred)(implicit ec: ExecutionContext): Future[Option[JsValue]] = {
-    collection.find(id).one[JsValue](readPreference)
+
+      collection.find(_id(id))(new OWrites[JsObject] { def writes(o: JsObject): JsObject = o }).one[JsValue](readPreference)
   }
 
 
