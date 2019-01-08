@@ -25,7 +25,7 @@ import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
 import uk.gov.hmrc.play.microservice.filters.{AuditFilter, LoggingFilter, MicroserviceFilterSupport}
 
 object MicroserviceGlobal extends DefaultMicroserviceGlobal
-    with RunMode with MicroserviceFilterSupport
+    with MicroserviceFilterSupport with DefaultRunMode
 {
 
   object CConfig extends ControllerConfig {
@@ -48,7 +48,7 @@ object MicroserviceGlobal extends DefaultMicroserviceGlobal
     }
 
   override val microserviceAuditFilter =
-    new AuditFilter with AppName with MicroserviceFilterSupport{
+    new AuditFilter with DefaultAppName with MicroserviceFilterSupport{
       override val auditConnector = MicroserviceAuditConnector
       override def controllerNeedsAuditing(controllerName: String) =
         mconfig(controllerName).needsAuditing

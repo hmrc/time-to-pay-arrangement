@@ -16,13 +16,19 @@
 
 package uk.gov.hmrc.timetopay.arrangement.config
 
-import javax.inject.{Inject, Provider}
-import com.google.inject.{AbstractModule, Singleton}
-import uk.gov.hmrc.play.config._
+import play.api.Mode.Mode
+import play.api.{Configuration, Play}
+import uk.gov.hmrc.play.config.{AppName, RunMode}
 
-class GuiceModule extends AbstractModule with ServicesConfig with DefaultRunMode {
-  override def configure: Unit = {
-    bind(classOf[reactivemongo.api.DB]).toProvider(classOf[MongoDbProvider])
-    ()
-  }
+trait DefaultRunMode extends RunMode {
+
+  override protected def runModeConfiguration: Configuration = Play.current.configuration
+  override protected def mode: Mode = Play.current.mode
+
+}
+
+trait DefaultAppName extends AppName {
+
+  override protected def appNameConfiguration: Configuration = Play.current.configuration
+
 }

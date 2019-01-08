@@ -15,6 +15,7 @@
  */
 
 package uk.gov.hmrc.timetopay.arrangement.config
+import com.typesafe.config.Config
 import play.api.mvc.Controller
 import play.modules.reactivemongo.MongoDbConnection
 import uk.gov.hmrc.http._
@@ -33,19 +34,21 @@ trait Hooks extends HttpHooks with HttpAuditing{
   override lazy val auditConnector = MicroserviceAuditConnector
 }
 
-trait WSHttp extends WSGet with HttpGet with WSPost with HttpPost with WSDelete with HttpDelete  with WSPatch with HttpPatch with Hooks with AppName
+trait WSHttp extends WSGet with HttpGet with WSPost with HttpPost with WSDelete with HttpDelete  with WSPatch with HttpPatch with Hooks with DefaultAppName {
+  override lazy val configuration: Option[Config] = None
+}
 
 object WSHttp extends WSHttp
 
-object MicroserviceAuditConnector extends AuditConnector with RunMode {
+object MicroserviceAuditConnector extends AuditConnector with DefaultRunMode {
   override lazy val auditingConfig = LoadAuditingConfig(s"auditing")
 }
 
-object MicroserviceAuthConnector extends AuthConnector with ServicesConfig with WSHttp {
+object MicroserviceAuthConnector extends AuthConnector with ServicesConfig with WSHttp with DefaultRunMode {
   override val authBaseUrl = baseUrl("auth")
 }
 
-class DesArrangementApiService() extends DesArrangementService with ServicesConfig {
+class DesArrangementApiService() extends DesArrangementService with ServicesConfig with DefaultRunMode {
   override val desArrangementUrl: String = baseUrl("des-arrangement-api")
   override val serviceEnvironment: String = getConfString("des-arrangement-api.environment", "unknown")
   override val authorisationToken: String = getConfString("des-arrangement-api.authorization-token", "not-found")
@@ -53,7 +56,7 @@ class DesArrangementApiService() extends DesArrangementService with ServicesConf
   override val http: HttpGet with HttpPost = WSHttp
 }
 
-class LetterAndControlAndJurisdictionChecker extends ServicesConfig {
+class LetterAndControlAndJurisdictionChecker extends ServicesConfig with DefaultRunMode {
   override def getConfString(confKey: String, defString: => String) = {
     runModeConfiguration.getString(s"$confKey").
       getOrElse(runModeConfiguration.getString(s"$confKey").
@@ -81,7 +84,7 @@ class LetterAndControlAndJurisdictionChecker extends ServicesConfig {
   }
 }
 
-trait ServiceRegistry extends ServicesConfig with MongoDbConnection {
+trait ServiceRegistry extends ServicesConfig with MongoDbConnection with DefaultRunMode {
   val letterAndJurisction = new LetterAndControlAndJurisdictionChecker()
    val TTPArrangementRepository: TTPArrangementRepository =new TTPArrangementRepository(db.apply())
    val arrangementDesApiConnector = new DesArrangementApiService()
