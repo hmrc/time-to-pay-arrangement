@@ -10,16 +10,17 @@ object MicroServiceBuild extends Build with MicroService {
 private object AppDependencies {
   import play.sbt.PlayImport._
 
-  private val scalaTestVersion = "2.2.6"
+  private val scalaTestVersion = "3.0.5"
   private val pegdownVersion = "1.6.0"
-
-  private val playReactivemongoVersion = "4.8.0"
-  val compile = Seq(
-    "uk.gov.hmrc" %% "play-reactivemongo" % "5.2.0",
+  private val scalatestplusPlayVersion = "2.0.1"
+  private val scalamockScalatestSupportVersion = "3.6.0"
+  
+  val compile: Seq[ModuleID] = Seq(
+    "uk.gov.hmrc" %% "play-reactivemongo" % "6.2.0",
     "org.reactivemongo" %% "play2-reactivemongo" % "0.12.0",
     ws,
-    "uk.gov.hmrc" %% "microservice-bootstrap" %  "6.18.0",
-    "uk.gov.hmrc" %% "play-ui" % "7.13.0",
+    "uk.gov.hmrc" %% "microservice-bootstrap" %  "9.1.0",
+    "uk.gov.hmrc" %% "play-ui" % "7.27.0-play-25",
     "uk.gov.hmrc" %% "domain" %  "4.1.0"
   )
 
@@ -29,34 +30,34 @@ private object AppDependencies {
   }
 
   object Test {
-    def apply() = new TestDependencies {
-      override lazy val test = Seq(
-        "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1",
-        "uk.gov.hmrc" %% "hmrctest" %  "2.3.0",
+    def apply(): Seq[ModuleID] = new TestDependencies {
+      override lazy val test: Seq[ModuleID] = Seq(
+        "org.scalatestplus.play" %% "scalatestplus-play" % scalatestplusPlayVersion,
+        "uk.gov.hmrc" %% "hmrctest" %  "3.3.0",
         "org.scalatest" %% "scalatest" % scalaTestVersion % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
-        "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % scope,
+        "org.scalamock" %% "scalamock-scalatest-support" % scalamockScalatestSupportVersion % scope,
         "org.mockito" % "mockito-core" % "2.18.3" % "test,it"
       )
     }.test
   }
 
   object IntegrationTest {
-    def apply() = new TestDependencies {
+    def apply(): Seq[ModuleID] = new TestDependencies {
 
       override lazy val scope: String = "it"
 
-      override lazy val test = Seq(
-        "uk.gov.hmrc" %% "hmrctest" %  "2.3.0",
+      override lazy val test: Seq[ModuleID] = Seq(
+        "uk.gov.hmrc" %% "hmrctest" %  "3.3.0",
         "org.scalatest" %% "scalatest" % scalaTestVersion % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
-        "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % scope,
-        "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % scope,
+        "org.scalatestplus.play" %% "scalatestplus-play" % scalatestplusPlayVersion % scope,
+        "org.scalamock" %% "scalamock-scalatest-support" % scalamockScalatestSupportVersion % scope,
         "org.mockito" % "mockito-core" % "1.10.19"
       )
     }.test
   }
 
-  def apply() = compile ++ Test() ++ IntegrationTest()
+  def apply(): Seq[ModuleID] = compile ++ Test() ++ IntegrationTest()
 }
 

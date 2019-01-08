@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,37 +15,42 @@
  */
 
 package uk.gov.hmrc.timetopay.arrangement.config
+import com.typesafe.config.Config
 import play.api.mvc.Controller
 import play.modules.reactivemongo.MongoDbConnection
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.http.hooks.{HttpHook, HttpHooks}
+import uk.gov.hmrc.http.hooks.HttpHooks
 import uk.gov.hmrc.play.audit.http.HttpAuditing
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.auth.microservice.connectors.AuthConnector
-import uk.gov.hmrc.play.config.{AppName, RunMode, ServicesConfig}
+import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.ws._
 import uk.gov.hmrc.play.microservice.config.LoadAuditingConfig
 import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.services._
 
+import scala.concurrent.ExecutionContextExecutor
+
 trait Hooks extends HttpHooks with HttpAuditing{
-  override val hooks = Seq(AuditingHook)
-  override lazy val auditConnector = MicroserviceAuditConnector
+  override val hooks: Seq[AuditingHook.type] = Seq(AuditingHook)
+  override lazy val auditConnector: MicroserviceAuditConnector.type = MicroserviceAuditConnector
 }
 
-trait WSHttp extends WSGet with HttpGet with WSPost with HttpPost with WSDelete with HttpDelete  with WSPatch with HttpPatch with Hooks with AppName
+trait WSHttp extends WSGet with HttpGet with WSPost with HttpPost with WSDelete with HttpDelete  with WSPatch with HttpPatch with Hooks with DefaultAppName {
+  override lazy val configuration: Option[Config] = None
+}
 
 object WSHttp extends WSHttp
 
-object MicroserviceAuditConnector extends AuditConnector with RunMode {
+object MicroserviceAuditConnector extends AuditConnector with DefaultRunMode {
   override lazy val auditingConfig = LoadAuditingConfig(s"auditing")
 }
 
-object MicroserviceAuthConnector extends AuthConnector with ServicesConfig with WSHttp {
-  override val authBaseUrl = baseUrl("auth")
+object MicroserviceAuthConnector extends AuthConnector with ServicesConfig with WSHttp with DefaultRunMode {
+  override val authBaseUrl: String = baseUrl("auth")
 }
 
-class DesArrangementApiService() extends DesArrangementService with ServicesConfig {
+class DesArrangementApiService() extends DesArrangementService with ServicesConfig with DefaultRunMode {
   override val desArrangementUrl: String = baseUrl("des-arrangement-api")
   override val serviceEnvironment: String = getConfString("des-arrangement-api.environment", "unknown")
   override val authorisationToken: String = getConfString("des-arrangement-api.authorization-token", "not-found")
@@ -53,8 +58,8 @@ class DesArrangementApiService() extends DesArrangementService with ServicesConf
   override val http: HttpGet with HttpPost = WSHttp
 }
 
-class LetterAndControlAndJurisdictionChecker extends ServicesConfig {
-  override def getConfString(confKey: String, defString: => String) = {
+class LetterAndControlAndJurisdictionChecker extends ServicesConfig with DefaultRunMode {
+  override def getConfString(confKey: String, defString: => String): String = {
     runModeConfiguration.getString(s"$confKey").
       getOrElse(runModeConfiguration.getString(s"$confKey").
         getOrElse(runModeConfiguration.getString(s"$confKey").
@@ -81,7 +86,7 @@ class LetterAndControlAndJurisdictionChecker extends ServicesConfig {
   }
 }
 
-trait ServiceRegistry extends ServicesConfig with MongoDbConnection {
+trait ServiceRegistry extends ServicesConfig with MongoDbConnection with DefaultRunMode {
   val letterAndJurisction = new LetterAndControlAndJurisdictionChecker()
    val TTPArrangementRepository: TTPArrangementRepository =new TTPArrangementRepository(db.apply())
    val arrangementDesApiConnector = new DesArrangementApiService()
@@ -91,7 +96,7 @@ trait ServiceRegistry extends ServicesConfig with MongoDbConnection {
 
 trait ControllerRegistry extends ServiceRegistry {
 
-  implicit val ec =  scala.concurrent.ExecutionContext.Implicits.global
+  implicit val ec: ExecutionContextExecutor =  scala.concurrent.ExecutionContext.Implicits.global
   private lazy val controllers = Map[Class[_], Controller](
     classOf[TTPArrangementController] -> new TTPArrangementController(new TTPArrangementService(desTTPArrangementService,
       arrangementDesApiConnector,TTPArrangementRepository,letterAndControlService))

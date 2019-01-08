@@ -16,15 +16,19 @@
 
 package uk.gov.hmrc.timetopay.arrangement.config
 
-import com.google.inject.Inject
+import play.api.Mode.Mode
+import play.api.{Configuration, Play}
+import uk.gov.hmrc.play.config.{AppName, RunMode}
 
-case class LetterAndControlConfig @Inject()(salutation: String,
-                                   claimIndicateInt: String,
-                                   template: String,
-                                   officeName1: String,
-                                   officeName2: String,
-                                   officePostCode: String,
-                                   officePhone: String,
-                                   officeFax: String,
-                                   officeOpeningHours: String ){
+trait DefaultRunMode extends RunMode {
+
+  override protected def runModeConfiguration: Configuration = Play.current.configuration
+  override protected def mode: Mode = Play.current.mode
+
+}
+
+trait DefaultAppName extends AppName {
+
+  override protected def appNameConfiguration: Configuration = Play.current.configuration
+
 }
