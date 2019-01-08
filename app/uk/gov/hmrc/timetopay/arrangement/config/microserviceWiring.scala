@@ -19,19 +19,21 @@ import com.typesafe.config.Config
 import play.api.mvc.Controller
 import play.modules.reactivemongo.MongoDbConnection
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.http.hooks.{HttpHook, HttpHooks}
+import uk.gov.hmrc.http.hooks.HttpHooks
 import uk.gov.hmrc.play.audit.http.HttpAuditing
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.auth.microservice.connectors.AuthConnector
-import uk.gov.hmrc.play.config.{AppName, RunMode, ServicesConfig}
+import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.ws._
 import uk.gov.hmrc.play.microservice.config.LoadAuditingConfig
 import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.services._
 
+import scala.concurrent.ExecutionContextExecutor
+
 trait Hooks extends HttpHooks with HttpAuditing{
-  override val hooks = Seq(AuditingHook)
-  override lazy val auditConnector = MicroserviceAuditConnector
+  override val hooks: Seq[AuditingHook.type] = Seq(AuditingHook)
+  override lazy val auditConnector: MicroserviceAuditConnector.type = MicroserviceAuditConnector
 }
 
 trait WSHttp extends WSGet with HttpGet with WSPost with HttpPost with WSDelete with HttpDelete  with WSPatch with HttpPatch with Hooks with DefaultAppName {
@@ -45,7 +47,7 @@ object MicroserviceAuditConnector extends AuditConnector with DefaultRunMode {
 }
 
 object MicroserviceAuthConnector extends AuthConnector with ServicesConfig with WSHttp with DefaultRunMode {
-  override val authBaseUrl = baseUrl("auth")
+  override val authBaseUrl: String = baseUrl("auth")
 }
 
 class DesArrangementApiService() extends DesArrangementService with ServicesConfig with DefaultRunMode {
@@ -57,7 +59,7 @@ class DesArrangementApiService() extends DesArrangementService with ServicesConf
 }
 
 class LetterAndControlAndJurisdictionChecker extends ServicesConfig with DefaultRunMode {
-  override def getConfString(confKey: String, defString: => String) = {
+  override def getConfString(confKey: String, defString: => String): String = {
     runModeConfiguration.getString(s"$confKey").
       getOrElse(runModeConfiguration.getString(s"$confKey").
         getOrElse(runModeConfiguration.getString(s"$confKey").
@@ -94,7 +96,7 @@ trait ServiceRegistry extends ServicesConfig with MongoDbConnection with Default
 
 trait ControllerRegistry extends ServiceRegistry {
 
-  implicit val ec =  scala.concurrent.ExecutionContext.Implicits.global
+  implicit val ec: ExecutionContextExecutor =  scala.concurrent.ExecutionContext.Implicits.global
   private lazy val controllers = Map[Class[_], Controller](
     classOf[TTPArrangementController] -> new TTPArrangementController(new TTPArrangementService(desTTPArrangementService,
       arrangementDesApiConnector,TTPArrangementRepository,letterAndControlService))
