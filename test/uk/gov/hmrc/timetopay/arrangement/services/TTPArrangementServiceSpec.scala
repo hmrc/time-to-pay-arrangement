@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,22 +26,24 @@ import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiService
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement._
-import org.mockito.{ ArgumentMatchers => Args }
+import org.mockito.{ArgumentMatchers => Args}
+import org.scalatest.concurrent
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent._
 
 class TTPArrangementServiceSpec extends PlaySpec  with OneAppPerSuite with MockitoSugar {
-  implicit val defaultPatience = ScalaFutures.PatienceConfig(timeout = Span(5, Seconds), interval = Span(500, Millis))
-  val mockDesAPi = mock[DesArrangementService]
-  val mockTTpRepo=  mock[TTPArrangementRepository]
+  implicit val defaultPatience: concurrent.ScalaFutures.PatienceConfig = ScalaFutures.PatienceConfig(timeout = Span(5, Seconds), interval = Span(500, Millis))
+  val mockDesAPi: DesArrangementService = mock[DesArrangementService]
+  val mockTTpRepo: TTPArrangementRepository = mock[TTPArrangementRepository]
 
   val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement]
-  val savedArrangement = ttparrangementResponse.as[TTPArrangement]
+  val savedArrangement: TTPArrangement = ttparrangementResponse.as[TTPArrangement]
 
-  val letterAndControlMock = mock[LetterAndControlBuilder]
-  val desTTPArrangementBuilderMock = mock[DesTTPArrangementBuilder]
-  val ttpArrangementRepository = mock[TTPArrangementRepository]
-  val desSubmissionApiMock= mock[DesArrangementApiService]
+  val letterAndControlMock: LetterAndControlBuilder = mock[LetterAndControlBuilder]
+  val desTTPArrangementBuilderMock: DesTTPArrangementBuilder = mock[DesTTPArrangementBuilder]
+  val ttpArrangementRepository: TTPArrangementRepository = mock[TTPArrangementRepository]
+  val desSubmissionApiMock: DesArrangementApiService = mock[DesArrangementApiService]
 
   lazy val arrangementService = new TTPArrangementService(desTTPArrangementBuilderMock,desSubmissionApiMock,ttpArrangementRepository,letterAndControlMock)
 
@@ -56,7 +58,7 @@ class TTPArrangementServiceSpec extends PlaySpec  with OneAppPerSuite with Mocki
       when(desSubmissionApiMock.submitArrangement(arrangement.taxpayer,request)).thenReturn(Future.successful(Right(SubmissionSuccess())))
       when(ttpArrangementRepository.save(Args.any[TTPArrangement])).thenReturn(Future.successful(Some(savedArrangement)))
 
-      val response = arrangementService.submit(arrangement)(new HeaderCarrier())
+      val response = arrangementService.submit(arrangement)(HeaderCarrier())
 
       ScalaFutures.whenReady(response) { r =>
         val desSubmissionRequest = r.get.desArrangement.get
@@ -64,7 +66,9 @@ class TTPArrangementServiceSpec extends PlaySpec  with OneAppPerSuite with Mocki
         desSubmissionRequest.ttpArrangement.firstPaymentAmount mustBe "1248.95"
         desSubmissionRequest.ttpArrangement.enforcementAction mustBe "Distraint"
         desSubmissionRequest.ttpArrangement.regularPaymentAmount mustBe "1248.95"
-        desSubmissionRequest.letterAndControl.clmPymtString mustBe s"Initial payment of ${arrangement.schedule.initialPayment} then ${arrangement.schedule.instalments.size - 1} payments of ${arrangement.schedule.instalments.head.amount} and final payment of " +
+        desSubmissionRequest.letterAndControl.clmPymtString mustBe s"Initial payment of " +
+          s"${arrangement.schedule.initialPayment} then ${arrangement.schedule.instalments.size - 1} " +
+          s"payments of ${arrangement.schedule.instalments.head.amount} and final payment of " +
           s"${arrangement.schedule.instalments.last.amount}"
       }
     }
@@ -80,7 +84,7 @@ class TTPArrangementServiceSpec extends PlaySpec  with OneAppPerSuite with Mocki
       val response = arrangementService.submit(arrangement)(headerCarrier)
 
       ScalaFutures.whenReady(response.failed) { e =>
-        e mustBe a [DesApiException]
+        e mustBe a[DesApiException]
         e.getMessage mustBe "DES httpCode: 400, reason: Bad JSON"
       }
     }

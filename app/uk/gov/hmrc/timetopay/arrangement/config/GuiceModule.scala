@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import javax.inject.{Inject, Provider}
 import com.google.inject.{AbstractModule, Singleton}
 import uk.gov.hmrc.play.config._
 
-class GuiceModule extends AbstractModule with ServicesConfig {
+class GuiceModule extends AbstractModule with ServicesConfig with DefaultRunMode {
   override def configure: Unit = {
     bind(classOf[reactivemongo.api.DB]).toProvider(classOf[MongoDbProvider])
     ()
