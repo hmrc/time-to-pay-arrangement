@@ -33,7 +33,6 @@ private object AppDependencies {
     def apply(): Seq[ModuleID] = new TestDependencies {
       override lazy val test: Seq[ModuleID] = Seq(
         "org.scalatestplus.play" %% "scalatestplus-play" % scalatestplusPlayVersion,
-        "uk.gov.hmrc" %% "hmrctest" %  "3.3.0",
         "org.scalatest" %% "scalatest" % scalaTestVersion % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
         "org.scalamock" %% "scalamock-scalatest-support" % scalamockScalatestSupportVersion % scope,
