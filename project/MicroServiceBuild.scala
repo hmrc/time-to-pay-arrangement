@@ -19,7 +19,7 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-reactivemongo" % "6.2.0",
     "org.reactivemongo" %% "play2-reactivemongo" % "0.12.0",
     ws,
-    "uk.gov.hmrc" %% "microservice-bootstrap" %  "9.1.0",
+    "uk.gov.hmrc" %% "microservice-bootstrap" %  "10.6.0",
     "uk.gov.hmrc" %% "play-ui" % "7.27.0-play-25",
     "uk.gov.hmrc" %% "domain" %  "4.1.0"
   )

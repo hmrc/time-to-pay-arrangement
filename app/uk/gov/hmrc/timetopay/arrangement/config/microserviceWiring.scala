@@ -15,15 +15,18 @@
  */
 
 package uk.gov.hmrc.timetopay.arrangement.config
+
+import akka.actor.ActorSystem
 import com.typesafe.config.Config
 import play.api.mvc.Controller
+import play.api.{Configuration, Play}
 import play.modules.reactivemongo.MongoDbConnection
-import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.hooks.HttpHooks
+import uk.gov.hmrc.http.{HttpDelete, HttpGet, HttpPost, HttpPut, _}
 import uk.gov.hmrc.play.audit.http.HttpAuditing
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.auth.microservice.connectors.AuthConnector
-import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.config.{AppName, ServicesConfig}
 import uk.gov.hmrc.play.http.ws._
 import uk.gov.hmrc.play.microservice.config.LoadAuditingConfig
 import uk.gov.hmrc.timetopay.arrangement._
@@ -31,14 +34,19 @@ import uk.gov.hmrc.timetopay.arrangement.services._
 
 import scala.concurrent.ExecutionContextExecutor
 
-trait Hooks extends HttpHooks with HttpAuditing{
+trait Hooks extends HttpHooks with HttpAuditing {
   override val hooks: Seq[AuditingHook.type] = Seq(AuditingHook)
   override lazy val auditConnector: MicroserviceAuditConnector.type = MicroserviceAuditConnector
 }
 
-trait WSHttp extends WSGet with HttpGet with WSPost with HttpPost with WSDelete with HttpDelete  with WSPatch with HttpPatch with Hooks with DefaultAppName {
-  override lazy val configuration: Option[Config] = None
+trait WSHttp extends HttpGet with WSGet with HttpPut with WSPut with HttpPost with WSPost with HttpDelete with WSDelete with Hooks with WSPatch with HttpPatch with AppName {
+  override protected def appNameConfiguration: Configuration = Play.current.configuration
+
+  override protected def actorSystem: ActorSystem = Play.current.actorSystem
+
+  override protected def configuration: Option[Config] = Option(Play.current.configuration.underlying)
 }
+
 
 object WSHttp extends WSHttp
 
@@ -65,7 +73,8 @@ class LetterAndControlAndJurisdictionChecker extends ServicesConfig with Default
         getOrElse(runModeConfiguration.getString(s"$confKey").
           getOrElse(defString)))
   }
-  def createLetterAndControlConfig:LetterAndControlConfig = {
+
+  def createLetterAndControlConfig: LetterAndControlConfig = {
     LetterAndControlConfig(
       getConfString("letterAndControl.salutation", ""),
       getConfString("letterAndControl.claimIndicateInt", ""),
@@ -78,7 +87,8 @@ class LetterAndControlAndJurisdictionChecker extends ServicesConfig with Default
       getConfString("letterAndControl.office.officeOpeningHours", "")
     )
   }
-  def createJurisdictionCheckerConfig:JurisdictionChecker = {
+
+  def createJurisdictionCheckerConfig: JurisdictionChecker = {
     new JurisdictionChecker(JurisdictionCheckerConfig(
       getConfString("jurisdictionChecker.scottish.postcode.prefix ", ""),
       getConfString("jurisdictionChecker.welsh.postcode.prefix", "")
@@ -88,18 +98,18 @@ class LetterAndControlAndJurisdictionChecker extends ServicesConfig with Default
 
 trait ServiceRegistry extends ServicesConfig with MongoDbConnection with DefaultRunMode {
   val letterAndJurisction = new LetterAndControlAndJurisdictionChecker()
-   val TTPArrangementRepository: TTPArrangementRepository =new TTPArrangementRepository(db.apply())
-   val arrangementDesApiConnector = new DesArrangementApiService()
-   val letterAndControlService = new LetterAndControlBuilder(letterAndJurisction)
-   val desTTPArrangementService = new DesTTPArrangementBuilder(letterAndJurisction)
+  val TTPArrangementRepository: TTPArrangementRepository = new TTPArrangementRepository(db.apply())
+  val arrangementDesApiConnector = new DesArrangementApiService()
+  val letterAndControlService = new LetterAndControlBuilder(letterAndJurisction)
+  val desTTPArrangementService = new DesTTPArrangementBuilder(letterAndJurisction)
 }
 
 trait ControllerRegistry extends ServiceRegistry {
 
-  implicit val ec: ExecutionContextExecutor =  scala.concurrent.ExecutionContext.Implicits.global
+  implicit val ec: ExecutionContextExecutor = scala.concurrent.ExecutionContext.Implicits.global
   private lazy val controllers = Map[Class[_], Controller](
     classOf[TTPArrangementController] -> new TTPArrangementController(new TTPArrangementService(desTTPArrangementService,
-      arrangementDesApiConnector,TTPArrangementRepository,letterAndControlService))
+      arrangementDesApiConnector, TTPArrangementRepository, letterAndControlService))
   )
 
   def getController[A](controllerClass: Class[A]): A = controllers(controllerClass).asInstanceOf[A]
