@@ -23,17 +23,17 @@ import play.api.mvc._
 import uk.gov.hmrc.play.bootstrap.controller.BackendController
 import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
-import uk.gov.hmrc.timetopay.arrangement.services.{DesApiException, TTPArrangementService}
+import uk.gov.hmrc.timetopay.arrangement.services.{ DesApiException, TTPArrangementService }
 
 import scala.concurrent.Future._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
-class TTPArrangementController @Inject()(val arrangementService: TTPArrangementService, cc: ControllerComponents)(implicit ec: ExecutionContext) extends BackendController(cc) {
+class TTPArrangementController @Inject() (val arrangementService: TTPArrangementService, cc: ControllerComponents)(implicit ec: ExecutionContext) extends BackendController(cc) {
 
-
-  /** Turns the json into our representation of a TTPArrangement
-    * It calls the submit method and applys a location to the returning result.
-    */
+  /**
+   * Turns the json into our representation of a TTPArrangement
+   * It calls the submit method and applys a location to the returning result.
+   */
   def create() = Action.async(parse.json) {
     implicit request =>
 
@@ -53,20 +53,19 @@ class TTPArrangementController @Inject()(val arrangementService: TTPArrangementS
       }
   }
 
+  private def createdNoLocation = Future.successful[Result](Created)
+
+  private def createdWithLocation(id: String)(implicit reqHead: RequestHeader) = Future.successful[Result](Created.withHeaders(LOCATION -> s"$protocol://${reqHead.host}/ttparrangements/$id"))
+
+  def protocol(implicit reqHead: RequestHeader): String = if (reqHead.secure) "https" else "http"
 
   def arrangement(id: String): Action[AnyContent] = Action.async {
     implicit request =>
-     // implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
+      // implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
 
       Logger.logger.debug(s"Requested arrangement $id")
       arrangementService.byId(id).flatMap {
         _.fold(successful(NotFound(s"arrangement with $id does not exist")))(r => successful(Ok(toJson(r))))
       }
   }
-
-  def protocol(implicit reqHead: RequestHeader): String = if (reqHead.secure) "https" else "http"
-
-  private def createdNoLocation = Future.successful[Result](Created)
-
-  private def createdWithLocation(id: String)(implicit reqHead: RequestHeader) = Future.successful[Result](Created.withHeaders(LOCATION -> s"$protocol://${reqHead.host}/ttparrangements/$id"))
 }

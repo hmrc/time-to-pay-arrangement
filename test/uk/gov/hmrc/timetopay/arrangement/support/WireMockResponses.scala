@@ -21,25 +21,21 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 
 object WireMockResponses {
 
-  def desArrangementApiSucccess(utr : String): StubMapping = {
+  def desArrangementApiSucccess(utr: String): StubMapping = {
     stubFor(
       post(
-        urlEqualTo(s"/time-to-pay/taxpayers/${utr}/arrangements")
-      ).willReturn(
-        aResponse()
-          .withStatus(200))
-    )
+        urlEqualTo(s"/time-to-pay/taxpayers/${utr}/arrangements")).willReturn(
+          aResponse()
+            .withStatus(200)))
   }
 
-  def desArrangementApiBadRequest(utr:String): StubMapping = {
+  def desArrangementApiBadRequest(utr: String): StubMapping = {
     stubFor(
       post(
-        urlEqualTo(s"/time-to-pay/taxpayers/${utr}/arrangements")
-      ).willReturn(
-        aResponse()
-          .withStatus(400)
-      .withBody("Bad JSON"))
-    )
+        urlEqualTo(s"/time-to-pay/taxpayers/${utr}/arrangements")).willReturn(
+          aResponse()
+            .withStatus(400)
+            .withBody("Bad JSON")))
   }
 
 }

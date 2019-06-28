@@ -16,19 +16,17 @@
 
 package uk.gov.hmrc.timetopay.arrangement.connectors
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.{ Inject, Singleton }
 import play.api.Logger
 import play.api.http.Status
-import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import uk.gov.hmrc.timetopay.arrangement.{DesSubmissionRequest, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiServiceConnectorConfig
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
+import uk.gov.hmrc.timetopay.arrangement.{ DesSubmissionRequest, Taxpayer }
 
-import scala.concurrent.{ExecutionContext, Future}
-
-
+import scala.concurrent.{ ExecutionContext, Future }
 
 case class SubmissionSuccess()
 
@@ -36,19 +34,10 @@ case class SubmissionError(code: Int, message: String)
 
 @Singleton
 class DesArrangementApiServiceConnector @Inject() (
-                                                    httpClient: HttpClient,
-                                                    config: DesArrangementApiServiceConnectorConfig)(implicit
-                                                    ec: ExecutionContext){
-
-
-
-
-
-
+  httpClient: HttpClient,
+  config: DesArrangementApiServiceConnectorConfig)(implicit ec: ExecutionContext) {
 
   type SubmissionResult = Either[SubmissionError, SubmissionSuccess]
-
-
 
   lazy val desHeaderCarrier: HeaderCarrier = HeaderCarrier(authorization = Some(Authorization(s"Bearer ${config.authorisationToken}")))
     .withExtraHeaders("Environment" -> config.serviceEnvironment)
@@ -63,14 +52,14 @@ class DesArrangementApiServiceConnector @Inject() (
         Logger.logger.info(s"Submission successful for '${taxpayer.selfAssessment.utr}'")
         Right(SubmissionSuccess())
       }).recover {
-      case e: Throwable =>
+        case e: Throwable =>
 
-        onError(e)
+          onError(e)
 
-    }
+      }
   }
 
-  private def onError(ex: Throwable) : SubmissionResult = {
+  private def onError(ex: Throwable): SubmissionResult = {
     val (code, message) = ex match {
       case e: HttpException => (e.responseCode, e.getMessage)
 

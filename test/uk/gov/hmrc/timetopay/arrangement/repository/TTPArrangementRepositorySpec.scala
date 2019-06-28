@@ -18,27 +18,15 @@ package uk.gov.hmrc.timetopay.arrangement.repository
 
 import play.api.Logger
 import play.api.libs.json.Json
+import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
-import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-
 class TTPArrangementRepositorySpec extends ITSpec {
 
-
   val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
-
-  override def beforeEach() {
-  val temp = arrangementRepo.collection.drop(false).futureValue
-  }
-
-  override def afterEach() {
-   val temp = arrangementRepo.collection.drop(false).futureValue
-  }
-
-
   val arrangement = Json.parse(
     s"""
        |{
@@ -146,6 +134,14 @@ class TTPArrangementRepositorySpec extends ITSpec {
        |    }
        |  }
        |}""".stripMargin).as[TTPArrangement]
+
+  override def beforeEach() {
+    val temp = arrangementRepo.collection.drop(false).futureValue
+  }
+
+  override def afterEach() {
+    val temp = arrangementRepo.collection.drop(false).futureValue
+  }
 
   "should add save a TTPArrangement" in {
 

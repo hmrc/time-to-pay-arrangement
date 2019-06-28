@@ -28,12 +28,8 @@ import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
 
 class DesTTPArrangementBuilderSpec extends ITSpec {
 
-  override def beforeEach() {
-  }
-
   val LetterAndControlConfigInject = fakeApplication.injector.instanceOf[LetterAndControlAndJurisdictionChecker]
   val desTTPArrangementService = new DesTTPArrangementBuilder(LetterAndControlConfigInject, config)
-
   val taxPayerData = Table(
     ("taxPayer", "enforcementFlag", "message"),
     (taxPayerWithScottishAddress, "Summary Warrant", "single scottish postcode"),
@@ -42,9 +38,10 @@ class DesTTPArrangementBuilderSpec extends ITSpec {
     (taxPayerWithMultipleScottishAddresses, "Summary Warrant", "multiple scottish postcode"),
     (taxPayerWithMultipleWelshAddresses, "Distraint", "multiple welsh postcode"),
     (taxPayerWithMultipleJurisdictions, "Other", "mixed postcodes"),
-    (taxPayerWithNoAddress, "Other", "no addresss")
-  )
+    (taxPayerWithNoAddress, "Other", "no addresss"))
 
+  override def beforeEach() {
+  }
 
   forAll(taxPayerData) { (taxpayer, enforcementFlag, message) =>
     s"DesTTPArrangementService should return enforcementFlag =  $enforcementFlag for $message  for $taxpayer" in {
@@ -52,7 +49,6 @@ class DesTTPArrangementBuilderSpec extends ITSpec {
       flag shouldBe enforcementFlag
     }
   }
-
 
   "DesTTPArrangementService create an des arrangement" in {
     implicit val arrangement = ttparrangementRequest.as[TTPArrangement]

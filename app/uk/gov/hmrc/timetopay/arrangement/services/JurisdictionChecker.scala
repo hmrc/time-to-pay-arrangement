@@ -20,22 +20,24 @@ import javax.inject.Singleton
 import uk.gov.hmrc.timetopay.arrangement.Address
 import uk.gov.hmrc.timetopay.arrangement.config.JurisdictionCheckerConfig
 
-object JurisdictionType extends Enumeration  {
+object JurisdictionType extends Enumeration {
   type JurisdictionType = Value
   val English, Scottish, Welsh = Value
 }
 
 @Singleton
-class JurisdictionChecker(config: JurisdictionCheckerConfig){
+class JurisdictionChecker(config: JurisdictionCheckerConfig) {
+
   import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType._
+
   val scottishPostCodeRegex = config.scottishPrefix.r
   val welshPostCodeRegex = config.welshPrefix.r
 
   def addressType(address: Address): JurisdictionType = {
-     address.postcode match {
-       case scottishPostCodeRegex(_) => Scottish
-       case welshPostCodeRegex(_) => Welsh
-       case _ =>  English
-     }
+    address.postcode match {
+      case scottishPostCodeRegex(_) => Scottish
+      case welshPostCodeRegex(_) => Welsh
+      case _ => English
+    }
   }
 }

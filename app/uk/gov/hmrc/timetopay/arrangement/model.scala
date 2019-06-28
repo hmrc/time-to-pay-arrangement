@@ -16,89 +16,94 @@
 
 package uk.gov.hmrc.timetopay.arrangement
 
-import java.time.{LocalDateTime, LocalDate}
+import java.time.{ LocalDate, LocalDateTime }
 
-import play.api.libs.json.{Json, JsResult, JsValue, OFormat, Format}
+import play.api.libs.json.{ Format, JsResult, JsValue, Json }
 
+case class Schedule(
+  startDate: LocalDate,
+  endDate: LocalDate,
+  initialPayment: BigDecimal,
+  amountToPay: BigDecimal,
+  instalmentBalance: BigDecimal,
+  totalInterestCharged: BigDecimal,
+  totalPayable: BigDecimal,
+  instalments: List[Instalment])
 
-case class Schedule(startDate: LocalDate,
-                    endDate: LocalDate,
-                    initialPayment: BigDecimal,
-                    amountToPay: BigDecimal,
-                    instalmentBalance: BigDecimal,
-                    totalInterestCharged: BigDecimal,
-                    totalPayable: BigDecimal,
-                    instalments: List[Instalment])
+case class Instalment(paymentDate: LocalDate, amount: BigDecimal)
 
-case class Instalment (paymentDate: LocalDate, amount: BigDecimal)
+case class Taxpayer(
+  customerName: String,
+  addresses: List[Address],
+  selfAssessment: SelfAssessment)
 
+case class SelfAssessment(
+  utr: String,
+  communicationPreferences: Option[CommunicationPreferences],
+  debits: List[Debit])
 
-case class Taxpayer(customerName: String,
-                    addresses: List[Address],
-                    selfAssessment: SelfAssessment)
+case class Address(
+  addressLine1: String = "",
+  addressLine2: Option[String] = None,
+  addressLine3: Option[String] = None,
+  addressLine4: Option[String] = None,
+  addressLine5: Option[String] = None,
+  postcode: String = "")
 
-case class SelfAssessment(utr: String,
-                          communicationPreferences: Option[CommunicationPreferences],
-                          debits: List[Debit])
-
-case class Address(addressLine1: String = "",
-                   addressLine2: Option[String] = None,
-                   addressLine3: Option[String] = None,
-                   addressLine4: Option[String] = None,
-                   addressLine5: Option[String] = None,
-                   postcode: String = "")
-
-case class CommunicationPreferences(welshLanguageIndicator: Boolean,
-                                    audioIndicator: Boolean,
-                                    largePrintIndicator: Boolean,
-                                    brailleIndicator: Boolean)
+case class CommunicationPreferences(
+  welshLanguageIndicator: Boolean,
+  audioIndicator: Boolean,
+  largePrintIndicator: Boolean,
+  brailleIndicator: Boolean)
 
 case class Debit(originCode: String, dueDate: LocalDate)
 
 case class DesDebit(debitType: String, dueDate: LocalDate)
 
-case class TTPArrangement(id: Option[String],
-                          createdOn: Option[LocalDateTime],
-                          paymentPlanReference: String,
-                          directDebitReference: String,
-                          taxpayer: Taxpayer,
-                          schedule: Schedule,
-                          desArrangement : Option[DesSubmissionRequest])
+case class TTPArrangement(
+  id: Option[String],
+  createdOn: Option[LocalDateTime],
+  paymentPlanReference: String,
+  directDebitReference: String,
+  taxpayer: Taxpayer,
+  schedule: Schedule,
+  desArrangement: Option[DesSubmissionRequest])
 
-case class DesTTPArrangement(startDate: LocalDate,
-                             endDate: LocalDate,
-                             firstPaymentDate: LocalDate,
-                             firstPaymentAmount: String,
-                             regularPaymentAmount: String,
-                             regularPaymentFrequency: String = "Monthly",
-                             reviewDate: LocalDate,
-                             initials: String = "ZZZ",
-                             enforcementAction: String,
-                             directDebit: Boolean = true,
-                             debitDetails: List[DesDebit],
-                             saNote: String)
+case class DesTTPArrangement(
+  startDate: LocalDate,
+  endDate: LocalDate,
+  firstPaymentDate: LocalDate,
+  firstPaymentAmount: String,
+  regularPaymentAmount: String,
+  regularPaymentFrequency: String = "Monthly",
+  reviewDate: LocalDate,
+  initials: String = "ZZZ",
+  enforcementAction: String,
+  directDebit: Boolean = true,
+  debitDetails: List[DesDebit],
+  saNote: String)
 
-case class LetterAndControl(customerName: String,
-                            salutation: String = "Dear Sir or Madam",
-                            addressLine1: String = "",
-                            addressLine2: Option[String] = None,
-                            addressLine3: Option[String] = None,
-                            addressLine4: Option[String] = None,
-                            addressLine5: Option[String] = None,
-                            postCode: String = "",
-                            totalAll: String,
-                            clmIndicateInt: String = "Interest is due",
-                            clmPymtString: String,
-                            officeName1: String = "",
-                            officeName2: String = "",
-                            officePostcode: String = "",
-                            officePhone: String = "",
-                            officeFax: String = "",
-                            officeOpeningHours: String = "9-5",
-                            template: String = "template",
-                            exceptionType: Option[String] = None,
-                            exceptionReason: Option[String] = None
-                           )
+case class LetterAndControl(
+  customerName: String,
+  salutation: String = "Dear Sir or Madam",
+  addressLine1: String = "",
+  addressLine2: Option[String] = None,
+  addressLine3: Option[String] = None,
+  addressLine4: Option[String] = None,
+  addressLine5: Option[String] = None,
+  postCode: String = "",
+  totalAll: String,
+  clmIndicateInt: String = "Interest is due",
+  clmPymtString: String,
+  officeName1: String = "",
+  officeName2: String = "",
+  officePostcode: String = "",
+  officePhone: String = "",
+  officeFax: String = "",
+  officeOpeningHours: String = "9-5",
+  template: String = "template",
+  exceptionType: Option[String] = None,
+  exceptionReason: Option[String] = None)
 
 case class DesSubmissionRequest(ttpArrangement: DesTTPArrangement, letterAndControl: LetterAndControl)
 

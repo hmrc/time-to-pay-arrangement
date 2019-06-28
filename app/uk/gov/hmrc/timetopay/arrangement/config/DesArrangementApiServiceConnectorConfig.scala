@@ -17,8 +17,8 @@
 package uk.gov.hmrc.timetopay.arrangement.config
 
 import javax.inject.Inject
+import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import play.api.{Configuration, Logger}
 
 final case class DesArrangementApiServiceConnectorConfig(desArrangementUrl: String, serviceEnvironment: String, authorisationToken: String) {
 
@@ -27,9 +27,8 @@ final case class DesArrangementApiServiceConnectorConfig(desArrangementUrl: Stri
 
     this(
 
-        desArrangementUrl = sConfig.baseUrl("des-arrangement-api"),
+      desArrangementUrl = sConfig.baseUrl("des-arrangement-api"),
       serviceEnvironment = configuration.get[String]("microservice.services.des-arrangement-api.environment"),
-      authorisationToken = configuration.get[String]("microservice.services.des-arrangement-api.authorization-token")
-    )
+      authorisationToken = configuration.get[String]("microservice.services.des-arrangement-api.authorization-token"))
   }
 }

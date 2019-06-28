@@ -16,20 +16,11 @@
 
 package uk.gov.hmrc.timetopay.arrangement.config
 
-import javax.inject.{Inject, Singleton}
-import play.api.{Configuration, Environment}
+import javax.inject.{ Inject, Singleton }
+import play.api.{ Configuration, Environment }
 
 @Singleton
-class LetterAndControlAndJurisdictionChecker @Inject()(config: Configuration, environment: Environment) {
-  def getConfString(confKey: String, defString: => String): String = {
-    val possibleValue = config.getOptional[String](s"$confKey")
-    possibleValue match {
-      case Some(x) => x
-      case None => defString
-    }
-
-  }
-
+class LetterAndControlAndJurisdictionChecker @Inject() (config: Configuration, environment: Environment) {
   def createLetterAndControlConfig: LetterAndControlConfig = {
     LetterAndControlConfig(
       getConfString("letterAndControl.salutation", ""),
@@ -40,7 +31,15 @@ class LetterAndControlAndJurisdictionChecker @Inject()(config: Configuration, en
       getConfString("letterAndControl.office.officePostCode", ""),
       getConfString("letterAndControl.office.officePhone", ""),
       getConfString("letterAndControl.office.officeFax", ""),
-      getConfString("letterAndControl.office.officeOpeningHours", "")
-    )
+      getConfString("letterAndControl.office.officeOpeningHours", ""))
+  }
+
+  def getConfString(confKey: String, defString: => String): String = {
+    val possibleValue = config.getOptional[String](s"$confKey")
+    possibleValue match {
+      case Some(x) => x
+      case None => defString
+    }
+
   }
 }

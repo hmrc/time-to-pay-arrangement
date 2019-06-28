@@ -19,14 +19,13 @@ package uk.gov.hmrc.timetopay.arrangement.services
 import java.time.format.DateTimeFormatter
 
 import javax.inject.Inject
-import play.api.{Configuration, Logger}
+import play.api.{ Configuration, Logger }
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig, LetterAndControlAndJurisdictionChecker}
-import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType.{JurisdictionType, Scottish}
+import uk.gov.hmrc.timetopay.arrangement.config.{ JurisdictionCheckerConfig, LetterAndControlAndJurisdictionChecker }
+import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType.{ JurisdictionType, Scottish }
 
-
-class DesTTPArrangementBuilder @Inject()(l: LetterAndControlAndJurisdictionChecker, configuration: Configuration) {
-   val jurisdictionChecker : JurisdictionChecker =  new JurisdictionChecker(JurisdictionCheckerConfig.create(configuration))
+class DesTTPArrangementBuilder @Inject() (l: LetterAndControlAndJurisdictionChecker, configuration: Configuration) {
+  val jurisdictionChecker: JurisdictionChecker = new JurisdictionChecker(JurisdictionCheckerConfig.create(configuration))
 
   val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
@@ -46,16 +45,16 @@ class DesTTPArrangementBuilder @Inject()(l: LetterAndControlAndJurisdictionCheck
       reviewDate = schedule.instalments.last.paymentDate.plusWeeks(3),
       enforcementAction = enforcementFlag(ttpArrangement.taxpayer),
       debitDetails = ttpArrangement.taxpayer.selfAssessment.debits.map { d => DesDebit(d.originCode, d.dueDate) },
-      saNote = saNote(ttpArrangement)
-    )
+      saNote = saNote(ttpArrangement))
   }
 
-  /** Uses the taxpayers post code to set the enforcementFlag
-    * 1. If the tax payer's address is in England, enter "Distraint"
-    * 2. If the tax payer's address in in Scotland, enter "Summary Warrant"
-    * 3. If the tax payer has addresses in both regions, enter "Other"
-    * 4. If the tax payer's address is a bad address (so we can't determine the region), enter "Other"
-    */
+  /**
+   * Uses the taxpayers post code to set the enforcementFlag
+   * 1. If the tax payer's address is in England, enter "Distraint"
+   * 2. If the tax payer's address in in Scotland, enter "Summary Warrant"
+   * 3. If the tax payer has addresses in both regions, enter "Other"
+   * 4. If the tax payer's address is a bad address (so we can't determine the region), enter "Other"
+   */
   def enforcementFlag(taxpayer: Taxpayer): String = {
     val addressTypes: List[JurisdictionType] = taxpayer.addresses.map {
       jurisdictionChecker.addressType

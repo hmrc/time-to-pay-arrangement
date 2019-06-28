@@ -22,21 +22,23 @@ import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoComponent
 import reactivemongo.api.ReadPreference
 import reactivemongo.api.commands.DefaultWriteResult
-import reactivemongo.api.indexes.{Index, IndexType}
+import reactivemongo.api.indexes.{ Index, IndexType }
 import reactivemongo.bson.BSONDocument
 import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
+//The below is needed !
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 
 object TTPArrangementMongoFormats {
   implicit val customWriterTTPArrangementMongo: Writes[TTPArrangement] = {
-    val pathToPersonalInfo = Seq((__ \ "taxpayer" \ "customerName").json.prune,
+    val pathToPersonalInfo = Seq(
+      (__ \ "taxpayer" \ "customerName").json.prune,
       (__ \ "taxpayer" \ "addresses").json.prune,
-      (__ \ "taxpayer"  \ "selfAssessment" \ "communicationPreferences").json.prune,
+      (__ \ "taxpayer" \ "selfAssessment" \ "communicationPreferences").json.prune,
       (__ \ "taxpayer" \ "selfAssessment" \ "debits").json.prune,
       (__ \ "desArrangement" \ "letterAndControl" \ "customerName").json.prune,
       (__ \ "desArrangement" \ "letterAndControl" \ "salutation").json.prune,
@@ -56,37 +58,39 @@ object TTPArrangementMongoFormats {
       (__ \ "desArrangement" \ "letterAndControl" \ "officeFax").json.prune,
       (__ \ "desArrangement" \ "letterAndControl" \ "officeOpeningHours").json.prune,
       (__ \ "desArrangement" \ "letterAndControl" \ "template").json.prune)
-    def pruneAll(jspaths: Seq[Reads[JsObject]],jsObject: JsObject):JsObject ={
-      jspaths.foldLeft(jsObject){(acc,path)=> acc.transform(path).get}
+
+    def pruneAll(jspaths: Seq[Reads[JsObject]], jsObject: JsObject): JsObject = {
+      jspaths.foldLeft(jsObject) { (acc, path) => acc.transform(path).get }
     }
+
     Json.writes[TTPArrangement].transform { json: JsValue =>
       json match {
         case obj: JsObject =>
-          pruneAll(pathToPersonalInfo,obj)
+          pruneAll(pathToPersonalInfo, obj)
         case other => other
       }
     }
   }
   implicit val format = ReactiveMongoFormats.mongoEntity({
-    Format(Json.reads[TTPArrangement],customWriterTTPArrangementMongo)
+    Format(Json.reads[TTPArrangement], customWriterTTPArrangementMongo)
   })
   val id = "_id"
 }
 
-class TTPArrangementRepository @Inject()(reactiveMongoComponent: ReactiveMongoComponent)
-  extends ReactiveRepository[TTPArrangement, String]("ttparrangements",reactiveMongoComponent.mongoConnector.db, TTPArrangementMongoFormats.format, implicitly[Format[String]]){
-
+class TTPArrangementRepository @Inject() (reactiveMongoComponent: ReactiveMongoComponent)
+  extends ReactiveRepository[TTPArrangement, String]("ttparrangements", reactiveMongoComponent.mongoConnector.db, TTPArrangementMongoFormats.format, implicitly[Format[String]]) {
 
   def findByIdLocal(id: String, readPreference: ReadPreference = ReadPreference.primaryPreferred)(implicit ec: ExecutionContext): Future[Option[JsValue]] = {
 
-    collection.find(_id(id))(new OWrites[JsObject] { def writes(o: JsObject): JsObject = o }).one[JsValue](readPreference)
+    collection.find(_id(id))(new OWrites[JsObject] {
+      def writes(o: JsObject): JsObject = o
+    }).one[JsValue](readPreference)
   }
 
-
-  def save(ttpArrangement: TTPArrangement) : Future[Option[TTPArrangement]] = {
+  def save(ttpArrangement: TTPArrangement): Future[Option[TTPArrangement]] = {
     Logger.logger.debug("Saving ttparrangement record")
     insert(ttpArrangement)
-      .collect{
+      .collect {
         case DefaultWriteResult(true, 1, Seq(), None, _, None) =>
           Logger.logger.info(s"Arrangement record persisted ID: ${ttpArrangement.id}")
           Some(ttpArrangement)
@@ -97,6 +101,5 @@ class TTPArrangementRepository @Inject()(reactiveMongoComponent: ReactiveMongoCo
   }
 
   override def indexes: Seq[Index] = Seq(
-    Index(key = Seq("createdOn" -> IndexType.Ascending), name = Some("expireAtIndex"), options = BSONDocument("expireAfterSeconds" -> 2592000))
-  )
+    Index(key = Seq("createdOn" -> IndexType.Ascending), name = Some("expireAtIndex"), options = BSONDocument("expireAfterSeconds" -> 2592000)))
 }

@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-
 import java.time.LocalDate
 
 import org.scalatest.prop.TableDrivenPropertyChecks._
@@ -28,14 +27,13 @@ import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
 
 class LetterAndControlBuilderSpec extends ITSpec {
 
-  val  letterAndControlAndJurisdictionChecker = fakeApplication().injector.instanceOf[LetterAndControlAndJurisdictionChecker]
+  val letterAndControlAndJurisdictionChecker = fakeApplication().injector.instanceOf[LetterAndControlAndJurisdictionChecker]
   val letterAndControlBuilder = fakeApplication().injector.instanceOf[LetterAndControlBuilder]
   val LetterAndControlConfigInject = fakeApplication.injector.instanceOf[LetterAndControlAndJurisdictionChecker]
 
-
   val taxPayerData = Table(
     ("taxPayer", "exceptionCode", "exceptionReason", "message"),
-   (taxPayerWithEnglishAddress, None, None, "1 English Address"),
+    (taxPayerWithEnglishAddress, None, None, "1 English Address"),
     (taxPayerWithEnglishAddressWithNoComsPref, None, None, "1 English Address and no comms preference"),
     (taxPayerWithWelshAddress, None, None, "1 Welsh Address"),
     (taxPayerWithNorthernIrelandAddress, None, None, "1 Northern Ireland Address"),
@@ -48,9 +46,7 @@ class LetterAndControlBuilderSpec extends ITSpec {
     (taxPayerWithScottishAndForeignAddresses, Some("1"), Some("address jurisdiction conflict"), "a Scottish and Foreign address"),
     (taxPayerWithEnglishScottishAndForeignAddresses, Some("1"), Some("address jurisdiction conflict"), "an English, Scottish and Foreign address"),
     (taxPayerWithNoAddress, Some("8"), Some("no address"), "no address"),
-    (taxPayerWithLargePrintAndWelsh, Some("5"), Some("welsh large print required"), "Welsh Language and Large Print")
-
-  )
+    (taxPayerWithLargePrintAndWelsh, Some("5"), Some("welsh large print required"), "Welsh Language and Large Print"))
 
   forAll(taxPayerData) { (taxpayer, exceptionCode, exceptionReason, message) =>
     s"LetterAndControlService should return (exceptionCode = $exceptionCode and exceptionReason = $exceptionReason) for $message" in {
@@ -66,7 +62,8 @@ class LetterAndControlBuilderSpec extends ITSpec {
 
   "LetterAndControlService should Format the clmPymtString correctly" in {
     val scheduleWithInstalments: Schedule = Schedule(LocalDate.now(), LocalDate.now(), 0.0, BigDecimal("100.98"), 100, 0.98, 100.98,
-      List(Instalment(LocalDate.now(), 10.0),
+      List(
+        Instalment(LocalDate.now(), 10.0),
         Instalment(LocalDate.now(), 10.0),
         Instalment(LocalDate.now(), 10.0),
         Instalment(LocalDate.now(), 10.0),
@@ -83,7 +80,8 @@ class LetterAndControlBuilderSpec extends ITSpec {
 
   "LetterAndControlService should Format the clmPymtString correctly for large numbers in" in {
     val scheduleWithInstalments: Schedule = Schedule(LocalDate.now(), LocalDate.now(), 5000000.0, BigDecimal("15000000.00"), 100, 0.00, 100.98,
-      List(Instalment(LocalDate.now(), 100000000.00),
+      List(
+        Instalment(LocalDate.now(), 100000000.00),
         Instalment(LocalDate.now(), 100000000.00),
         Instalment(LocalDate.now(), 100000000.00)))
     val result = letterAndControlBuilder.create(TTPArrangement(None, None, "XXX", "XXX", taxpayer, scheduleWithInstalments, None))

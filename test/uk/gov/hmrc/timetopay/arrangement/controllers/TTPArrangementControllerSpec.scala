@@ -16,17 +16,15 @@
 
 package uk.gov.hmrc.timetopay.arrangement.controllers
 
-import play.api.Logger
 import play.api.http.Status
 import play.api.mvc.ControllerComponents
 import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiServiceConnectorConfig
 import uk.gov.hmrc.timetopay.arrangement.connectors.DesArrangementApiServiceConnector
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementRepository
 import uk.gov.hmrc.timetopay.arrangement.resources._
-import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestConnector, WireMockResponses}
+import uk.gov.hmrc.timetopay.arrangement.support.{ ITSpec, TestConnector, WireMockResponses }
 
 class TTPArrangementControllerSpec extends ITSpec {
-
 
   val cc = fakeApplication.injector.instanceOf[ControllerComponents]
   val desArrangementApiServiceConnectorConfig = fakeApplication().injector.instanceOf[DesArrangementApiServiceConnectorConfig]
@@ -34,7 +32,6 @@ class TTPArrangementControllerSpec extends ITSpec {
   val arrangementController = fakeApplication().injector.instanceOf[TTPArrangementController]
   val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
   val testConnector = fakeApplication().injector.instanceOf[TestConnector]
-
 
   override def beforeEach() {
     val temp = arrangementRepo.collection.drop(false).futureValue
@@ -55,12 +52,10 @@ class TTPArrangementControllerSpec extends ITSpec {
   "POST /ttparrangements should return 500 if arrangement service fails" in {
 
     WireMockResponses.desArrangementApiBadRequest("1234567890")
-    val result : Throwable = testConnector.create(ttparrangementRequest).failed.futureValue
-    result.getMessage should include  ("returned 500")
-
+    val result: Throwable = testConnector.create(ttparrangementRequest).failed.futureValue
+    result.getMessage should include("returned 500")
 
   }
-
 
   "GET /ttparrangements should return 200 for arrangement" in {
 
@@ -77,7 +72,7 @@ class TTPArrangementControllerSpec extends ITSpec {
 
     val result = testConnector.nextUrl("http://localhost:19001/ttparrangements/22f9d802-3a34-45a9-bbb4-f5d6433bf3ff").failed.futureValue
 
-    result.getMessage should include  ("returned 404")
+    result.getMessage should include("returned 404")
 
   }
 

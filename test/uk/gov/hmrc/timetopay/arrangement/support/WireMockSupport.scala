@@ -19,7 +19,7 @@ package uk.gov.hmrc.timetopay.arrangement.support
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Suite}
+import org.scalatest.{ BeforeAndAfterAll, BeforeAndAfterEach, Suite }
 
 trait WireMockSupport extends BeforeAndAfterAll with BeforeAndAfterEach {
   self: Suite =>
@@ -28,11 +28,11 @@ trait WireMockSupport extends BeforeAndAfterAll with BeforeAndAfterEach {
 
   WireMock.configureFor(WireMockSupport.port)
 
+  override def beforeEach() = WireMock.reset()
+
   override protected def beforeAll(): Unit = wireMockServer.start()
 
   override protected def afterAll(): Unit = wireMockServer.stop()
-
-  override def beforeEach() = WireMock.reset()
 }
 
 object WireMockSupport {

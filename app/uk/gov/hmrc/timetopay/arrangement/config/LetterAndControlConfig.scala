@@ -18,13 +18,14 @@ package uk.gov.hmrc.timetopay.arrangement.config
 
 import com.google.inject.Inject
 
-case class LetterAndControlConfig @Inject()(salutation: String,
-                                   claimIndicateInt: String,
-                                   template: String,
-                                   officeName1: String,
-                                   officeName2: String,
-                                   officePostCode: String,
-                                   officePhone: String,
-                                   officeFax: String,
-                                   officeOpeningHours: String ){
+case class LetterAndControlConfig @Inject() (
+  salutation: String,
+  claimIndicateInt: String,
+  template: String,
+  officeName1: String,
+  officeName2: String,
+  officePostCode: String,
+  officePhone: String,
+  officeFax: String,
+  officeOpeningHours: String) {
 }

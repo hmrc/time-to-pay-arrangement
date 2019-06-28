@@ -17,39 +17,56 @@
 package uk.gov.hmrc.timetopay.arrangement.support
 
 import java.time.format.DateTimeFormatter
-import java.time.{LocalDateTime, ZoneId, ZonedDateTime}
+import java.time.{ LocalDateTime, ZoneId, ZonedDateTime }
 
 import com.google.inject.AbstractModule
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.time.{Millis, Seconds, Span}
-import org.scalatest.{BeforeAndAfterEach, FreeSpecLike, Matchers}
+import org.scalatest.time.{ Millis, Seconds, Span }
+import org.scalatest.{ BeforeAndAfterEach, FreeSpecLike, Matchers }
 import org.scalatestplus.play.guice.GuiceOneServerPerTest
-import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
+import play.api.inject.guice.{ GuiceApplicationBuilder, GuiceableModule }
 import play.api.mvc.Result
-import play.api.{Application, Configuration}
+import play.api.{ Application, Configuration }
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ Await, ExecutionContext, Future }
 
 /**
-  * This is common spec for every test case which brings all of useful routines we want to use in our scenarios.
-  */
+ * This is common spec for every test case which brings all of useful routines we want to use in our scenarios.
+ */
 
 trait ITSpec
   extends FreeSpecLike
-    with RichMatchers
-    with MockitoSugar
-    with BeforeAndAfterEach
-    with GuiceOneServerPerTest
-    with WireMockSupport
-    with Matchers {
+  with RichMatchers
+  with MockitoSugar
+  with BeforeAndAfterEach
+  with GuiceOneServerPerTest
+  with WireMockSupport
+  with Matchers {
 
-  val baseUrl: String = s"http://localhost:$WireMockSupport.port"
+  lazy val frozenZonedDateTime: ZonedDateTime = {
+    val formatter = DateTimeFormatter.ISO_DATE_TIME
+    LocalDateTime.parse("2018-11-02T16:28:55.185", formatter).atZone(ZoneId.of("Europe/London"))
+  }
 
   implicit lazy val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+  lazy val overridingsModule = new AbstractModule {
+    override def configure(): Unit = ()
+  }
+  lazy val servicesConfig = fakeApplication.injector.instanceOf[ServicesConfig]
+  lazy val config = fakeApplication.injector.instanceOf[Configuration]
+  val baseUrl: String = s"http://localhost:$WireMockSupport.port"
+
+  override implicit val patienceConfig = PatienceConfig(
+    timeout = scaled(Span(3, Seconds)),
+    interval = scaled(Span(300, Millis)))
+
+  implicit def emptyHC = HeaderCarrier()
+
+  def httpClient = fakeApplication().injector.instanceOf[HttpClient]
 
   override def fakeApplication(): Application = new GuiceApplicationBuilder()
     .overrides(GuiceableModule.fromGuiceModules(Seq(overridingsModule)))
@@ -57,40 +74,16 @@ trait ITSpec
       "mongodb.uri " -> "mongodb://localhost:27017/time-to-pay-arrangement-it",
       "microservice.services.des-arrangement-api.host" -> "localhost",
       "microservice.services.des-arrangement-api.environment" -> "localhost",
-      "microservice.services.des-arrangement-api.port" -> WireMockSupport.port
-    )).build()
-
-  lazy val frozenZonedDateTime: ZonedDateTime = {
-    val formatter = DateTimeFormatter.ISO_DATE_TIME
-    LocalDateTime.parse("2018-11-02T16:28:55.185", formatter).atZone(ZoneId.of("Europe/London"))
-  }
-
-  lazy val overridingsModule = new AbstractModule {
-    override def configure(): Unit = ()
-  }
-
-  def httpClient = fakeApplication().injector.instanceOf[HttpClient]
-
-  override implicit val patienceConfig = PatienceConfig(
-    timeout = scaled(Span(3, Seconds)),
-    interval = scaled(Span(300, Millis))
-  )
-
-  implicit def emptyHC = HeaderCarrier()
+      "microservice.services.des-arrangement-api.port" -> WireMockSupport.port)).build()
 
   def createBinId = {
     System.currentTimeMillis().toString.takeRight(11)
   }
 
-
-  lazy val servicesConfig = fakeApplication.injector.instanceOf[ServicesConfig]
-  lazy val config = fakeApplication.injector.instanceOf[Configuration]
-
   def await[A](future: Future[A])(implicit timeout: Duration): A = Await.result(future, timeout)
-
-  def status(of: Result) = of.header.status
 
   def status(of: Future[Result])(implicit timeout: Duration): Int = status(Await.result(of, timeout))
 
+  def status(of: Result) = of.header.status
 
 }

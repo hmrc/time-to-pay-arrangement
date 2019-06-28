@@ -20,14 +20,13 @@ import play.api.http.Status
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.timetopay.arrangement.DesSubmissionRequest
 import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiServiceConnectorConfig
-import uk.gov.hmrc.timetopay.arrangement.resources.{submitArrangementLetterAndControl, submitArrangementTTPArrangement, taxpayer}
-import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, WireMockResponses}
+import uk.gov.hmrc.timetopay.arrangement.resources.{ submitArrangementLetterAndControl, submitArrangementTTPArrangement, taxpayer }
+import uk.gov.hmrc.timetopay.arrangement.support.{ ITSpec, WireMockResponses }
 
 class DesArrangementApiServiceConnectorSpec extends ITSpec {
 
   val desArrangementApiServiceConnectorConfig = fakeApplication().injector.instanceOf[DesArrangementApiServiceConnectorConfig]
   val connector = fakeApplication().injector.instanceOf[DesArrangementApiServiceConnector]
-
 
   val request: DesSubmissionRequest = DesSubmissionRequest(submitArrangementTTPArrangement, submitArrangementLetterAndControl)
   "Calling submitArrangement should return 202 accepted response" in {

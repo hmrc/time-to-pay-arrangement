@@ -16,28 +16,26 @@
 
 package uk.gov.hmrc.timetopay.arrangement.support
 
-import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.verification.LoggedRequest
 import org.scalatest._
-import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
-import play.api.libs.json.{JsValue, Json}
+import org.scalatest.concurrent.{ Eventually, IntegrationPatience, ScalaFutures }
+import play.api.libs.json.{ JsValue, Json }
 
 trait RichMatchers
   extends Matchers
-    with DiagrammedAssertions
-    with TryValues
-    with EitherValues
-    with OptionValues
-    with AppendedClues
-    with ScalaFutures
-    with StreamlinedXml
-    with Inside
-    with Eventually
-    with IntegrationPatience {
+  with DiagrammedAssertions
+  with TryValues
+  with EitherValues
+  with OptionValues
+  with AppendedClues
+  with ScalaFutures
+  with StreamlinedXml
+  with Inside
+  with Eventually
+  with IntegrationPatience {
 
   implicit def toLoggedRequestOps(lr: LoggedRequest) = new {
     def getBodyAsJson: JsValue = Json.parse(lr.getBodyAsString)
   }
-
 
 }
