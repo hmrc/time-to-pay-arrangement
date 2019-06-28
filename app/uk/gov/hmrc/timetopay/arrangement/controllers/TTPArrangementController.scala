@@ -23,10 +23,10 @@ import play.api.mvc._
 import uk.gov.hmrc.play.bootstrap.controller.BackendController
 import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
-import uk.gov.hmrc.timetopay.arrangement.services.{ DesApiException, TTPArrangementService }
+import uk.gov.hmrc.timetopay.arrangement.services.{DesApiException, TTPArrangementService}
 
 import scala.concurrent.Future._
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 class TTPArrangementController @Inject() (val arrangementService: TTPArrangementService, cc: ControllerComponents)(implicit ec: ExecutionContext) extends BackendController(cc) {
 

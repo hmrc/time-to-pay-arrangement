@@ -62,7 +62,7 @@ class LetterAndControlBuilderSpec extends ITSpec {
 
   "LetterAndControlService should Format the clmPymtString correctly" in {
     val scheduleWithInstalments: Schedule = Schedule(LocalDate.now(), LocalDate.now(), 0.0, BigDecimal("100.98"), 100, 0.98, 100.98,
-      List(
+                                                     List(
         Instalment(LocalDate.now(), 10.0),
         Instalment(LocalDate.now(), 10.0),
         Instalment(LocalDate.now(), 10.0),
@@ -80,7 +80,7 @@ class LetterAndControlBuilderSpec extends ITSpec {
 
   "LetterAndControlService should Format the clmPymtString correctly for large numbers in" in {
     val scheduleWithInstalments: Schedule = Schedule(LocalDate.now(), LocalDate.now(), 5000000.0, BigDecimal("15000000.00"), 100, 0.00, 100.98,
-      List(
+                                                     List(
         Instalment(LocalDate.now(), 100000000.00),
         Instalment(LocalDate.now(), 100000000.00),
         Instalment(LocalDate.now(), 100000000.00)))

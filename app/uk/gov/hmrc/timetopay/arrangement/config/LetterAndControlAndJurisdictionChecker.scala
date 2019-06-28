@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.timetopay.arrangement.config
 
-import javax.inject.{ Inject, Singleton }
-import play.api.{ Configuration, Environment }
+import javax.inject.{Inject, Singleton}
+import play.api.{Configuration, Environment}
 
 @Singleton
 class LetterAndControlAndJurisdictionChecker @Inject() (config: Configuration, environment: Environment) {
@@ -38,7 +38,7 @@ class LetterAndControlAndJurisdictionChecker @Inject() (config: Configuration, e
     val possibleValue = config.getOptional[String](s"$confKey")
     possibleValue match {
       case Some(x) => x
-      case None => defString
+      case None    => defString
     }
 
   }

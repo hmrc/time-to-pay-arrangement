@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.timetopay.arrangement.connectors
 
-import javax.inject.{ Inject, Singleton }
+import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.http.Status
 import uk.gov.hmrc.http._
@@ -24,9 +24,9 @@ import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiServiceConnectorConfig
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
-import uk.gov.hmrc.timetopay.arrangement.{ DesSubmissionRequest, Taxpayer }
+import uk.gov.hmrc.timetopay.arrangement.{DesSubmissionRequest, Taxpayer}
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 case class SubmissionSuccess()
 
@@ -34,8 +34,8 @@ case class SubmissionError(code: Int, message: String)
 
 @Singleton
 class DesArrangementApiServiceConnector @Inject() (
-  httpClient: HttpClient,
-  config: DesArrangementApiServiceConnectorConfig)(implicit ec: ExecutionContext) {
+    httpClient: HttpClient,
+    config:     DesArrangementApiServiceConnectorConfig)(implicit ec: ExecutionContext) {
 
   type SubmissionResult = Either[SubmissionError, SubmissionSuccess]
 
@@ -61,12 +61,12 @@ class DesArrangementApiServiceConnector @Inject() (
 
   private def onError(ex: Throwable): SubmissionResult = {
     val (code, message) = ex match {
-      case e: HttpException => (e.responseCode, e.getMessage)
+      case e: HttpException       => (e.responseCode, e.getMessage)
 
       case e: Upstream4xxResponse => (e.reportAs, e.getMessage)
       case e: Upstream5xxResponse => (e.reportAs, e.getMessage)
 
-      case e: Throwable => (Status.INTERNAL_SERVER_ERROR, e.getMessage)
+      case e: Throwable           => (Status.INTERNAL_SERVER_ERROR, e.getMessage)
     }
 
     Logger.logger.error(s"Failure from DES, code $code and body $message")

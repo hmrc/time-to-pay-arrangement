@@ -27,7 +27,7 @@ final case class DesArrangementApiServiceConnectorConfig(desArrangementUrl: Stri
 
     this(
 
-      desArrangementUrl = sConfig.baseUrl("des-arrangement-api"),
+      desArrangementUrl  = sConfig.baseUrl("des-arrangement-api"),
       serviceEnvironment = configuration.get[String]("microservice.services.des-arrangement-api.environment"),
       authorisationToken = configuration.get[String]("microservice.services.des-arrangement-api.authorization-token"))
   }

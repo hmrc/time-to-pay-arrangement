@@ -20,8 +20,8 @@ import java.nio.charset.Charset
 
 import akka.stream.Materializer
 import akka.util.ByteString
-import org.scalatest.{ Matchers, OptionValues, WordSpecLike }
-import play.api.libs.json.{ JsValue, Json }
+import org.scalatest.{Matchers, OptionValues, WordSpecLike}
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
 
 import scala.concurrent.ExecutionContext
@@ -29,7 +29,7 @@ import scala.concurrent.ExecutionContext
 trait UnitSpec extends WordSpecLike with Matchers with OptionValues {
 
   import scala.concurrent.duration._
-  import scala.concurrent.{ Await, Future }
+  import scala.concurrent.{Await, Future}
   implicit lazy val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
   implicit val defaultTimeout: FiniteDuration = 5 seconds

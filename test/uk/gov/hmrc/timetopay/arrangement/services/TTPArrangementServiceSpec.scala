@@ -18,12 +18,12 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import play.api.Logger
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.config.{ DesArrangementApiServiceConnectorConfig, LetterAndControlAndJurisdictionChecker }
+import uk.gov.hmrc.timetopay.arrangement.config.{DesArrangementApiServiceConnectorConfig, LetterAndControlAndJurisdictionChecker}
 import uk.gov.hmrc.timetopay.arrangement.connectors.DesArrangementApiServiceConnector
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementRepository
 import uk.gov.hmrc.timetopay.arrangement.resources._
-import uk.gov.hmrc.timetopay.arrangement.support.{ ITSpec, WireMockResponses }
+import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, WireMockResponses}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

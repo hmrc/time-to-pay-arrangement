@@ -17,22 +17,22 @@
 package uk.gov.hmrc.timetopay.arrangement.support
 
 import java.time.format.DateTimeFormatter
-import java.time.{ LocalDateTime, ZoneId, ZonedDateTime }
+import java.time.{LocalDateTime, ZoneId, ZonedDateTime}
 
 import com.google.inject.AbstractModule
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.time.{ Millis, Seconds, Span }
-import org.scalatest.{ BeforeAndAfterEach, FreeSpecLike, Matchers }
+import org.scalatest.time.{Millis, Seconds, Span}
+import org.scalatest.{BeforeAndAfterEach, FreeSpecLike, Matchers}
 import org.scalatestplus.play.guice.GuiceOneServerPerTest
-import play.api.inject.guice.{ GuiceApplicationBuilder, GuiceableModule }
+import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.mvc.Result
-import play.api.{ Application, Configuration }
+import play.api.{Application, Configuration}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{ Await, ExecutionContext, Future }
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 /**
  * This is common spec for every test case which brings all of useful routines we want to use in our scenarios.
@@ -61,7 +61,7 @@ trait ITSpec
   val baseUrl: String = s"http://localhost:$WireMockSupport.port"
 
   override implicit val patienceConfig = PatienceConfig(
-    timeout = scaled(Span(3, Seconds)),
+    timeout  = scaled(Span(3, Seconds)),
     interval = scaled(Span(300, Millis)))
 
   implicit def emptyHC = HeaderCarrier()

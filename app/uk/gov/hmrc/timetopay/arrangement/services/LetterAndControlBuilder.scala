@@ -17,10 +17,9 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
 import javax.inject.Inject
-import play.api.{ Configuration, Logger }
+import play.api.{Configuration, Logger}
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.config.{ JurisdictionCheckerConfig, LetterAndControlAndJurisdictionChecker }
-import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType.JurisdictionType
+import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig, LetterAndControlAndJurisdictionChecker}
 
 import scala.util.Try
 
@@ -37,38 +36,38 @@ class LetterAndControlBuilder @Inject() (letterAndControlAndJurisdictionChecker:
 
     val address: Address = validateAddressFormat(correspondence._1)
 
-    def resolveCommsException = {
-      (for {
-        c <- taxpayer.selfAssessment.communicationPreferences
-        e <- commsPrefException(c)
-      } yield (Some(e.code.toString), Some(e.message))).getOrElse((None, None))
-    }
+      def resolveCommsException = {
+        (for {
+          c <- taxpayer.selfAssessment.communicationPreferences
+          e <- commsPrefException(c)
+        } yield (Some(e.code.toString), Some(e.message))).getOrElse((None, None))
+      }
 
     val exception = correspondence._2.fold(resolveCommsException)(x => (Some(x.code.toString), Some(x.message)))
 
     val customerName = taxpayer.customerName
 
     LetterAndControl(
-      customerName = customerName,
-      salutation = s"${LetterAndControlConfig.salutation}$customerName",
-      addressLine1 = address.addressLine1,
-      addressLine2 = address.addressLine2,
-      addressLine3 = address.addressLine3,
-      addressLine4 = address.addressLine4,
-      addressLine5 = address.addressLine5,
-      postCode = address.postcode,
-      totalAll = ttpArrangement.schedule.totalPayable.setScale(2).toString(),
-      clmPymtString = paymentMessage(ttpArrangement.schedule),
-      clmIndicateInt = LetterAndControlConfig.claimIndicateInt,
-      template = LetterAndControlConfig.template,
-      officeName1 = LetterAndControlConfig.officeName1,
-      officeName2 = LetterAndControlConfig.officeName2,
-      officePostcode = LetterAndControlConfig.officePostCode,
-      officePhone = LetterAndControlConfig.officePhone,
-      officeFax = LetterAndControlConfig.officeFax,
+      customerName       = customerName,
+      salutation         = s"${LetterAndControlConfig.salutation}$customerName",
+      addressLine1       = address.addressLine1,
+      addressLine2       = address.addressLine2,
+      addressLine3       = address.addressLine3,
+      addressLine4       = address.addressLine4,
+      addressLine5       = address.addressLine5,
+      postCode           = address.postcode,
+      totalAll           = ttpArrangement.schedule.totalPayable.setScale(2).toString(),
+      clmPymtString      = paymentMessage(ttpArrangement.schedule),
+      clmIndicateInt     = LetterAndControlConfig.claimIndicateInt,
+      template           = LetterAndControlConfig.template,
+      officeName1        = LetterAndControlConfig.officeName1,
+      officeName2        = LetterAndControlConfig.officeName2,
+      officePostcode     = LetterAndControlConfig.officePostCode,
+      officePhone        = LetterAndControlConfig.officePhone,
+      officeFax          = LetterAndControlConfig.officeFax,
       officeOpeningHours = LetterAndControlConfig.officeOpeningHours,
-      exceptionType = exception._1,
-      exceptionReason = exception._2)
+      exceptionType      = exception._1,
+      exceptionReason    = exception._2)
 
   }
 
@@ -92,7 +91,7 @@ class LetterAndControlBuilder @Inject() (letterAndControlAndJurisdictionChecker:
     addressLine3 = if (address.addressLine3.getOrElse("").equals("")) None else address.addressLine3,
     addressLine4 = if (address.addressLine4.getOrElse("").equals("")) None else address.addressLine4,
     addressLine5 = if (address.addressLine5.getOrElse("").equals("")) None else address.addressLine5,
-    postcode = address.postcode)
+    postcode     = address.postcode)
 
   private def resolveAddress(ttpArrangement: TTPArrangement): AddressResult = {
     implicit val taxpayer: Taxpayer = ttpArrangement.taxpayer

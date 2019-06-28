@@ -32,10 +32,10 @@ import scala.concurrent.Future
 import scala.util.Try
 
 class TTPArrangementService @Inject() (
-  desTTPArrangementBuilder: DesTTPArrangementBuilder,
-  desArrangementApiService: DesArrangementApiServiceConnector,
-  ttpArrangementRepository: TTPArrangementRepository,
-  letterAndControlBuilder: LetterAndControlBuilder) {
+    desTTPArrangementBuilder: DesTTPArrangementBuilder,
+    desArrangementApiService: DesArrangementApiServiceConnector,
+    ttpArrangementRepository: TTPArrangementRepository,
+    letterAndControlBuilder:  LetterAndControlBuilder) {
 
   def byId(id: String): Future[Option[JsValue]] = ttpArrangementRepository.findByIdLocal(id)
 
@@ -66,8 +66,8 @@ class TTPArrangementService @Inject() (
    */
   private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[TTPArrangement]] = {
     val toSave = arrangement.copy(
-      id = Some(UUID.randomUUID().toString),
-      createdOn = Some(LocalDateTime.now()),
+      id             = Some(UUID.randomUUID().toString),
+      createdOn      = Some(LocalDateTime.now()),
       desArrangement = Some(desSubmissionRequest))
 
     Try(ttpArrangementRepository.save(toSave)).getOrElse(Future.successful(None))

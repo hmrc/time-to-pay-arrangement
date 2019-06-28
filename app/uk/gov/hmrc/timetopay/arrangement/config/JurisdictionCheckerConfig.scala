@@ -25,7 +25,7 @@ object JurisdictionCheckerConfig {
 
   def create(configuration: Configuration) = {
 
-    def getConfig(key: String) = configuration.get[String](key)
+      def getConfig(key: String) = configuration.get[String](key)
 
     JurisdictionCheckerConfig(
       getConfig("jurisdictionChecker.scottish.postcode.prefix"),

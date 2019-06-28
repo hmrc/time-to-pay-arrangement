@@ -4,7 +4,7 @@ import scalariform.formatter.preferences._
 import uk.gov.hmrc.DefaultBuildSettings.{defaultSettings, integrationTestSettings, scalaSettings}
 import uk.gov.hmrc.SbtArtifactory
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
-import wartremover.{Wart, wartremoverErrors, wartremoverWarnings}
+import wartremover.{Wart, wartremoverErrors, wartremoverExcluded, wartremoverWarnings}
 
 
 lazy val scalariformSettings = {
@@ -94,6 +94,15 @@ lazy val microservice = Project(appName, file("."))
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false)
   )
   .settings(majorVersion := 0)
+  .settings(scalariformSettings: _*)
+  .settings(wartRemoverError)
+  .settings(wartRemoverWarning)
+  .settings(wartremoverErrors in(Test, compile) --= Seq(Wart.Any, Wart.Equals, Wart.Null, Wart.NonUnitStatements, Wart.PublicInference))
+  .settings(wartremoverExcluded ++=
+    routes.in(Compile).value ++
+      (baseDirectory.value / "it").get ++
+      (baseDirectory.value / "test").get ++
+      Seq(sourceManaged.value / "main" / "sbt-buildinfo" / "BuildInfo.scala"))
   .settings(scoverageSettings: _*)
   .settings(publishingSettings: _*)
   .settings(PlayKeys.playDefaultPort := 8889)

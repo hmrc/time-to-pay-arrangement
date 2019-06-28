@@ -18,8 +18,8 @@ package uk.gov.hmrc.timetopay.arrangement.support
 
 import com.github.tomakehurst.wiremock.verification.LoggedRequest
 import org.scalatest._
-import org.scalatest.concurrent.{ Eventually, IntegrationPatience, ScalaFutures }
-import play.api.libs.json.{ JsValue, Json }
+import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
+import play.api.libs.json.{JsValue, Json}
 
 trait RichMatchers
   extends Matchers

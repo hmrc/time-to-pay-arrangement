@@ -22,7 +22,7 @@ import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiServiceConnecto
 import uk.gov.hmrc.timetopay.arrangement.connectors.DesArrangementApiServiceConnector
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementRepository
 import uk.gov.hmrc.timetopay.arrangement.resources._
-import uk.gov.hmrc.timetopay.arrangement.support.{ ITSpec, TestConnector, WireMockResponses }
+import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestConnector, WireMockResponses}
 
 class TTPArrangementControllerSpec extends ITSpec {
 

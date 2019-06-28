@@ -22,14 +22,14 @@ import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoComponent
 import reactivemongo.api.ReadPreference
 import reactivemongo.api.commands.DefaultWriteResult
-import reactivemongo.api.indexes.{ Index, IndexType }
+import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.BSONDocument
 import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 //The below is needed !
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 
@@ -59,9 +59,9 @@ object TTPArrangementMongoFormats {
       (__ \ "desArrangement" \ "letterAndControl" \ "officeOpeningHours").json.prune,
       (__ \ "desArrangement" \ "letterAndControl" \ "template").json.prune)
 
-    def pruneAll(jspaths: Seq[Reads[JsObject]], jsObject: JsObject): JsObject = {
-      jspaths.foldLeft(jsObject) { (acc, path) => acc.transform(path).get }
-    }
+      def pruneAll(jspaths: Seq[Reads[JsObject]], jsObject: JsObject): JsObject = {
+        jspaths.foldLeft(jsObject) { (acc, path) => acc.transform(path).get }
+      }
 
     Json.writes[TTPArrangement].transform { json: JsValue =>
       json match {
@@ -71,7 +71,7 @@ object TTPArrangementMongoFormats {
       }
     }
   }
-  implicit val format = ReactiveMongoFormats.mongoEntity({
+  implicit val format: Format[TTPArrangement] = ReactiveMongoFormats.mongoEntity({
     Format(Json.reads[TTPArrangement], customWriterTTPArrangementMongo)
   })
   val id = "_id"
@@ -101,5 +101,5 @@ class TTPArrangementRepository @Inject() (reactiveMongoComponent: ReactiveMongoC
   }
 
   override def indexes: Seq[Index] = Seq(
-    Index(key = Seq("createdOn" -> IndexType.Ascending), name = Some("expireAtIndex"), options = BSONDocument("expireAfterSeconds" -> 2592000)))
+    Index(key     = Seq("createdOn" -> IndexType.Ascending), name = Some("expireAtIndex"), options = BSONDocument("expireAfterSeconds" -> 2592000)))
 }
