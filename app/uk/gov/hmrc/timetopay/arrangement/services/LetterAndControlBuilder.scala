@@ -17,18 +17,19 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
 import javax.inject.Inject
-
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.config.LetterAndControlAndJurisdictionChecker
+import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig, LetterAndControlAndJurisdictionChecker}
 import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType.JurisdictionType
 
 import scala.util.Try
 
-class LetterAndControlBuilder @Inject()(letterAndControlAndJurisdictionCHecker:LetterAndControlAndJurisdictionChecker)   {
+class LetterAndControlBuilder @Inject()(letterAndControlAndJurisdictionChecker:LetterAndControlAndJurisdictionChecker, configuration: Configuration)   {
   type AddressResult = (Address, Option[LetterError])
-  val LetterAndControlConfig = letterAndControlAndJurisdictionCHecker.createLetterAndControlConfig
-  val jurisdictionChecker  = letterAndControlAndJurisdictionCHecker.createJurisdictionCheckerConfig
+
+  val jurisdictionChecker : JurisdictionChecker =  new JurisdictionChecker(JurisdictionCheckerConfig.create(configuration))
+  val LetterAndControlConfig = letterAndControlAndJurisdictionChecker.createLetterAndControlConfig
+
   case class LetterError (code: Int, message: String)
 
   object LetterError {
@@ -57,9 +58,10 @@ class LetterAndControlBuilder @Inject()(letterAndControlAndJurisdictionCHecker:L
     val exception = correspondence._2.fold(resolveCommsException)(x => (Some(x.code.toString), Some(x.message)))
 
     val customerName = taxpayer.customerName
+
     LetterAndControl(
       customerName = customerName,
-      salutation = s"${LetterAndControlConfig.salutation} $customerName",
+      salutation = s"${LetterAndControlConfig.salutation}$customerName",
       addressLine1 = address.addressLine1,
       addressLine2 = address.addressLine2,
       addressLine3 = address.addressLine3,
@@ -80,6 +82,20 @@ class LetterAndControlBuilder @Inject()(letterAndControlAndJurisdictionCHecker:L
       exceptionReason = exception._2
     )
 
+  }
+
+  private def paymentMessage(schedule: Schedule) = {
+    val instalmentSize = schedule.instalments.size - 2
+    val regularPaymentAmount = schedule.instalments.head.amount.setScale(2)
+    val lastPaymentAmount = schedule.instalments.last.amount.setScale(2)
+
+    val initialPayment = (Try(schedule.initialPayment).getOrElse(BigDecimal(0.0)) + schedule.instalments.head.amount).setScale(2)
+
+    instalmentSize match {
+      case 0 => f"Initial payment of £$initialPayment%,.2f then a final payment of £" + s"$lastPaymentAmount%,.2f"
+      case _ => f"Initial payment of £$initialPayment%,.2f then $instalmentSize payments of £$regularPaymentAmount%,.2f and final payment of £" +
+        f"$lastPaymentAmount%,.2f"
+    }
   }
 
   private def validateAddressFormat(address: Address): Address = Address(
@@ -129,20 +145,6 @@ class LetterAndControlBuilder @Inject()(letterAndControlAndJurisdictionCHecker:L
       (address, None)
   }
 
-
-  private def paymentMessage(schedule: Schedule) = {
-    val instalmentSize = schedule.instalments.size - 2
-    val regularPaymentAmount = schedule.instalments.head.amount.setScale(2)
-    val lastPaymentAmount = schedule.instalments.last.amount.setScale(2)
-
-    val initialPayment = (Try(schedule.initialPayment).getOrElse(BigDecimal(0.0)) + schedule.instalments.head.amount).setScale(2)
-
-    instalmentSize match {
-      case 0 => f"Initial payment of £$initialPayment%,.2f then a final payment of £" + s"$lastPaymentAmount%,.2f"
-      case _ => f"Initial payment of £$initialPayment%,.2f then $instalmentSize payments of £$regularPaymentAmount%,.2f and final payment of £" +
-        f"$lastPaymentAmount%,.2f"
-    }
-  }
 
   private def commsPrefException(commsPrefs: CommunicationPreferences): Option[LetterError] = commsPrefs match {
       case CommunicationPreferences(true, _, true, _) =>

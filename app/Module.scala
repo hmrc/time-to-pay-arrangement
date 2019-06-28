@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.timetopay.arrangement.config
+import java.time.Clock
 
-import play.api.Mode.Mode
-import play.api.{Configuration, Play}
-import uk.gov.hmrc.play.config.{AppName, RunMode}
+import com.google.inject.{AbstractModule, Provides}
+import javax.inject.Singleton
 
-trait DefaultRunMode extends RunMode {
+class Module extends AbstractModule {
+  override def configure(): Unit = {
+  }
 
-  override protected def runModeConfiguration: Configuration = Play.current.configuration
-  override protected def mode: Mode = Play.current.mode
-
-}
-
-trait DefaultAppName extends AppName {
-
-  override protected def appNameConfiguration: Configuration = Play.current.configuration
-
+  @Provides
+  @Singleton
+  def clock(): Clock = Clock.systemDefaultZone()
 }

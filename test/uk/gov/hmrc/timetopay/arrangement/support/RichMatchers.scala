@@ -14,32 +14,30 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.timetopay.arrangement
+package uk.gov.hmrc.timetopay.arrangement.support
 
+import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.verification.LoggedRequest
 import org.scalatest._
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
-import org.scalatest.mock.MockitoSugar
-import uk.gov.hmrc.http.HeaderCarrier
+import play.api.libs.json.{JsValue, Json}
 
-import scala.concurrent.ExecutionContext
-/**
- * This is common spec for every test case which brings all of useful routines we want to use in our scenarios.
- */
-trait UnitTestSpec
-  extends FreeSpecLike
-  with Matchers
-  with DiagrammedAssertions
-  with TryValues
-  with EitherValues
-  with OptionValues
-  with AppendedClues
-  with ScalaFutures
-  with StreamlinedXml
-  with Inside
-  with Eventually
-  with MockitoSugar
-  with IntegrationPatience {
-  implicit val hc = HeaderCarrier()
-  implicit lazy val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+trait RichMatchers
+  extends Matchers
+    with DiagrammedAssertions
+    with TryValues
+    with EitherValues
+    with OptionValues
+    with AppendedClues
+    with ScalaFutures
+    with StreamlinedXml
+    with Inside
+    with Eventually
+    with IntegrationPatience {
+
+  implicit def toLoggedRequestOps(lr: LoggedRequest) = new {
+    def getBodyAsJson: JsValue = Json.parse(lr.getBodyAsString)
+  }
+
 
 }

@@ -18,7 +18,7 @@ package uk.gov.hmrc.timetopay.arrangement
 
 import java.time.{LocalDateTime, LocalDate}
 
-import play.api.libs.json.{Json, JsResult, JsValue, Format}
+import play.api.libs.json.{Json, JsResult, JsValue, OFormat, Format}
 
 
 case class Schedule(startDate: LocalDate,
@@ -116,6 +116,8 @@ object modelFormat {
 
     override def writes(o: LocalDateTime): JsValue = Json.toJson(o.toString)
   }
+
+  //AJER check that we do want to switch to OFORMAT
   implicit val instalmentFormat = Json.format[Instalment]
   implicit val scheduleFormat = Json.format[Schedule]
   implicit val addressFormat = Json.format[Address]
@@ -129,4 +131,5 @@ object modelFormat {
   implicit val letterAndControlFormat = Json.format[LetterAndControl]
   implicit val desSubmissionRequestFormat = Json.format[DesSubmissionRequest]
   implicit val ttpArrangementFormat = Json.format[TTPArrangement]
+  //implicit val ttpArrangementOFormat: OFormat[TTPArrangement] = Json.format[TTPArrangement]
 }

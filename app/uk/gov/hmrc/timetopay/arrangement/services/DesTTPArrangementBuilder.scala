@@ -17,19 +17,21 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
 import java.time.format.DateTimeFormatter
-import javax.inject.Inject
 
-import play.api.Logger
+import javax.inject.Inject
+import play.api.{Configuration, Logger}
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.config.LetterAndControlAndJurisdictionChecker
+import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig, LetterAndControlAndJurisdictionChecker}
 import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType.{JurisdictionType, Scottish}
 
 
-class DesTTPArrangementBuilder @Inject()(l: LetterAndControlAndJurisdictionChecker) {
-  val jurisdictionChecker = l.createJurisdictionCheckerConfig
+class DesTTPArrangementBuilder @Inject()(l: LetterAndControlAndJurisdictionChecker, configuration: Configuration) {
+   val jurisdictionChecker : JurisdictionChecker =  new JurisdictionChecker(JurisdictionCheckerConfig.create(configuration))
+
   val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
   def create(implicit ttpArrangement: TTPArrangement): DesTTPArrangement = {
+
     val schedule: Schedule = ttpArrangement.schedule
     val firstPaymentInstalment: Instalment = schedule.instalments.head
 

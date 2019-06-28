@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
+import javax.inject.Singleton
 import uk.gov.hmrc.timetopay.arrangement.Address
 import uk.gov.hmrc.timetopay.arrangement.config.JurisdictionCheckerConfig
 
@@ -23,6 +24,8 @@ object JurisdictionType extends Enumeration  {
   type JurisdictionType = Value
   val English, Scottish, Welsh = Value
 }
+
+@Singleton
 class JurisdictionChecker(config: JurisdictionCheckerConfig){
   import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType._
   val scottishPostCodeRegex = config.scottishPrefix.r

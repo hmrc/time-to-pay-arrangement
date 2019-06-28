@@ -17,21 +17,19 @@
 package uk.gov.hmrc.timetopay.arrangement.config
 
 import javax.inject.Inject
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import play.api.{Configuration, Logger}
 
-import play.api.Configuration
+final case class DesArrangementApiServiceConnectorConfig(desArrangementUrl: String, serviceEnvironment: String, authorisationToken: String) {
 
+  @Inject()
+  def this(sConfig: ServicesConfig, configuration: Configuration) {
 
-case class JurisdictionCheckerConfig @Inject()(scottishPrefix:String , welshPrefix:String)
+    this(
 
-object JurisdictionCheckerConfig {
-
-  def create(configuration: Configuration) = {
-
-    def getConfig(key: String) = configuration.get[String](key)
-
-    JurisdictionCheckerConfig(getConfig("jurisdictionChecker.scottish.postcode.prefix"),
-      getConfig("jurisdictionChecker.welsh.postcode.prefix")
+        desArrangementUrl = sConfig.baseUrl("des-arrangement-api"),
+      serviceEnvironment = configuration.get[String]("microservice.services.des-arrangement-api.environment"),
+      authorisationToken = configuration.get[String]("microservice.services.des-arrangement-api.authorization-token")
     )
-
   }
 }

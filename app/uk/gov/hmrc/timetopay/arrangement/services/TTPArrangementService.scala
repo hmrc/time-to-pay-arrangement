@@ -18,22 +18,22 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import java.time.LocalDateTime
 import java.util.UUID
-import javax.inject.Inject
 
+import javax.inject.Inject
 import play.api.Logger
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiService
+import uk.gov.hmrc.timetopay.arrangement.connectors.DesArrangementApiServiceConnector
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Try
 
 class TTPArrangementService @Inject()(desTTPArrangementBuilder: DesTTPArrangementBuilder,
-                                      desArrangementApiService: DesArrangementApiService,
+                                      desArrangementApiService: DesArrangementApiServiceConnector,
                                       ttpArrangementRepository: TTPArrangementRepository,
-                                      letterAndControlBuilder: LetterAndControlBuilder) {
+                                      letterAndControlBuilder: LetterAndControlBuilder){
 
   def byId(id: String): Future[Option[JsValue]] = ttpArrangementRepository.findByIdLocal(id)
 
