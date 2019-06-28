@@ -20,7 +20,7 @@ import play.api.Logger
 import play.api.libs.json.Json
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
-import uk.gov.hmrc.timetopay.arrangement.{TTPArrangement, TTPArrangementRepository}
+import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

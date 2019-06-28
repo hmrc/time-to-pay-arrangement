@@ -21,9 +21,9 @@ import play.api.http.Status
 import play.api.mvc.ControllerComponents
 import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiServiceConnectorConfig
 import uk.gov.hmrc.timetopay.arrangement.connectors.DesArrangementApiServiceConnector
+import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementRepository
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestConnector, WireMockResponses}
-import uk.gov.hmrc.timetopay.arrangement.{TTPArrangementController, TTPArrangementRepository}
 
 class TTPArrangementControllerSpec extends ITSpec {
 

@@ -25,6 +25,7 @@ import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.connectors.DesArrangementApiServiceConnector
+import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementRepository
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

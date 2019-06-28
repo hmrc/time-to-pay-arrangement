@@ -22,7 +22,8 @@ import uk.gov.hmrc.timetopay.arrangement.connectors.DesArrangementApiServiceConn
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, WireMockResponses}
-import uk.gov.hmrc.timetopay.arrangement.{TTPArrangementRepository, _}
+import uk.gov.hmrc.timetopay.arrangement._
+import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementRepository
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

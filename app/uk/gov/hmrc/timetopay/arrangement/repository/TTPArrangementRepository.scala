@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.timetopay.arrangement
+package uk.gov.hmrc.timetopay.arrangement.repository
+
 import javax.inject.Inject
 import play.api.Logger
 import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoComponent
-import reactivemongo.api.{DB, ReadPreference}
+import reactivemongo.api.ReadPreference
 import reactivemongo.api.commands.DefaultWriteResult
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.BSONDocument
 import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
+import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 
 object TTPArrangementMongoFormats {
-  import modelFormat._
   implicit val customWriterTTPArrangementMongo: Writes[TTPArrangement] = {
     val pathToPersonalInfo = Seq((__ \ "taxpayer" \ "customerName").json.prune,
       (__ \ "taxpayer" \ "addresses").json.prune,
