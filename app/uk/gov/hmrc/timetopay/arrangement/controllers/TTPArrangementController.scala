@@ -28,7 +28,7 @@ import uk.gov.hmrc.timetopay.arrangement.services.{DesApiException, TTPArrangeme
 import scala.concurrent.Future._
 import scala.concurrent.{ExecutionContext, Future}
 
-class TTPArrangementController @Inject() (val arrangementService: TTPArrangementService, cc: ControllerComponents)(implicit ec: ExecutionContext) extends BackendController(cc) {
+class TTPArrangementController @Inject() (arrangementService: TTPArrangementService, cc: ControllerComponents)(implicit ec: ExecutionContext) extends BackendController(cc) {
 
   /**
    * Turns the json into our representation of a TTPArrangement

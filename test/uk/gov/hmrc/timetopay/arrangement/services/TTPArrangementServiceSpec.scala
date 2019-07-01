@@ -43,16 +43,18 @@ class TTPArrangementServiceSpec extends ITSpec {
   val tTPArrangementService = fakeApplication().injector.instanceOf[TTPArrangementService]
   val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement]
   val savedArrangement: TTPArrangement = ttparrangementResponse.as[TTPArrangement]
-  val request = DesSubmissionRequest(ttpArrangement, letter)
   private val ttpArrangement: DesTTPArrangement = savedArrangement.desArrangement.get.ttpArrangement
   private val letter: LetterAndControl = savedArrangement.desArrangement.get.letterAndControl
+  val request = DesSubmissionRequest(ttpArrangement, letter)
 
-  override def beforeEach() {
-    val temp = arrangementRepo.collection.drop(false).futureValue
+  override def beforeEach(): Unit = {
+    arrangementRepo.collection.drop(false).futureValue
+    ()
   }
 
-  override def afterEach() {
-    val temp = arrangementRepo.collection.drop(false).futureValue
+  override def afterEach(): Unit = {
+    arrangementRepo.collection.drop(false).futureValue
+    ()
   }
 
   "TTPArrangementService should submit arrangement to DES and save the response/request combined" in {

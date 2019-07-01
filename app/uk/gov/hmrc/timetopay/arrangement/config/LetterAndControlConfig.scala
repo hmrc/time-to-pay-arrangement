@@ -16,9 +16,7 @@
 
 package uk.gov.hmrc.timetopay.arrangement.config
 
-import com.google.inject.Inject
-
-case class LetterAndControlConfig @Inject() (
+case class LetterAndControlConfig(
     salutation:         String,
     claimIndicateInt:   String,
     template:           String,

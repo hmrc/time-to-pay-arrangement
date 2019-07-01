@@ -35,18 +35,16 @@ class DesArrangementApiServiceConnectorSpec extends ITSpec {
 
     val result = connector.submitArrangement(taxpayer, request).futureValue
 
-    result.right.get shouldBe SubmissionSuccess()
+    result.right.value shouldBe SubmissionSuccess()
 
   }
   "Calling submitArrangement should return 400 response" in {
 
     WireMockResponses.desArrangementApiBadRequest(taxpayer.selfAssessment.utr)
 
-    val response = HttpResponse(responseStatus = Status.BAD_REQUEST, responseString = Some("JSON Not valid"))
-
     val result = connector.submitArrangement(taxpayer, request).futureValue
 
-    result.left.get.code shouldBe 400
+    result.left.value.code shouldBe 400
   }
 
 }

@@ -82,7 +82,9 @@ class TTPArrangementRepository @Inject() (reactiveMongoComponent: ReactiveMongoC
 
   def findByIdLocal(id: String, readPreference: ReadPreference = ReadPreference.primaryPreferred)(implicit ec: ExecutionContext): Future[Option[JsValue]] = {
 
-    collection.find(_id(id))(new OWrites[JsObject] {
+    collection.find(_id(id), None)(new OWrites[JsObject] {
+      def writes(o: JsObject): JsObject = o
+    }, new OWrites[JsObject] {
       def writes(o: JsObject): JsObject = o
     }).one[JsValue](readPreference)
   }

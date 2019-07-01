@@ -40,9 +40,6 @@ class DesTTPArrangementBuilderSpec extends ITSpec {
     (taxPayerWithMultipleJurisdictions, "Other", "mixed postcodes"),
     (taxPayerWithNoAddress, "Other", "no addresss"))
 
-  override def beforeEach() {
-  }
-
   forAll(taxPayerData) { (taxpayer, enforcementFlag, message) =>
     s"DesTTPArrangementService should return enforcementFlag =  $enforcementFlag for $message  for $taxpayer" in {
       val flag = desTTPArrangementService.enforcementFlag(taxpayer)

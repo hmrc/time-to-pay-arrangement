@@ -23,6 +23,8 @@ import akka.util.ByteString
 import org.scalatest.{Matchers, OptionValues, WordSpecLike}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
+import scala.language.implicitConversions
+import scala.language.postfixOps
 
 import scala.concurrent.ExecutionContext
 

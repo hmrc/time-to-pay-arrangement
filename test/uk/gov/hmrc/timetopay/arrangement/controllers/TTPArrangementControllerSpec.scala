@@ -33,12 +33,14 @@ class TTPArrangementControllerSpec extends ITSpec {
   val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
   val testConnector = fakeApplication().injector.instanceOf[TestConnector]
 
-  override def beforeEach() {
-    val temp = arrangementRepo.collection.drop(false).futureValue
+  override def beforeEach(): Unit = {
+    arrangementRepo.collection.drop(false).futureValue
+    ()
   }
 
-  override def afterEach() {
-    val temp = arrangementRepo.collection.drop(false).futureValue
+  override def afterEach(): Unit = {
+    arrangementRepo.collection.drop(false).futureValue
+    ()
   }
 
   "POST /ttparrangements should return 201" in {

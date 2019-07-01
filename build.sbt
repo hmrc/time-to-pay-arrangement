@@ -118,12 +118,14 @@ lazy val microservice = Project(appName, file("."))
     parallelExecution in IntegrationTest := false)
   .settings(
     scalacOptions ++= Seq(
+      "-Xfatal-warnings",
       "-Ywarn-dead-code",
       "-Ywarn-unused",
       "-Ywarn-inaccessible",
       "-Ywarn-value-discard",
       "-unchecked",
       "-Ywarn-nullary-unit",
+      "-feature",
       "-Xfuture"
     )
   )

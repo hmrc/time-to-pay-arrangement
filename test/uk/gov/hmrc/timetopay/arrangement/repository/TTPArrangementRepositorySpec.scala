@@ -135,12 +135,14 @@ class TTPArrangementRepositorySpec extends ITSpec {
        |  }
        |}""".stripMargin).as[TTPArrangement]
 
-  override def beforeEach() {
-    val temp = arrangementRepo.collection.drop(false).futureValue
+  override def beforeEach(): Unit = {
+    arrangementRepo.collection.drop(false).futureValue
+    ()
   }
 
-  override def afterEach() {
-    val temp = arrangementRepo.collection.drop(false).futureValue
+  override def afterEach(): Unit = {
+    arrangementRepo.collection.drop(false).futureValue
+    ()
   }
 
   "should add save a TTPArrangement" in {
@@ -153,7 +155,7 @@ class TTPArrangementRepositorySpec extends ITSpec {
   "should get a TTPArrangement for given id" in {
 
     Logger.warn(arrangement.toString)
-    val result = arrangementRepo.save(arrangement).futureValue
+    arrangementRepo.save(arrangement).futureValue
 
     val loaded = arrangementRepo.findByIdLocal(arrangement.id.get).futureValue.get
     assert(loaded.toString.contains("desArrangement"))
