@@ -18,26 +18,18 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import java.time.LocalDate
 
-import org.mockito.Mockito._
-import org.scalamock.scalatest.MockFactory
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
 import org.scalatest.prop.TableDrivenPropertyChecks._
-import org.scalatestplus.play.OneAppPerSuite
-import uk.gov.hmrc.play.test.UnitSpec
 import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
-import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig, LetterAndControlAndJurisdictionChecker}
+import uk.gov.hmrc.timetopay.arrangement.config.LetterAndControlAndJurisdictionChecker
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
 import uk.gov.hmrc.timetopay.arrangement.resources._
-class DesTTPArrangementBuilderSpec extends UnitSpec  with MockFactory  with ScalaFutures with OneAppPerSuite with MockitoSugar{
+import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
 
-  val jurisdictionConfig = JurisdictionCheckerConfig("^(AB|DD|DG|EH|FK|G|HS|IV|KA|KW|KY|ML|PA|PH|TD|ZE)[0-9].*",
-    "^(LL|SY|LD|HR|NP|CF|SA)[0-9].*")
-   val  LetterAndControlConfigInject = MockitoSugar.mock[LetterAndControlAndJurisdictionChecker]
-  when(LetterAndControlConfigInject.createJurisdictionCheckerConfig).thenReturn(new JurisdictionChecker(jurisdictionConfig))
-  val desTTPArrangementService = new DesTTPArrangementBuilder(LetterAndControlConfigInject)
+class DesTTPArrangementBuilderSpec extends ITSpec {
 
+  val LetterAndControlConfigInject = fakeApplication.injector.instanceOf[LetterAndControlAndJurisdictionChecker]
+  val desTTPArrangementService = new DesTTPArrangementBuilder(LetterAndControlConfigInject, config)
   val taxPayerData = Table(
     ("taxPayer", "enforcementFlag", "message"),
     (taxPayerWithScottishAddress, "Summary Warrant", "single scottish postcode"),
@@ -46,32 +38,30 @@ class DesTTPArrangementBuilderSpec extends UnitSpec  with MockFactory  with Scal
     (taxPayerWithMultipleScottishAddresses, "Summary Warrant", "multiple scottish postcode"),
     (taxPayerWithMultipleWelshAddresses, "Distraint", "multiple welsh postcode"),
     (taxPayerWithMultipleJurisdictions, "Other", "mixed postcodes"),
-    (taxPayerWithNoAddress, "Other", "no addresss")
-  )
+    (taxPayerWithNoAddress, "Other", "no addresss"))
 
-  "DesTTPArrangementService " should {
-    forAll(taxPayerData) { (taxpayer, enforcementFlag,message) =>
-      s"return enforcementFlag =  $enforcementFlag for $message" in {
-        val flag = desTTPArrangementService.enforcementFlag(taxpayer)
-        flag shouldBe enforcementFlag
-      }
-    }
-
-    "create a des arrangement" in {
-      implicit val arrangement = ttparrangementRequest.as[TTPArrangement]
-      val desArrangement = desTTPArrangementService.create(arrangement)
-      desArrangement.enforcementAction shouldBe "Distraint"
-      desArrangement.directDebit shouldBe true
-      desArrangement.initials shouldBe "ZZZ"
-      desArrangement.startDate shouldBe LocalDate.parse("2016-09-01")
-      desArrangement.regularPaymentFrequency shouldBe "Monthly"
-      desArrangement.firstPaymentAmount shouldBe "1298.95"
-      val expectedResult: String = "DDI 12345678901234567890123456789012345678900123456, PP 12345678901234567890123456789012345678900123456, First Payment Due Date 01/10/2016, First Payment " +
-        "£1298.95, Regular Payment £1248.95, " +
-        "Frequency Monthly, " +
-        "Final Payment £1248.95, Review Date 22/08"
-      desArrangement.saNote.length shouldBe 250
-      desArrangement.saNote shouldBe expectedResult
+  forAll(taxPayerData) { (taxpayer, enforcementFlag, message) =>
+    s"DesTTPArrangementService should return enforcementFlag =  $enforcementFlag for $message  for $taxpayer" in {
+      val flag = desTTPArrangementService.enforcementFlag(taxpayer)
+      flag shouldBe enforcementFlag
     }
   }
+
+  "DesTTPArrangementService create an des arrangement" in {
+    implicit val arrangement = ttparrangementRequest.as[TTPArrangement]
+    val desArrangement = desTTPArrangementService.create(arrangement)
+    desArrangement.enforcementAction shouldBe "Distraint"
+    desArrangement.directDebit shouldBe true
+    desArrangement.initials shouldBe "ZZZ"
+    desArrangement.startDate shouldBe LocalDate.parse("2016-09-01")
+    desArrangement.regularPaymentFrequency shouldBe "Monthly"
+    desArrangement.firstPaymentAmount shouldBe "1298.95"
+    val expectedResult: String = "DDI 12345678901234567890123456789012345678900123456, PP 12345678901234567890123456789012345678900123456, First Payment Due Date 01/10/2016, First Payment " +
+      "£1298.95, Regular Payment £1248.95, " +
+      "Frequency Monthly, " +
+      "Final Payment £1248.95, Review Date 22/08"
+    desArrangement.saNote.length shouldBe 250
+    desArrangement.saNote shouldBe expectedResult
+  }
+
 }

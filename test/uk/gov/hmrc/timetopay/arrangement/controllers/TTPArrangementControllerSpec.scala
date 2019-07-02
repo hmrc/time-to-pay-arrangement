@@ -16,87 +16,66 @@
 
 package uk.gov.hmrc.timetopay.arrangement.controllers
 
-import akka.stream.Materializer
-import javax.inject.Inject
-import org.scalamock.scalatest.MockFactory
-import org.scalatest.concurrent.ScalaFutures
 import play.api.http.Status
-import play.api.libs.json.Json
-import play.api.mvc.Result
-import play.api.test.FakeRequest
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.test.UnitSpec
-import uk.gov.hmrc.timetopay.arrangement.modelFormat._
+import play.api.mvc.ControllerComponents
+import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiServiceConnectorConfig
+import uk.gov.hmrc.timetopay.arrangement.connectors.DesArrangementApiServiceConnector
+import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementRepository
 import uk.gov.hmrc.timetopay.arrangement.resources._
-import uk.gov.hmrc.timetopay.arrangement.services._
-import uk.gov.hmrc.timetopay.arrangement.{TTPArrangement, TTPArrangementController}
+import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestConnector, WireMockResponses}
 
-import scala.concurrent.Future
-class TTPArrangementControllerSpec extends UnitSpec with MockFactory with ScalaFutures {
+class TTPArrangementControllerSpec extends ITSpec {
 
-  class MockService extends TTPArrangementService(null,null,null,null) {}
-  val arrangementServiceStub = stub[MockService]
-  implicit val ec =  scala.concurrent.ExecutionContext.Implicits.global
-  val arrangementController = new TTPArrangementController(arrangementServiceStub)
+  val cc = fakeApplication.injector.instanceOf[ControllerComponents]
+  val desArrangementApiServiceConnectorConfig = fakeApplication().injector.instanceOf[DesArrangementApiServiceConnectorConfig]
+  val connector = fakeApplication().injector.instanceOf[DesArrangementApiServiceConnector]
+  val arrangementController = fakeApplication().injector.instanceOf[TTPArrangementController]
+  val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
+  val testConnector = fakeApplication().injector.instanceOf[TestConnector]
 
-  "POST /ttparrangements" should {
-    "return 201" in {
-      implicit val hc = HeaderCarrier
-      (arrangementServiceStub.submit(_: TTPArrangement)(_: HeaderCarrier)).when(ttparrangementRequest.as[TTPArrangement], *) returns Some(ttparrangementResponse.as[TTPArrangement])
-
-      val fakeRequest = FakeRequest("POST", "/ttparrangements").withBody(ttparrangementRequest)
-      val result = arrangementController.create().apply(fakeRequest).futureValue
-      status(result) shouldBe Status.CREATED
-      result.header.headers.get("Location") should not be None
-    }
-
-    "return 201 without header if saving arrangement fails" in {
-      implicit val hc = HeaderCarrier
-      (arrangementServiceStub.submit(_: TTPArrangement)(_: HeaderCarrier)).when(ttparrangementRequest.as[TTPArrangement], *) returns None
-
-      val fakeRequest = FakeRequest("POST", "/ttparrangements").withBody(ttparrangementRequest)
-      val result = arrangementController.create()(fakeRequest).futureValue
-      status(result) shouldBe Status.CREATED
-      result.header.headers.get("Location") shouldBe None
-    }
-
-    "return 500 if arrangement service fails" in {
-      implicit val hc = HeaderCarrier
-      (arrangementServiceStub.submit(_: TTPArrangement)(_: HeaderCarrier)).when(ttparrangementRequest.as[TTPArrangement], *) returns Future.failed(new RuntimeException("****Simulated exception**** Internal processing exception"))
-
-      val fakeRequest = FakeRequest("POST", "/ttparrangements").withBody(ttparrangementRequest)
-      val result: Result = arrangementController.create()(fakeRequest).futureValue
-      status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-    }
-
-    "return 500 if arrangement service throws desapiexception" in {
-      implicit val hc = HeaderCarrier
-      (arrangementServiceStub.submit(_: TTPArrangement)(_: HeaderCarrier)).when(ttparrangementRequest.as[TTPArrangement], *) returns Future.failed(new DesApiException(403, "Forbidden"))
-
-      val fakeRequest = FakeRequest("POST", "/ttparrangements").withBody(ttparrangementRequest)
-      val result = arrangementController.create()(fakeRequest).futureValue
-      status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-    }
+  override def beforeEach(): Unit = {
+    arrangementRepo.collection.drop(false).futureValue
+    ()
   }
 
-  "GET /ttparrangements" should {
-    "return 200 for arrangement" in {
-
-      (arrangementServiceStub.byId(_: String)).when("XXX-XXX-XXX") returns Future.successful(Some(ttparrangementResponse))
-
-      val fakeRequest = FakeRequest("GET", "/ttparrangements/XXX-XXX-XXX")
-      val result = arrangementController.arrangement("XXX-XXX-XXX")(fakeRequest).futureValue
-      status(result) shouldBe Status.OK
-    }
-
-    "return 404 for non existent arrangement" in {
-
-      (arrangementServiceStub.byId(_: String)).when("XXX-XXX-XXX") returns Future.successful(None)
-
-      val fakeRequest = FakeRequest("GET", "/ttparrangements/XXX-XXX-XXX")
-      val result = arrangementController.arrangement("XXX-XXX-XXX").apply(fakeRequest).futureValue
-      status(result) shouldBe Status.NOT_FOUND
-
-    }
+  override def afterEach(): Unit = {
+    arrangementRepo.collection.drop(false).futureValue
+    ()
   }
+
+  "POST /ttparrangements should return 201" in {
+
+    WireMockResponses.desArrangementApiSucccess("1234567890")
+    val result = testConnector.create(ttparrangementRequest).futureValue
+    result.status shouldBe Status.CREATED
+    result.header("Location") should not be None
+  }
+
+  "POST /ttparrangements should return 500 if arrangement service fails" in {
+
+    WireMockResponses.desArrangementApiBadRequest("1234567890")
+    val result: Throwable = testConnector.create(ttparrangementRequest).failed.futureValue
+    result.getMessage should include("returned 500")
+
+  }
+
+  "GET /ttparrangements should return 200 for arrangement" in {
+
+    WireMockResponses.desArrangementApiSucccess("1234567890")
+    val result = testConnector.create(ttparrangementRequest).futureValue
+    result.status shouldBe Status.CREATED
+    val nextUrl = result.header("Location").get
+
+    val result2 = testConnector.nextUrl(nextUrl).futureValue
+    result2.status shouldBe Status.OK
+  }
+
+  "GET /ttparrangements should return 404 for non existent arrangement" in {
+
+    val result = testConnector.nextUrl("http://localhost:19001/ttparrangements/22f9d802-3a34-45a9-bbb4-f5d6433bf3ff").failed.futureValue
+
+    result.getMessage should include("returned 404")
+
+  }
+
 }

@@ -17,43 +17,44 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
 import java.time.format.DateTimeFormatter
+
 import javax.inject.Inject
-
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.config.LetterAndControlAndJurisdictionChecker
-import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType.{JurisdictionType, Scottish}
+import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig, LetterAndControlAndJurisdictionChecker}
+import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionTypes.Scottish
 
+class DesTTPArrangementBuilder @Inject() (l: LetterAndControlAndJurisdictionChecker, configuration: Configuration) {
+  val jurisdictionChecker: JurisdictionChecker = new JurisdictionChecker(JurisdictionCheckerConfig.create(configuration))
 
-class DesTTPArrangementBuilder @Inject()(l: LetterAndControlAndJurisdictionChecker) {
-  val jurisdictionChecker = l.createJurisdictionCheckerConfig
   val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
   def create(implicit ttpArrangement: TTPArrangement): DesTTPArrangement = {
+
     val schedule: Schedule = ttpArrangement.schedule
     val firstPaymentInstalment: Instalment = schedule.instalments.head
 
     val firstPayment = firstPaymentAmount(schedule)
 
     DesTTPArrangement(
-      startDate = schedule.startDate,
-      endDate = schedule.endDate,
-      firstPaymentDate = firstPaymentInstalment.paymentDate,
-      firstPaymentAmount = firstPayment.setScale(2).toString(),
+      startDate            = schedule.startDate,
+      endDate              = schedule.endDate,
+      firstPaymentDate     = firstPaymentInstalment.paymentDate,
+      firstPaymentAmount   = firstPayment.setScale(2).toString(),
       regularPaymentAmount = firstPaymentInstalment.amount.setScale(2).toString(),
-      reviewDate = schedule.instalments.last.paymentDate.plusWeeks(3),
-      enforcementAction = enforcementFlag(ttpArrangement.taxpayer),
-      debitDetails = ttpArrangement.taxpayer.selfAssessment.debits.map { d => DesDebit(d.originCode, d.dueDate) },
-      saNote = saNote(ttpArrangement)
-    )
+      reviewDate           = schedule.instalments.last.paymentDate.plusWeeks(3),
+      enforcementAction    = enforcementFlag(ttpArrangement.taxpayer),
+      debitDetails         = ttpArrangement.taxpayer.selfAssessment.debits.map { d => DesDebit(d.originCode, d.dueDate) },
+      saNote               = saNote(ttpArrangement))
   }
 
-  /** Uses the taxpayers post code to set the enforcementFlag
-    * 1. If the tax payer's address is in England, enter "Distraint"
-    * 2. If the tax payer's address in in Scotland, enter "Summary Warrant"
-    * 3. If the tax payer has addresses in both regions, enter "Other"
-    * 4. If the tax payer's address is a bad address (so we can't determine the region), enter "Other"
-    */
+  /**
+   * Uses the taxpayers post code to set the enforcementFlag
+   * 1. If the tax payer's address is in England, enter "Distraint"
+   * 2. If the tax payer's address in in Scotland, enter "Summary Warrant"
+   * 3. If the tax payer has addresses in both regions, enter "Other"
+   * 4. If the tax payer's address is a bad address (so we can't determine the region), enter "Other"
+   */
   def enforcementFlag(taxpayer: Taxpayer): String = {
     val addressTypes: List[JurisdictionType] = taxpayer.addresses.map {
       jurisdictionChecker.addressType
@@ -62,7 +63,7 @@ class DesTTPArrangementBuilder @Inject()(l: LetterAndControlAndJurisdictionCheck
     addressTypes match {
       case x :: Nil => x match {
         case Scottish => "Summary Warrant"
-        case _ => "Distraint"
+        case _        => "Distraint"
       }
       case _ =>
         Logger.logger.info(s"Unable to determine enforcement flag as multiple mixed or no jurisdictions detected $addressTypes")

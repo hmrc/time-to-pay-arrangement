@@ -1,51 +1,32 @@
-package uk.gov.hmrc.timetopay.arrangement.repositories
+/*
+ * Copyright 2019 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
+package uk.gov.hmrc.timetopay.arrangement.repository
 
-import org.scalatest.{MustMatchers, GivenWhenThen, BeforeAndAfter, FunSpec}
+import play.api.Logger
 import play.api.libs.json.Json
-import uk.gov.hmrc.mongo.MongoConnector
-import uk.gov.hmrc.timetopay.arrangement.{TTPArrangementRepository, TTPArrangement}
+import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
+import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.io.Source
-import scala.concurrent.{Await, Future}
-import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.duration._
 
+class TTPArrangementRepositorySpec extends ITSpec {
 
-trait FutureHelpers {
-
-  implicit class futureHelpers[T](f: Future[T]) {
-    def waitFor(timeout: FiniteDuration = 10 seconds) = Await.result(f, timeout)
-  }
-
-}
-
-
-class TTPArrangementRepositoryISpec extends FunSpec with BeforeAndAfter with GivenWhenThen with FutureHelpers with MustMatchers {
-
-  private def databaseName = "test-" + this.getClass.getSimpleName
-
-  private def mongoUri: String = s"mongodb://127.0.0.1:27017/$databaseName"
-
-  implicit val mongoConnectorForTest = new MongoConnector(mongoUri)
-  val mongo = mongoConnectorForTest.db
-
-  val repository = new TTPArrangementRepository(mongo.apply())
-
-  before {
-    clear()
-  }
-
-  after {
-    clear()
-  }
-
-  def clear(): Unit = {
-    repository.removeAll().waitFor()
-  }
-
+  val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
   val arrangement = Json.parse(
     s"""
        |{
@@ -154,25 +135,37 @@ class TTPArrangementRepositoryISpec extends FunSpec with BeforeAndAfter with Giv
        |  }
        |}""".stripMargin).as[TTPArrangement]
 
-  it("should add save a TTPArrangement") {
+  override def beforeEach(): Unit = {
+    arrangementRepo.collection.drop(false).futureValue
+    ()
+  }
 
-    val result = repository.save(arrangement).waitFor()
-    result.get.taxpayer.selfAssessment.utr mustBe arrangement.taxpayer.selfAssessment.utr
+  override def afterEach(): Unit = {
+    arrangementRepo.collection.drop(false).futureValue
+    ()
+  }
+
+  "should add save a TTPArrangement" in {
+
+    val result = arrangementRepo.save(arrangement).futureValue
+    result.get.taxpayer.selfAssessment.utr shouldBe arrangement.taxpayer.selfAssessment.utr
 
   }
 
-  it("should get a TTPArrangement for given id") {
-    repository.save(arrangement).waitFor()
+  "should get a TTPArrangement for given id" in {
 
-    val loaded = repository.findByIdLocal(arrangement.id.get).waitFor().get
+    Logger.warn(arrangement.toString)
+    arrangementRepo.save(arrangement).futureValue
+
+    val loaded = arrangementRepo.findByIdLocal(arrangement.id.get).futureValue.get
     assert(loaded.toString.contains("desArrangement"))
     assert(loaded.toString.contains("XXX-XXX-XXX"))
   }
 
-  it("should not save any personal data in  ") {
-    repository.save(arrangement).waitFor()
+  "should not save any personal data in" in {
+    arrangementRepo.save(arrangement).futureValue
 
-    val loaded = repository.findByIdLocal(arrangement.id.get).waitFor().get
+    val loaded = arrangementRepo.findByIdLocal(arrangement.id.get).futureValue.get
     assert(!loaded.toString.contains("Customer Name"))
     assert(!loaded.toString.contains("addresses"))
   }

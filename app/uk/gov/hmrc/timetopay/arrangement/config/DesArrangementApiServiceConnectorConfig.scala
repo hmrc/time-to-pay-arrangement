@@ -16,19 +16,19 @@
 
 package uk.gov.hmrc.timetopay.arrangement.config
 
-import play.api.Mode.Mode
-import play.api.{Configuration, Play}
-import uk.gov.hmrc.play.config.{AppName, RunMode}
+import javax.inject.Inject
+import play.api.Configuration
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-trait DefaultRunMode extends RunMode {
+final case class DesArrangementApiServiceConnectorConfig(desArrangementUrl: String, serviceEnvironment: String, authorisationToken: String) {
 
-  override protected def runModeConfiguration: Configuration = Play.current.configuration
-  override protected def mode: Mode = Play.current.mode
+  @Inject()
+  def this(sConfig: ServicesConfig, configuration: Configuration) {
 
-}
+    this(
 
-trait DefaultAppName extends AppName {
-
-  override protected def appNameConfiguration: Configuration = Play.current.configuration
-
+      desArrangementUrl  = sConfig.baseUrl("des-arrangement-api"),
+      serviceEnvironment = configuration.get[String]("microservice.services.des-arrangement-api.environment"),
+      authorisationToken = configuration.get[String]("microservice.services.des-arrangement-api.authorization-token"))
+  }
 }

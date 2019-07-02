@@ -16,30 +16,20 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-
 import java.time.LocalDate
 
-import org.mockito.Mockito.when
-import org.scalamock.scalatest.MockFactory
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
 import org.scalatest.prop.TableDrivenPropertyChecks._
-import uk.gov.hmrc.play.test.UnitSpec
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig, LetterAndControlAndJurisdictionChecker, LetterAndControlConfig}
+import uk.gov.hmrc.timetopay.arrangement.config.LetterAndControlAndJurisdictionChecker
 import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
 import uk.gov.hmrc.timetopay.arrangement.resources._
+import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
 
-class LetterAndControlBuilderSpec extends UnitSpec with MockFactory   with ScalaFutures  with MockitoSugar{
+class LetterAndControlBuilderSpec extends ITSpec {
 
-  val letterAndControlConfig = LetterAndControlConfig("Dear", "XXXX","XXXX","XXXX","XXXX","XXXX","XXXX", "XXXX","XXXX")
-  val  jurisdictionConfig = JurisdictionCheckerConfig("^(AB|DD|DG|EH|FK|G|HS|IV|KA|KW|KY|ML|PA|PH|TD|ZE)[0-9].*",
-    "^(LL|SY|LD|HR|NP|CF|SA)[0-9].*")
-  val  LetterAndControlConfigInject = MockitoSugar.mock[LetterAndControlAndJurisdictionChecker]
-
-  when(LetterAndControlConfigInject.createLetterAndControlConfig).thenReturn(letterAndControlConfig)
-  when(LetterAndControlConfigInject.createJurisdictionCheckerConfig).thenReturn(new JurisdictionChecker(jurisdictionConfig))
-  val letterAndControlService = new LetterAndControlBuilder(LetterAndControlConfigInject)
+  val letterAndControlAndJurisdictionChecker = fakeApplication().injector.instanceOf[LetterAndControlAndJurisdictionChecker]
+  val letterAndControlBuilder = fakeApplication().injector.instanceOf[LetterAndControlBuilder]
+  val LetterAndControlConfigInject = fakeApplication.injector.instanceOf[LetterAndControlAndJurisdictionChecker]
 
   val taxPayerData = Table(
     ("taxPayer", "exceptionCode", "exceptionReason", "message"),
@@ -56,45 +46,46 @@ class LetterAndControlBuilderSpec extends UnitSpec with MockFactory   with Scala
     (taxPayerWithScottishAndForeignAddresses, Some("1"), Some("address jurisdiction conflict"), "a Scottish and Foreign address"),
     (taxPayerWithEnglishScottishAndForeignAddresses, Some("1"), Some("address jurisdiction conflict"), "an English, Scottish and Foreign address"),
     (taxPayerWithNoAddress, Some("8"), Some("no address"), "no address"),
-    (taxPayerWithLargePrintAndWelsh, Some("5"), Some("welsh large print required"), "Welsh Language and Large Print")
-  )
+    (taxPayerWithLargePrintAndWelsh, Some("5"), Some("welsh large print required"), "Welsh Language and Large Print"))
 
-  "LetterAndControlService " should {
-      forAll(taxPayerData) { (taxpayer, exceptionCode, exceptionReason, message) =>
-        s"return (exceptionCode = $exceptionCode and exceptionReason = $exceptionReason) for $message" in {
+  forAll(taxPayerData) { (taxpayer, exceptionCode, exceptionReason, message) =>
+    s"LetterAndControlService should return (exceptionCode = $exceptionCode and exceptionReason = $exceptionReason) for $message" in {
 
-        val result = letterAndControlService.create(TTPArrangement(None, None, "XXX", "XXX", taxpayer, schedule, None))
+      val result = letterAndControlBuilder.create(TTPArrangement(None, None, "XXX", "XXX", taxpayer, schedule, None))
 
-        result.customerName shouldBe taxpayer.customerName
-        result.salutation shouldBe s"Dear ${taxpayer.customerName}"
-        result.exceptionType shouldBe exceptionCode
-        result.exceptionReason shouldBe exceptionReason
-      }
+      result.customerName shouldBe taxpayer.customerName
+      result.salutation shouldBe s"Dear ${taxpayer.customerName}"
+      result.exceptionType shouldBe exceptionCode
+      result.exceptionReason shouldBe exceptionReason
     }
-    "Format the clmPymtString correctly" in {
-      val scheduleWithInstalments: Schedule = Schedule(LocalDate.now(), LocalDate.now(), 0.0, BigDecimal("100.98"), 100, 0.98, 100.98,
-        List(Instalment(LocalDate.now(), 10.0),
-          Instalment(LocalDate.now(), 10.0),
-          Instalment(LocalDate.now(), 10.0),
-          Instalment(LocalDate.now(), 10.0),
-          Instalment(LocalDate.now(), 10.0),
-          Instalment(LocalDate.now(), 10.0),
-          Instalment(LocalDate.now(), 10.0),
-          Instalment(LocalDate.now(), 10.0),
-          Instalment(LocalDate.now(), 10.0),
-          Instalment(LocalDate.now(), 10.98)))
-      val result = letterAndControlService.create(TTPArrangement(None, None, "XXX", "XXX", taxpayer, scheduleWithInstalments, None))
-      result.clmPymtString shouldBe "Initial payment of £10.00 then 8 payments of £10.00 and final payment of £10.98"
-      result.totalAll shouldBe "100.98"
-    }
-    "Format the clmPymtString correctly for large numbers in" in {
-      val scheduleWithInstalments: Schedule = Schedule(LocalDate.now(), LocalDate.now(), 5000000.0, BigDecimal("15000000.00"), 100, 0.00, 100.98,
-        List(Instalment(LocalDate.now(), 100000000.00),
-          Instalment(LocalDate.now(), 100000000.00),
-          Instalment(LocalDate.now(), 100000000.00)))
-      val result = letterAndControlService.create(TTPArrangement(None, None, "XXX", "XXX", taxpayer, scheduleWithInstalments, None))
-      result.clmPymtString shouldBe "Initial payment of £105,000,000.00 then 1 payments of £100,000,000.00 and final payment of £100,000,000.00"
-    }
+  }
+
+  "LetterAndControlService should Format the clmPymtString correctly" in {
+    val scheduleWithInstalments: Schedule = Schedule(LocalDate.now(), LocalDate.now(), 0.0, BigDecimal("100.98"), 100, 0.98, 100.98,
+                                                     List(
+        Instalment(LocalDate.now(), 10.0),
+        Instalment(LocalDate.now(), 10.0),
+        Instalment(LocalDate.now(), 10.0),
+        Instalment(LocalDate.now(), 10.0),
+        Instalment(LocalDate.now(), 10.0),
+        Instalment(LocalDate.now(), 10.0),
+        Instalment(LocalDate.now(), 10.0),
+        Instalment(LocalDate.now(), 10.0),
+        Instalment(LocalDate.now(), 10.0),
+        Instalment(LocalDate.now(), 10.98)))
+    val result = letterAndControlBuilder.create(TTPArrangement(None, None, "XXX", "XXX", taxpayer, scheduleWithInstalments, None))
+    result.clmPymtString shouldBe "Initial payment of £10.00 then 8 payments of £10.00 and final payment of £10.98"
+    result.totalAll shouldBe "100.98"
+  }
+
+  "LetterAndControlService should Format the clmPymtString correctly for large numbers in" in {
+    val scheduleWithInstalments: Schedule = Schedule(LocalDate.now(), LocalDate.now(), 5000000.0, BigDecimal("15000000.00"), 100, 0.00, 100.98,
+                                                     List(
+        Instalment(LocalDate.now(), 100000000.00),
+        Instalment(LocalDate.now(), 100000000.00),
+        Instalment(LocalDate.now(), 100000000.00)))
+    val result = letterAndControlBuilder.create(TTPArrangement(None, None, "XXX", "XXX", taxpayer, scheduleWithInstalments, None))
+    result.clmPymtString shouldBe "Initial payment of £105,000,000.00 then 1 payments of £100,000,000.00 and final payment of £100,000,000.00"
   }
 
 }

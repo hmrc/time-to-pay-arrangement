@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.timetopay.arrangement.services
+package uk.gov.hmrc.timetopay.arrangement.connectors
 
+import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.http.Status
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.logging.Authorization
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiServiceConnectorConfig
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.{DesSubmissionRequest, Taxpayer}
 
@@ -29,45 +32,44 @@ case class SubmissionSuccess()
 
 case class SubmissionError(code: Int, message: String)
 
-trait DesArrangementService {
+@Singleton
+class DesArrangementApiServiceConnector @Inject() (
+    httpClient: HttpClient,
+    config:     DesArrangementApiServiceConnectorConfig)(implicit ec: ExecutionContext) {
 
   type SubmissionResult = Either[SubmissionError, SubmissionSuccess]
 
-  val authorisationToken: String
-  val serviceEnvironment: String
-  val desArrangementUrl: String
-  val http: HttpGet with HttpPost
-
-  lazy val desHeaderCarrier: HeaderCarrier = HeaderCarrier(authorization = Some(Authorization(s"Bearer $authorisationToken")))
-    .withExtraHeaders("Environment" -> serviceEnvironment)
+  lazy val desHeaderCarrier: HeaderCarrier = HeaderCarrier(authorization = Some(Authorization(s"Bearer ${config.authorisationToken}")))
+    .withExtraHeaders("Environment" -> config.serviceEnvironment)
 
   def submitArrangement(taxpayer: Taxpayer, desSubmissionRequest: DesSubmissionRequest)(implicit ec: ExecutionContext): Future[SubmissionResult] = {
     implicit val hc: HeaderCarrier = desHeaderCarrier
     val serviceUrl = s"time-to-pay/taxpayers/${taxpayer.selfAssessment.utr}/arrangements"
 
     Logger.logger.debug(s"Header carrier ${hc.headers}")
-    http.POST[DesSubmissionRequest, HttpResponse](s"$desArrangementUrl/$serviceUrl", desSubmissionRequest)
+    httpClient.POST[DesSubmissionRequest, HttpResponse](s"${config.desArrangementUrl}/$serviceUrl", desSubmissionRequest)
       .map(_ => {
         Logger.logger.info(s"Submission successful for '${taxpayer.selfAssessment.utr}'")
         Right(SubmissionSuccess())
       }).recover {
-      case e: Throwable =>
-        onError(e)
-    }
+        case e: Throwable =>
+
+          onError(e)
+
+      }
   }
 
-  private def onError(ex: Throwable) = {
+  private def onError(ex: Throwable): SubmissionResult = {
     val (code, message) = ex match {
-      case e: HttpException => (e.responseCode, e.getMessage)
+      case e: HttpException       => (e.responseCode, e.getMessage)
 
       case e: Upstream4xxResponse => (e.reportAs, e.getMessage)
       case e: Upstream5xxResponse => (e.reportAs, e.getMessage)
 
-      case e: Throwable => (Status.INTERNAL_SERVER_ERROR, e.getMessage)
+      case e: Throwable           => (Status.INTERNAL_SERVER_ERROR, e.getMessage)
     }
 
     Logger.logger.error(s"Failure from DES, code $code and body $message")
     Left(SubmissionError(code, message))
   }
-
 }

@@ -16,22 +16,19 @@
 
 package uk.gov.hmrc.timetopay.arrangement.config
 
-import javax.inject.Inject
-
 import play.api.Configuration
 
-
-case class JurisdictionCheckerConfig @Inject()(scottishPrefix:String , welshPrefix:String)
+case class JurisdictionCheckerConfig(scottishPrefix: String, welshPrefix: String)
 
 object JurisdictionCheckerConfig {
 
   def create(configuration: Configuration) = {
 
-    def getConfig(key: String) = configuration.getString(key).getOrElse("")
+      def getConfig(key: String) = configuration.get[String](key)
 
-    JurisdictionCheckerConfig(getConfig("scottish.postcode.prefix"),
-      getConfig("welsh.postcode.prefix")
-    )
+    JurisdictionCheckerConfig(
+      getConfig("jurisdictionChecker.scottish.postcode.prefix"),
+      getConfig("jurisdictionChecker.welsh.postcode.prefix"))
 
   }
 }
