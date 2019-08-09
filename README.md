@@ -16,7 +16,7 @@ Below is a diagram showing where the arrangement service fits into the SSTTP pro
 #### Service Definitions
 The default port for this service is 8889
 
-#### POST /ttparrangements
+#### POST /ttparrangements 
 
 Sets up a new time to pay arrangement based on the arrangement submitted. 
 
