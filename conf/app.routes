@@ -1,4 +1,3 @@
 # microservice specific routes
 
-POST        /ttparrangements        @uk.gov.hmrc.timetopay.arrangement.TTPArrangementController.create
-GET         /ttparrangements/:id    @uk.gov.hmrc.timetopay.arrangement.TTPArrangementController.arrangement(id: String)
+POST        /time-to-pay-arrangement/submit-arrangement        @timetopayarrangement.ArrangementController.submitArrangement()

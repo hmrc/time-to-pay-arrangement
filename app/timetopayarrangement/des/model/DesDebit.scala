@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.timetopay.arrangement.config
+package timetopayarrangement.des.model
 
-import javax.inject.Inject
+import java.time.LocalDate
 
-import play.api.Configuration
+import play.api.libs.json.{Json, OFormat}
 
+case class DesDebit(debitType: String, dueDate: LocalDate)
 
-case class JurisdictionCheckerConfig @Inject()(scottishPrefix:String , welshPrefix:String)
-
-object JurisdictionCheckerConfig {
-
-  def create(configuration: Configuration) = {
-
-    def getConfig(key: String) = configuration.getString(key).getOrElse("")
-
-    JurisdictionCheckerConfig(getConfig("scottish.postcode.prefix"),
-      getConfig("welsh.postcode.prefix")
-    )
-
-  }
+object DesDebit {
+  implicit val format: OFormat[DesDebit] = Json.format[DesDebit]
 }

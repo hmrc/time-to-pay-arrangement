@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.timetopay.arrangement.config
+package timetopayarrangement
 
-import play.modules.reactivemongo.ReactiveMongoComponent
-import javax.inject._
+import play.api.libs.functional.syntax._
+import play.api.libs.json.Format
+import play.api.mvc.PathBindable
 
-class MongoDbProvider @Inject() (
-  reactiveMongoComponent: ReactiveMongoComponent
-) extends Provider[reactivemongo.api.DB] {
-  def get = reactiveMongoComponent.mongoConnector.db()
+case class SaUtr(value: String) {
+  def obfuscate: SaUtr = SaUtr(value = value.take(4) + "***")
+}
+
+object SaUtr {
+  implicit val format: Format[SaUtr] = implicitly[Format[String]].inmap(SaUtr(_), _.value)
+  implicit val journeyIdBinder: PathBindable[SaUtr] = ValueClassBinder.valueClassBinder(_.value)
+
 }
