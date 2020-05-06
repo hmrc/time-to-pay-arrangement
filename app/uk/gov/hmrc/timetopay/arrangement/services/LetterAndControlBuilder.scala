@@ -26,8 +26,8 @@ import scala.util.Try
 class LetterAndControlBuilder @Inject() (letterAndControlAndJurisdictionChecker: LetterAndControlAndJurisdictionChecker, configuration: Configuration) {
   type AddressResult = (Address, Option[LetterError])
 
-  val jurisdictionChecker: JurisdictionChecker = new JurisdictionChecker(JurisdictionCheckerConfig.create(configuration))
-  val LetterAndControlConfig = letterAndControlAndJurisdictionChecker.createLetterAndControlConfig
+  private val jurisdictionChecker = new JurisdictionChecker(JurisdictionCheckerConfig.create(configuration))
+  private val LetterAndControlConfig = letterAndControlAndJurisdictionChecker.createLetterAndControlConfig
 
   def create(ttpArrangement: TTPArrangement): LetterAndControl = {
     val taxpayer = ttpArrangement.taxpayer
@@ -79,7 +79,7 @@ class LetterAndControlBuilder @Inject() (letterAndControlAndJurisdictionChecker:
     val initialPayment = (Try(schedule.initialPayment).getOrElse(BigDecimal(0.0)) + schedule.instalments.head.amount).setScale(2)
 
     instalmentSize match {
-      case 0 => f"Initial payment of £$initialPayment%,.2f then a final payment of £" + s"$lastPaymentAmount%,.2f"
+      case 0 => f"Initial payment of £$initialPayment%,.2f then a final payment of £$lastPaymentAmount%,.2f"
       case _ => f"Initial payment of £$initialPayment%,.2f then $instalmentSize payments of £$regularPaymentAmount%,.2f and final payment of £" +
         f"$lastPaymentAmount%,.2f"
     }
@@ -114,7 +114,7 @@ class LetterAndControlBuilder @Inject() (letterAndControlAndJurisdictionChecker:
     }.distinct
 
     uniqueAddressTypes match {
-      case x :: Nil =>
+      case _ :: Nil =>
         Logger.logger.trace("Found single unique address type found")
         validate(taxpayer.addresses.head)
       case _ =>
@@ -123,7 +123,7 @@ class LetterAndControlBuilder @Inject() (letterAndControlAndJurisdictionChecker:
     }
   }
 
-  def validate(address: Address) = address match {
+  private def validate(address: Address) = address match {
     case Address(_, _, _, _, _, "") | Address("", _, _, _, _, _) =>
       (address, Some(LetterError(9, "incomplete address")))
     case _ =>
