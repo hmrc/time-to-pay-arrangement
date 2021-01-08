@@ -16,18 +16,18 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import java.time.LocalDate.now
-
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
 
+import java.time.LocalDate.now
+
 class LetterAndControlBuilderSpec extends ITSpec {
   private val letterAndControlBuilder = fakeApplication().injector.instanceOf[LetterAndControlBuilder]
 
-  val taxPayerData = Table(
+  private val taxPayerData = Table(
     ("taxPayer", "exceptionCode", "exceptionReason", "message"),
     (taxPayerWithEnglishAddress, None, None, "1 English Address"),
     (taxPayerWithEnglishAddressWithNoComsPref, None, None, "1 English Address and no comms preference"),

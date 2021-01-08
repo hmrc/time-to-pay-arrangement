@@ -17,21 +17,14 @@
 package uk.gov.hmrc.timetopay.arrangement.controllers
 
 import play.api.http.Status
-import play.api.mvc.ControllerComponents
-import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiServiceConnectorConfig
-import uk.gov.hmrc.timetopay.arrangement.connectors.DesArrangementApiServiceConnector
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementRepository
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestConnector, WireMockResponses}
 
 class TTPArrangementControllerSpec extends ITSpec {
 
-  val cc = fakeApplication.injector.instanceOf[ControllerComponents]
-  val desArrangementApiServiceConnectorConfig = fakeApplication().injector.instanceOf[DesArrangementApiServiceConnectorConfig]
-  val connector = fakeApplication().injector.instanceOf[DesArrangementApiServiceConnector]
-  val arrangementController = fakeApplication().injector.instanceOf[TTPArrangementController]
-  val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
-  val testConnector = fakeApplication().injector.instanceOf[TestConnector]
+  private val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
+  private val testConnector = fakeApplication().injector.instanceOf[TestConnector]
 
   override def beforeEach(): Unit = {
     arrangementRepo.collection.drop(false).futureValue

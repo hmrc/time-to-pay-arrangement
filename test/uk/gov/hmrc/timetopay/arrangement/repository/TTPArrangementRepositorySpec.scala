@@ -26,8 +26,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class TTPArrangementRepositorySpec extends ITSpec {
 
-  val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
-  val arrangement = Json.parse(
+  private val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
+  private val arrangement = Json.parse(
     s"""
        |{
        |  "id" : "XXX-XXX-XXX",

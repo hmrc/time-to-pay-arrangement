@@ -18,8 +18,6 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import play.api.Logger
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.config.{DesArrangementApiServiceConnectorConfig, LetterAndControlAndJurisdictionChecker}
-import uk.gov.hmrc.timetopay.arrangement.connectors.DesArrangementApiServiceConnector
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementRepository
 import uk.gov.hmrc.timetopay.arrangement.resources._
@@ -33,19 +31,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class TTPArrangementServiceSpec extends ITSpec {
 
-  val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
-  val desArrangementApiServiceConnectorConfig = fakeApplication().injector.instanceOf[DesArrangementApiServiceConnectorConfig]
-  val desArrangementApiServiceConnector = fakeApplication().injector.instanceOf[DesArrangementApiServiceConnector]
-  val letterAndControlAndJurisdictionChecker = fakeApplication().injector.instanceOf[LetterAndControlAndJurisdictionChecker]
-  val desTTPArrangementBuilder = fakeApplication().injector.instanceOf[DesTTPArrangementBuilder]
-  val tTPArrangementRepository = fakeApplication().injector.instanceOf[TTPArrangementRepository]
-  val letterAndControlBuilder = fakeApplication().injector.instanceOf[LetterAndControlBuilder]
-  val tTPArrangementService = fakeApplication().injector.instanceOf[TTPArrangementService]
-  val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement]
-  val savedArrangement: TTPArrangement = ttparrangementResponse.as[TTPArrangement]
-  private val ttpArrangement: DesTTPArrangement = savedArrangement.desArrangement.get.ttpArrangement
-  private val letter: LetterAndControl = savedArrangement.desArrangement.get.letterAndControl
-  val request = DesSubmissionRequest(ttpArrangement, letter)
+  private val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
+  private val tTPArrangementService = fakeApplication().injector.instanceOf[TTPArrangementService]
+  private val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement]
 
   override def beforeEach(): Unit = {
     arrangementRepo.collection.drop(false).futureValue
