@@ -56,7 +56,7 @@ class DesTTPArrangementBuilder @Inject() (l: LetterAndControlAndJurisdictionChec
    * 4. If the tax payer's address is a bad address (so we can't determine the region), enter "Other"
    */
   def enforcementFlag(taxpayer: Taxpayer): String = {
-    val addressTypes: List[JurisdictionType] = taxpayer.addresses.map {
+    val addressTypes: List[JurisdictionType] = taxpayer.addresses.flatMap {
       jurisdictionChecker.addressType
     }.distinct
 

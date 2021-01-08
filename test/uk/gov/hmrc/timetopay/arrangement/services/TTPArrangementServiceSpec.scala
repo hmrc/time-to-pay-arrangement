@@ -20,6 +20,7 @@ import play.api.Logger
 import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementRepository
+import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers.taxPayerWithEnglishAddress
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, WireMockResponses}
 
@@ -33,7 +34,7 @@ class TTPArrangementServiceSpec extends ITSpec {
 
   private val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
   private val tTPArrangementService = fakeApplication().injector.instanceOf[TTPArrangementService]
-  private val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement]
+  private val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement].copy(taxpayer = taxPayerWithEnglishAddress)
 
   override def beforeEach(): Unit = {
     arrangementRepo.collection.drop(false).futureValue

@@ -45,8 +45,8 @@ class JurisdictionChecker(config: JurisdictionCheckerConfig) {
   val scottishPostCodeRegex = config.scottishPrefix.r
   val welshPostCodeRegex = config.welshPrefix.r
 
-  def addressType(address: Address): JurisdictionType = {
-    address.postcode match {
+  def addressType(address: Address): Option[JurisdictionType] = {
+    address.postcode.filterNot(_.trim.isEmpty).map {
       case scottishPostCodeRegex(_) => JurisdictionTypes.Scottish
       case welshPostCodeRegex(_)    => JurisdictionTypes.Welsh
       case _                        => JurisdictionTypes.English

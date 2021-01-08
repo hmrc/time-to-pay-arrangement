@@ -38,7 +38,10 @@ class DesTTPArrangementBuilderSpec extends ITSpec {
     (taxPayerWithMultipleScottishAddresses, "Summary Warrant", "multiple scottish postcode"),
     (taxPayerWithMultipleWelshAddresses, "Distraint", "multiple welsh postcode"),
     (taxPayerWithMultipleJurisdictions, "Other", "mixed postcodes"),
-    (taxPayerWithNoAddress, "Other", "no addresss"))
+    (taxPayerWithEmptyPostcode, "Other", "empty postcode"),
+    (taxPayerWithMissingPostcode, "Other", "missing postcode"),
+    (taxPayerWithNoAddress, "Other", "no addresss")
+  )
 
   forAll(taxPayerData) { (taxpayer, enforcementFlag, message) =>
     s"DesTTPArrangementService should return enforcementFlag =  $enforcementFlag for $message  for $taxpayer" in {
@@ -48,7 +51,7 @@ class DesTTPArrangementBuilderSpec extends ITSpec {
   }
 
   "DesTTPArrangementService create an des arrangement" in {
-    implicit val arrangement = ttparrangementRequest.as[TTPArrangement]
+    val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement].copy(taxpayer = taxPayerWithEnglishAddress)
     val desArrangement = desTTPArrangementService.create(arrangement)
     desArrangement.enforcementAction shouldBe "Distraint"
     desArrangement.directDebit shouldBe true

@@ -48,7 +48,7 @@ case class Address(
     addressLine3: Option[String] = None,
     addressLine4: Option[String] = None,
     addressLine5: Option[String] = None,
-    postcode:     String         = "")
+    postcode:     Option[String] = None)
 
 case class CommunicationPreferences(
     welshLanguageIndicator: Boolean,
@@ -91,7 +91,7 @@ case class LetterAndControl(
     addressLine3:       Option[String] = None,
     addressLine4:       Option[String] = None,
     addressLine5:       Option[String] = None,
-    postCode:           String         = "",
+    postCode:           Option[String] = None,
     totalAll:           String,
     clmIndicateInt:     String         = "Interest is due",
     clmPymtString:      String,

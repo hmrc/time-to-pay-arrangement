@@ -19,8 +19,6 @@ package uk.gov.hmrc.timetopay.arrangement.controllers
 import play.api.http.Status
 import play.api.libs.json._
 import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
-import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementRepository
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, WireMockResponses}
