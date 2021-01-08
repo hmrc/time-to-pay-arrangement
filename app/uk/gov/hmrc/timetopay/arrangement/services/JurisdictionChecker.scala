@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,8 +45,8 @@ class JurisdictionChecker(config: JurisdictionCheckerConfig) {
   val scottishPostCodeRegex = config.scottishPrefix.r
   val welshPostCodeRegex = config.welshPrefix.r
 
-  def addressType(address: Address): JurisdictionType = {
-    address.postcode match {
+  def addressType(address: Address): Option[JurisdictionType] = {
+    address.postcode.filterNot(_.trim.isEmpty).map {
       case scottishPostCodeRegex(_) => JurisdictionTypes.Scottish
       case welshPostCodeRegex(_)    => JurisdictionTypes.Welsh
       case _                        => JurisdictionTypes.English

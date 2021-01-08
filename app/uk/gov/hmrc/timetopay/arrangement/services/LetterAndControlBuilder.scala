@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,7 +109,7 @@ class LetterAndControlBuilder @Inject() (letterAndControlAndJurisdictionChecker:
   }
 
   private def multipleAddresses(implicit taxpayer: Taxpayer) = {
-    val uniqueAddressTypes: List[JurisdictionType] = taxpayer.addresses.map {
+    val uniqueAddressTypes: List[JurisdictionType] = taxpayer.addresses.flatMap {
       jurisdictionChecker.addressType
     }.distinct
 
@@ -124,7 +124,7 @@ class LetterAndControlBuilder @Inject() (letterAndControlAndJurisdictionChecker:
   }
 
   private def validate(address: Address) = address match {
-    case Address(_, _, _, _, _, "") | Address("", _, _, _, _, _) =>
+    case Address(_, _, _, _, _, None | Some("")) | Address("", _, _, _, _, _) =>
       (address, Some(LetterError(9, "incomplete address")))
     case _ =>
       (address, None)

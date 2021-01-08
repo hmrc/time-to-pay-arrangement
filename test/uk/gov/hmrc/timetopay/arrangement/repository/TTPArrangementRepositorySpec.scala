@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class TTPArrangementRepositorySpec extends ITSpec {
 
-  val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
-  val arrangement = Json.parse(
+  private val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
+  private val arrangement = Json.parse(
     s"""
        |{
        |  "id" : "XXX-XXX-XXX",

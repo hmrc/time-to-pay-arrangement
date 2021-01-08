@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,28 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import java.time.LocalDate.now
-
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
 
+import java.time.LocalDate.now
+
 class LetterAndControlBuilderSpec extends ITSpec {
   private val letterAndControlBuilder = fakeApplication().injector.instanceOf[LetterAndControlBuilder]
 
-  val taxPayerData = Table(
+  private val taxPayerData = Table(
     ("taxPayer", "exceptionCode", "exceptionReason", "message"),
     (taxPayerWithEnglishAddress, None, None, "1 English Address"),
     (taxPayerWithEnglishAddressWithNoComsPref, None, None, "1 English Address and no comms preference"),
     (taxPayerWithWelshAddress, None, None, "1 Welsh Address"),
     (taxPayerWithNorthernIrelandAddress, None, None, "1 Northern Ireland Address"),
-    (taxPayerWithMissingPostcodeAndLine1, Some("9"), Some("incomplete address"), "Missing address line 1 and postcode"),
-    (taxPayerWithMissingPostcode, Some("9"), Some("incomplete address"), "missing line 1"),
-    (taxPayerWithMissingLine1, Some("9"), Some("incomplete address"), "missing postcode"),
+    (taxPayerWithMissingPostcodeAndLine1, Some("9"), Some("incomplete address"), "Missing address line 1 and missing postcode"),
+    (taxPayerWithEmptyPostcodeAndMissingLine1, Some("9"), Some("incomplete address"), "Missing address line 1 and empty postcode"),
+    (taxPayerWithMissingPostcode, Some("9"), Some("incomplete address"), "missing postcode"),
+    (taxPayerWithEmptyPostcode, Some("9"), Some("incomplete address"), "empty postcode"),
+    (taxPayerWithMissingLine1, Some("9"), Some("incomplete address"), "missing line 1"),
     (taxPayerWithMultipleEnglishAddresses, None, None, "multiple English addresses"),
     (taxPayerWithEnglishAndScottishAddresses, Some("1"), Some("address jurisdiction conflict"), "an English and Scottish address"),
     (taxPayerWithEnglishAndForeignAddresses, None, None, "an English and Foreign address"),

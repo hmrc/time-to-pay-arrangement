@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import java.time.LocalDate
-
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
 import uk.gov.hmrc.timetopay.arrangement.config.LetterAndControlAndJurisdictionChecker
@@ -26,11 +24,13 @@ import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
 
+import java.time.LocalDate
+
 class DesTTPArrangementBuilderSpec extends ITSpec {
 
-  val LetterAndControlConfigInject = fakeApplication.injector.instanceOf[LetterAndControlAndJurisdictionChecker]
-  val desTTPArrangementService = new DesTTPArrangementBuilder(LetterAndControlConfigInject, config)
-  val taxPayerData = Table(
+  private val LetterAndControlConfigInject = fakeApplication.injector.instanceOf[LetterAndControlAndJurisdictionChecker]
+  private val desTTPArrangementService = new DesTTPArrangementBuilder(LetterAndControlConfigInject, config)
+  private val taxPayerData = Table(
     ("taxPayer", "enforcementFlag", "message"),
     (taxPayerWithScottishAddress, "Summary Warrant", "single scottish postcode"),
     (taxPayerWithWelshAddress, "Distraint", "single welsh postcode"),
@@ -38,7 +38,10 @@ class DesTTPArrangementBuilderSpec extends ITSpec {
     (taxPayerWithMultipleScottishAddresses, "Summary Warrant", "multiple scottish postcode"),
     (taxPayerWithMultipleWelshAddresses, "Distraint", "multiple welsh postcode"),
     (taxPayerWithMultipleJurisdictions, "Other", "mixed postcodes"),
-    (taxPayerWithNoAddress, "Other", "no addresss"))
+    (taxPayerWithEmptyPostcode, "Other", "empty postcode"),
+    (taxPayerWithMissingPostcode, "Other", "missing postcode"),
+    (taxPayerWithNoAddress, "Other", "no addresss")
+  )
 
   forAll(taxPayerData) { (taxpayer, enforcementFlag, message) =>
     s"DesTTPArrangementService should return enforcementFlag =  $enforcementFlag for $message  for $taxpayer" in {
@@ -48,7 +51,7 @@ class DesTTPArrangementBuilderSpec extends ITSpec {
   }
 
   "DesTTPArrangementService create an des arrangement" in {
-    implicit val arrangement = ttparrangementRequest.as[TTPArrangement]
+    val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement].copy(taxpayer = taxPayerWithEnglishAddress)
     val desArrangement = desTTPArrangementService.create(arrangement)
     desArrangement.enforcementAction shouldBe "Distraint"
     desArrangement.directDebit shouldBe true

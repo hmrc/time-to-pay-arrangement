@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,16 @@
 
 package uk.gov.hmrc.timetopay.arrangement.connectors
 
-import play.api.http.Status
-import uk.gov.hmrc.http._
 import uk.gov.hmrc.timetopay.arrangement.DesSubmissionRequest
-import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiServiceConnectorConfig
 import uk.gov.hmrc.timetopay.arrangement.resources.{submitArrangementLetterAndControl, submitArrangementTTPArrangement, taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, WireMockResponses}
 
 class DesArrangementApiServiceConnectorSpec extends ITSpec {
 
-  val desArrangementApiServiceConnectorConfig = fakeApplication().injector.instanceOf[DesArrangementApiServiceConnectorConfig]
-  val connector = fakeApplication().injector.instanceOf[DesArrangementApiServiceConnector]
+  private val connector = fakeApplication().injector.instanceOf[DesArrangementApiServiceConnector]
 
-  val request: DesSubmissionRequest = DesSubmissionRequest(submitArrangementTTPArrangement, submitArrangementLetterAndControl)
+  private val request: DesSubmissionRequest = DesSubmissionRequest(submitArrangementTTPArrangement, submitArrangementLetterAndControl)
+
   "Calling submitArrangement should return 202 accepted response" in {
 
     WireMockResponses.desArrangementApiSucccess(taxpayer.selfAssessment.utr)
