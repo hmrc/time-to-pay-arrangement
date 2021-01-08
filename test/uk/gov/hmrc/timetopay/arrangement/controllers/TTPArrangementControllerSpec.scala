@@ -17,7 +17,10 @@
 package uk.gov.hmrc.timetopay.arrangement.controllers
 
 import play.api.http.Status
+import play.api.libs.json._
 import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
+import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementRepository
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, WireMockResponses}
@@ -40,6 +43,23 @@ class TTPArrangementControllerSpec extends ITSpec {
 
     WireMockResponses.desArrangementApiSucccess("1234567890")
     val result: HttpResponse = httpClient.POST(s"$baseUrl/ttparrangements", ttparrangementRequest).futureValue
+    result.status shouldBe Status.CREATED
+    result.header("Location") should not be None
+  }
+
+  "POST /ttparrangements should return 201 when no postcode is provided (bug fix OPS-5756)" in {
+
+    WireMockResponses.desArrangementApiSucccess("1234567890")
+
+    val requestWithNoPostcode: JsValue = ttparrangementRequest.transform(
+      (__ \ "taxpayer" \ "addresses").json.update {
+        __.read[JsArray].map {
+          case JsArray(addressObjs) => JsArray(addressObjs.map(_.as[JsObject] - "postcode"))
+        }
+      }
+    ).get
+
+    val result: HttpResponse = httpClient.POST(s"$baseUrl/ttparrangements", requestWithNoPostcode).futureValue
     result.status shouldBe Status.CREATED
     result.header("Location") should not be None
   }
