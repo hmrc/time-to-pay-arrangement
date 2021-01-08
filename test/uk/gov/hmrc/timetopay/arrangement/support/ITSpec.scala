@@ -58,7 +58,7 @@ trait ITSpec
   }
   lazy val servicesConfig = fakeApplication.injector.instanceOf[ServicesConfig]
   lazy val config = fakeApplication.injector.instanceOf[Configuration]
-  val baseUrl: String = s"http://localhost:$WireMockSupport.port"
+  val baseUrl: String = s"http://localhost:$port"
 
   override implicit val patienceConfig = PatienceConfig(
     timeout  = scaled(Span(3, Seconds)),

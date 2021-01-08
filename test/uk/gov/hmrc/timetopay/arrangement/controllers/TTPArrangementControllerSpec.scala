@@ -17,14 +17,14 @@
 package uk.gov.hmrc.timetopay.arrangement.controllers
 
 import play.api.http.Status
+import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementRepository
 import uk.gov.hmrc.timetopay.arrangement.resources._
-import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestConnector, WireMockResponses}
+import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, WireMockResponses}
 
 class TTPArrangementControllerSpec extends ITSpec {
 
   private val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
-  private val testConnector = fakeApplication().injector.instanceOf[TestConnector]
 
   override def beforeEach(): Unit = {
     arrangementRepo.collection.drop(false).futureValue
@@ -39,7 +39,7 @@ class TTPArrangementControllerSpec extends ITSpec {
   "POST /ttparrangements should return 201" in {
 
     WireMockResponses.desArrangementApiSucccess("1234567890")
-    val result = testConnector.create(ttparrangementRequest).futureValue
+    val result: HttpResponse = httpClient.POST(s"$baseUrl/ttparrangements", ttparrangementRequest).futureValue
     result.status shouldBe Status.CREATED
     result.header("Location") should not be None
   }
@@ -47,7 +47,7 @@ class TTPArrangementControllerSpec extends ITSpec {
   "POST /ttparrangements should return 500 if arrangement service fails" in {
 
     WireMockResponses.desArrangementApiBadRequest("1234567890")
-    val result: Throwable = testConnector.create(ttparrangementRequest).failed.futureValue
+    val result: Throwable = httpClient.POST(s"$baseUrl/ttparrangements", ttparrangementRequest).failed.futureValue
     result.getMessage should include("returned 500")
 
   }
@@ -55,17 +55,19 @@ class TTPArrangementControllerSpec extends ITSpec {
   "GET /ttparrangements should return 200 for arrangement" in {
 
     WireMockResponses.desArrangementApiSucccess("1234567890")
-    val result = testConnector.create(ttparrangementRequest).futureValue
+    val result: HttpResponse = httpClient.POST(s"$baseUrl/ttparrangements", ttparrangementRequest).futureValue
     result.status shouldBe Status.CREATED
     val nextUrl = result.header("Location").get
 
-    val result2 = testConnector.nextUrl(nextUrl).futureValue
+    val result2 = httpClient.GET[HttpResponse](nextUrl).futureValue
     result2.status shouldBe Status.OK
   }
 
   "GET /ttparrangements should return 404 for non existent arrangement" in {
 
-    val result = testConnector.nextUrl("http://localhost:19001/ttparrangements/22f9d802-3a34-45a9-bbb4-f5d6433bf3ff").failed.futureValue
+    val result: Throwable = httpClient
+      .GET[HttpResponse]("http://localhost:19001/ttparrangements/22f9d802-3a34-45a9-bbb4-f5d6433bf3ff")
+      .failed.futureValue
 
     result.getMessage should include("returned 404")
 
