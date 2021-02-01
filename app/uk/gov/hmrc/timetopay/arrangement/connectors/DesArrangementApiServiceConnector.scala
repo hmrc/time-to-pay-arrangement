@@ -39,15 +39,27 @@ class DesArrangementApiServiceConnector @Inject() (
 
   type SubmissionResult = Either[SubmissionError, SubmissionSuccess]
 
-  lazy val desHeaderCarrier: HeaderCarrier = HeaderCarrier(authorization = Some(Authorization(s"Bearer ${config.authorisationToken}")))
-    .withExtraHeaders("Environment" -> config.serviceEnvironment)
+  def submitArrangement(taxpayer: Taxpayer, desSubmissionRequest: DesSubmissionRequest)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[SubmissionResult] = {
+    //we put sessionId and requestId into hc so auditor can populate these fields when auditing
+    //request to DES
+    val desHc: HeaderCarrier =
+      HeaderCarrier(
+        sessionId     = hc.sessionId,
+        requestId     = hc.requestId,
+        authorization = Some(Authorization(s"Bearer ${config.authorisationToken}")),
+        extraHeaders  = Seq("Environment" -> config.serviceEnvironment)
+      )
 
-  def submitArrangement(taxpayer: Taxpayer, desSubmissionRequest: DesSubmissionRequest)(implicit ec: ExecutionContext): Future[SubmissionResult] = {
-    implicit val hc: HeaderCarrier = desHeaderCarrier
     val serviceUrl = s"time-to-pay/taxpayers/${taxpayer.selfAssessment.utr}/arrangements"
 
-    Logger.logger.debug(s"Header carrier ${hc.headers}")
-    httpClient.POST[DesSubmissionRequest, HttpResponse](s"${config.desArrangementUrl}/$serviceUrl", desSubmissionRequest)
+    httpClient.POST[DesSubmissionRequest, HttpResponse](
+      s"${config.desArrangementUrl}/$serviceUrl",
+      desSubmissionRequest)(
+        implicitly,
+        implicitly,
+        desHc,
+        implicitly
+      )
       .map(_ => {
         Logger.logger.info(s"Submission successful for '${taxpayer.selfAssessment.utr}'")
         Right(SubmissionSuccess())
