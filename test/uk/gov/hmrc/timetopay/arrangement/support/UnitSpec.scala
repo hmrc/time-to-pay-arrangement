@@ -16,17 +16,15 @@
 
 package uk.gov.hmrc.timetopay.arrangement.support
 
-import java.nio.charset.Charset
-
 import akka.stream.Materializer
 import akka.util.ByteString
 import org.scalatest.{Matchers, OptionValues, WordSpecLike}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
-import scala.language.implicitConversions
-import scala.language.postfixOps
 
+import java.nio.charset.Charset
 import scala.concurrent.ExecutionContext
+import scala.language.{implicitConversions, postfixOps}
 
 trait UnitSpec extends WordSpecLike with Matchers with OptionValues {
 

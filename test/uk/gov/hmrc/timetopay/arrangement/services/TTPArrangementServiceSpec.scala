@@ -24,13 +24,8 @@ import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers.taxPayerWithEnglish
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, WireMockResponses}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
-//DesArrangementApiService = DesArrangementApiServiceConnectorConfig
-
-//DesArrangementService = DesArrangementApiServiceConnector
-
 class TTPArrangementServiceSpec extends ITSpec {
+  val logger = Logger(getClass)
 
   private val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
   private val tTPArrangementService = fakeApplication().injector.instanceOf[TTPArrangementService]
@@ -54,7 +49,7 @@ class TTPArrangementServiceSpec extends ITSpec {
 
     val desSubmissionRequest = response.get.desArrangement.get
 
-    Logger.warn(desSubmissionRequest.toString)
+    logger.warn(desSubmissionRequest.toString)
 
     desSubmissionRequest.ttpArrangement.firstPaymentAmount shouldBe "1298.95"
     desSubmissionRequest.ttpArrangement.enforcementAction shouldBe "Distraint"

@@ -16,12 +16,16 @@
 
 package uk.gov.hmrc.timetopay.arrangement.connectors
 
+import com.fasterxml.jackson.core.JsonParseException
+
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.http.Status
+import play.api.libs.json.JsValue
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.http.logging.Authorization
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.Authorization
+import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiServiceConnectorConfig
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.{DesSubmissionRequest, Taxpayer}
@@ -35,11 +39,16 @@ case class SubmissionError(code: Int, message: String)
 @Singleton
 class DesArrangementApiServiceConnector @Inject() (
     httpClient: HttpClient,
-    config:     DesArrangementApiServiceConnectorConfig)(implicit ec: ExecutionContext) {
+    config:     DesArrangementApiServiceConnectorConfig
+) {
+  val logger: Logger = Logger(getClass)
 
   type SubmissionResult = Either[SubmissionError, SubmissionSuccess]
 
-  def submitArrangement(taxpayer: Taxpayer, desSubmissionRequest: DesSubmissionRequest)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[SubmissionResult] = {
+  def submitArrangement(
+      taxpayer:             Taxpayer,
+      desSubmissionRequest: DesSubmissionRequest
+  )(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[SubmissionResult] = {
     //we put sessionId and requestId into hc so auditor can populate these fields when auditing
     //request to DES
     val desHc: HeaderCarrier =
@@ -52,16 +61,16 @@ class DesArrangementApiServiceConnector @Inject() (
 
     val serviceUrl = s"time-to-pay/taxpayers/${taxpayer.selfAssessment.utr}/arrangements"
 
-    httpClient.POST[DesSubmissionRequest, HttpResponse](
+    httpClient.POST[DesSubmissionRequest, JsValue](
       s"${config.desArrangementUrl}/$serviceUrl",
       desSubmissionRequest)(
         implicitly,
         implicitly,
         desHc,
-        implicitly
+        ec
       )
       .map(_ => {
-        Logger.logger.info(s"Submission successful for '${taxpayer.selfAssessment.utr}'")
+        logger.info(s"Submission successful for '${taxpayer.selfAssessment.utr}'")
         Right(SubmissionSuccess())
       }).recover {
         case e: Throwable =>
@@ -73,15 +82,15 @@ class DesArrangementApiServiceConnector @Inject() (
 
   private def onError(ex: Throwable): SubmissionResult = {
     val (code, message) = ex match {
-      case e: HttpException       => (e.responseCode, e.getMessage)
+      case e: HttpException         => (e.responseCode, e.getMessage)
 
-      case e: Upstream4xxResponse => (e.reportAs, e.getMessage)
-      case e: Upstream5xxResponse => (e.reportAs, e.getMessage)
+      case e: UpstreamErrorResponse => (e.reportAs, e.getMessage)
 
-      case e: Throwable           => (Status.INTERNAL_SERVER_ERROR, e.getMessage)
+      case e: JsonParseException    => (Status.BAD_REQUEST, e.getMessage)
+      case e: Throwable             => (Status.INTERNAL_SERVER_ERROR, e.getMessage)
     }
 
-    Logger.logger.error(s"Failure from DES, code $code and body $message")
+    logger.error(s"Failure from DES, code $code and body $message")
     Left(SubmissionError(code, message))
   }
 }

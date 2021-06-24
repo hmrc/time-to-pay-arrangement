@@ -6,6 +6,7 @@ import uk.gov.hmrc.SbtArtifactory
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 import wartremover.{Wart, wartremoverErrors, wartremoverExcluded, wartremoverWarnings}
 
+val scalaV = "2.12.12"
 
 lazy val scalariformSettings = {
   // description of options found here -> https://github.com/scala-ide/scalariform
@@ -86,8 +87,8 @@ lazy val scoverageSettings = {
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
   .settings(
-    scalaVersion := "2.11.11",
-    resolvers ++= Seq(Resolver.bintrayRepo("hmrc", "releases"), Resolver.jcenterRepo),
+    scalaVersion := scalaV,
+    resolvers ++= Seq(Resolver.jcenterRepo),
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
     retrieveManaged := true,
     routesGenerator := InjectedRoutesGenerator,
@@ -108,6 +109,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(PlayKeys.playDefaultPort := 8889)
   .settings(scalaSettings: _*)
   .settings(defaultSettings(): _*)
+  .settings(scalaVersion := scalaV)
   .settings(integrationTestSettings())
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
@@ -123,6 +125,7 @@ lazy val microservice = Project(appName, file("."))
       "-Ywarn-unused",
       "-Ywarn-inaccessible",
       "-Ywarn-value-discard",
+      "-Ywarn-unused:-imports",
       "-unchecked",
       "-Ywarn-nullary-unit",
       "-feature",

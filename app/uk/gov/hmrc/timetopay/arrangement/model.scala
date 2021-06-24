@@ -17,7 +17,6 @@
 package uk.gov.hmrc.timetopay.arrangement
 
 import java.time.{LocalDate, LocalDateTime}
-
 import play.api.libs.json._
 
 case class Schedule(
@@ -30,17 +29,33 @@ case class Schedule(
     totalPayable:         BigDecimal,
     instalments:          List[Instalment])
 
+object Schedule {
+  implicit val format: OFormat[Schedule] = Json.format
+}
+
 case class Instalment(paymentDate: LocalDate, amount: BigDecimal)
+
+object Instalment {
+  implicit val format: OFormat[Instalment] = Json.format
+}
 
 case class Taxpayer(
     customerName:   String,
     addresses:      List[Address],
     selfAssessment: SelfAssessment)
 
+object Taxpayer {
+  implicit val format: OFormat[Taxpayer] = Json.format
+}
+
 case class SelfAssessment(
     utr:                      String,
     communicationPreferences: Option[CommunicationPreferences],
     debits:                   List[Debit])
+
+object SelfAssessment {
+  implicit val format: OFormat[SelfAssessment] = Json.format
+}
 
 case class Address(
     addressLine1: String         = "",
@@ -50,15 +65,31 @@ case class Address(
     addressLine5: Option[String] = None,
     postcode:     Option[String] = None)
 
+object Address {
+  implicit val format: OFormat[Address] = Json.format
+}
+
 case class CommunicationPreferences(
     welshLanguageIndicator: Boolean,
     audioIndicator:         Boolean,
     largePrintIndicator:    Boolean,
     brailleIndicator:       Boolean)
 
+object CommunicationPreferences {
+  implicit val format: OFormat[CommunicationPreferences] = Json.format
+}
+
 case class Debit(originCode: String, dueDate: LocalDate)
 
+object Debit {
+  implicit val format: OFormat[Debit] = Json.format
+}
+
 case class DesDebit(debitType: String, dueDate: LocalDate)
+
+object DesDebit {
+  implicit val format: OFormat[DesDebit] = Json.format
+}
 
 case class TTPArrangement(
     id:                   Option[String],
@@ -83,6 +114,10 @@ case class DesTTPArrangement(
     debitDetails:            List[DesDebit],
     saNote:                  String)
 
+object DesTTPArrangement {
+  implicit val format: OFormat[DesTTPArrangement] = Json.format
+}
+
 case class LetterAndControl(
     customerName:       String,
     salutation:         String         = "Dear Sir or Madam",
@@ -105,7 +140,15 @@ case class LetterAndControl(
     exceptionType:      Option[String] = None,
     exceptionReason:    Option[String] = None)
 
+object LetterAndControl {
+  implicit val format: OFormat[LetterAndControl] = Json.format
+}
+
 case class DesSubmissionRequest(ttpArrangement: DesTTPArrangement, letterAndControl: LetterAndControl)
+
+object DesSubmissionRequest {
+  implicit val format: OFormat[DesSubmissionRequest] = Json.format
+}
 
 object modelFormat {
 

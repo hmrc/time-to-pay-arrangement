@@ -26,7 +26,9 @@ object WireMockResponses {
       post(
         urlEqualTo(s"/time-to-pay/taxpayers/${utr}/arrangements")).willReturn(
           aResponse()
-            .withStatus(200)))
+            .withStatus(200)
+            .withBody("{}")
+        ))
   }
 
   def desArrangementApiBadRequest(utr: String): StubMapping = {

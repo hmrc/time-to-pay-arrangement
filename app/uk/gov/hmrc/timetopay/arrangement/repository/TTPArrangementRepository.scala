@@ -16,8 +16,6 @@
 
 package uk.gov.hmrc.timetopay.arrangement.repository
 
-import javax.inject.Inject
-import play.api.Logger
 import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoComponent
 import reactivemongo.api.ReadPreference
@@ -28,10 +26,10 @@ import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import javax.inject.Inject
+
 import scala.concurrent.{ExecutionContext, Future}
 //The below is needed !
-import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 
 object TTPArrangementMongoFormats {
   implicit val customWriterTTPArrangementMongo: Writes[TTPArrangement] = {
@@ -89,15 +87,15 @@ class TTPArrangementRepository @Inject() (reactiveMongoComponent: ReactiveMongoC
     }).one[JsValue](readPreference)
   }
 
-  def save(ttpArrangement: TTPArrangement): Future[Option[TTPArrangement]] = {
-    Logger.logger.debug("Saving ttparrangement record")
+  def doInsert(ttpArrangement: TTPArrangement)(implicit ec: ExecutionContext): Future[Option[TTPArrangement]] = {
+    logger.debug("Saving ttparrangement record")
     insert(ttpArrangement)
       .collect {
         case DefaultWriteResult(true, 1, Seq(), None, _, None) =>
-          Logger.logger.info(s"Arrangement record persisted ID: ${ttpArrangement.id}")
+          logger.info(s"Arrangement record persisted ID: ${ttpArrangement.id}")
           Some(ttpArrangement)
         case DefaultWriteResult(false, 1, Seq(), None, _, Some(msg)) =>
-          Logger.logger.error(s"An error occurred saving record: $msg")
+          logger.error(s"An error occurred saving record: $msg")
           None
       }
   }

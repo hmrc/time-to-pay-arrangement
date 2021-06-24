@@ -19,6 +19,7 @@ package uk.gov.hmrc.timetopay.arrangement.controllers
 import play.api.http.Status
 import play.api.libs.json._
 import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementRepository
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, WireMockResponses}
@@ -40,7 +41,7 @@ class TTPArrangementControllerSpec extends ITSpec {
   "POST /ttparrangements should return 201" in {
 
     WireMockResponses.desArrangementApiSucccess("1234567890")
-    val result: HttpResponse = httpClient.POST(s"$baseUrl/ttparrangements", ttparrangementRequest).futureValue
+    val result: HttpResponse = httpClient.POST[JsValue, HttpResponse](s"$baseUrl/ttparrangements", ttparrangementRequest).futureValue
     result.status shouldBe Status.CREATED
     result.header("Location") should not be None
   }
@@ -57,7 +58,7 @@ class TTPArrangementControllerSpec extends ITSpec {
       }
     ).get
 
-    val result: HttpResponse = httpClient.POST(s"$baseUrl/ttparrangements", requestWithNoPostcode).futureValue
+    val result: HttpResponse = httpClient.POST[JsValue, HttpResponse](s"$baseUrl/ttparrangements", requestWithNoPostcode).futureValue
     result.status shouldBe Status.CREATED
     result.header("Location") should not be None
   }
@@ -65,15 +66,18 @@ class TTPArrangementControllerSpec extends ITSpec {
   "POST /ttparrangements should return 500 if arrangement service fails" in {
 
     WireMockResponses.desArrangementApiBadRequest("1234567890")
-    val result: Throwable = httpClient.POST(s"$baseUrl/ttparrangements", ttparrangementRequest).failed.futureValue
-    result.getMessage should include("returned 500")
+    val result = httpClient.POST[JsValue, HttpResponse](s"$baseUrl/ttparrangements", ttparrangementRequest)
+      .futureValue
+
+    result.status shouldBe 500
+    result.body should include("Submission to DES failed, status code [400]")
 
   }
 
   "GET /ttparrangements should return 200 for arrangement" in {
 
     WireMockResponses.desArrangementApiSucccess("1234567890")
-    val result: HttpResponse = httpClient.POST(s"$baseUrl/ttparrangements", ttparrangementRequest).futureValue
+    val result: HttpResponse = httpClient.POST[JsValue, HttpResponse](s"$baseUrl/ttparrangements", ttparrangementRequest).futureValue
     result.status shouldBe Status.CREATED
     val nextUrl = result.header("Location").get
 
@@ -82,12 +86,12 @@ class TTPArrangementControllerSpec extends ITSpec {
   }
 
   "GET /ttparrangements should return 404 for non existent arrangement" in {
-
-    val result: Throwable = httpClient
+    val result = httpClient
       .GET[HttpResponse]("http://localhost:19001/ttparrangements/22f9d802-3a34-45a9-bbb4-f5d6433bf3ff")
-      .failed.futureValue
+      .futureValue
 
-    result.getMessage should include("returned 404")
+    result.status shouldBe 404
+    result.body should include("does not exist")
 
   }
 

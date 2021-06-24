@@ -24,6 +24,8 @@ import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig, Lett
 import scala.util.Try
 
 class LetterAndControlBuilder @Inject() (letterAndControlAndJurisdictionChecker: LetterAndControlAndJurisdictionChecker, configuration: Configuration) {
+  val logger: Logger = Logger(getClass)
+
   type AddressResult = (Address, Option[LetterError])
 
   private val jurisdictionChecker = new JurisdictionChecker(JurisdictionCheckerConfig.create(configuration))
@@ -97,13 +99,13 @@ class LetterAndControlBuilder @Inject() (letterAndControlAndJurisdictionChecker:
     implicit val taxpayer: Taxpayer = ttpArrangement.taxpayer
     taxpayer.addresses match {
       case Nil =>
-        Logger.logger.debug("No address found in Digital")
+        logger.debug("No address found in Digital")
         (Address(), Some(LetterError(8, "no address")))
       case x :: Nil =>
-        Logger.logger.debug("Found single address")
+        logger.debug("Found single address")
         validate(x)
       case _ =>
-        Logger.logger.debug("Found multiple addresses")
+        logger.debug("Found multiple addresses")
         multipleAddresses
     }
   }
@@ -115,10 +117,10 @@ class LetterAndControlBuilder @Inject() (letterAndControlAndJurisdictionChecker:
 
     uniqueAddressTypes match {
       case _ :: Nil =>
-        Logger.logger.trace("Found single unique address type found")
+        logger.trace("Found single unique address type found")
         validate(taxpayer.addresses.head)
       case _ =>
-        Logger.logger.trace(s"Customer has addresses in ${uniqueAddressTypes.mkString(" and")} jurisdictions")
+        logger.trace(s"Customer has addresses in ${uniqueAddressTypes.mkString(" and")} jurisdictions")
         (Address(), Some(LetterError(1, "address jurisdiction conflict")))
     }
   }
@@ -132,22 +134,22 @@ class LetterAndControlBuilder @Inject() (letterAndControlAndJurisdictionChecker:
 
   private def commsPrefException(commsPrefs: CommunicationPreferences): Option[LetterError] = commsPrefs match {
     case CommunicationPreferences(true, _, true, _) =>
-      Logger.logger.debug(s"Exception found in LetterAndControl - Code: 5 Reason: Welsh large print required")
+      logger.debug(s"Exception found in LetterAndControl - Code: 5 Reason: Welsh large print required")
       Some(LetterError.welshLargePrint())
     case CommunicationPreferences(true, true, _, _) =>
-      Logger.logger.debug(s"Exception found in LetterAndControl - Code: 7 Reason: Audio Welsh required")
+      logger.debug(s"Exception found in LetterAndControl - Code: 7 Reason: Audio Welsh required")
       Some(LetterError.welshAudio())
     case CommunicationPreferences(true, _, _, _) =>
-      Logger.logger.debug(s"Exception found in LetterAndControl - Code: 4 Reason: Welsh required")
+      logger.debug(s"Exception found in LetterAndControl - Code: 4 Reason: Welsh required")
       Some(LetterError.welsh())
     case CommunicationPreferences(_, _, _, true) =>
-      Logger.logger.debug(s"Exception found in LetterAndControl - Code: 2 Reason: Braille required")
+      logger.debug(s"Exception found in LetterAndControl - Code: 2 Reason: Braille required")
       Some(LetterError.braille())
     case CommunicationPreferences(_, true, _, _) =>
-      Logger.logger.debug(s"Exception found in LetterAndControl - Code: 6 Reason: Audio required")
+      logger.debug(s"Exception found in LetterAndControl - Code: 6 Reason: Audio required")
       Some(LetterError.audio())
     case CommunicationPreferences(_, _, true, _) =>
-      Logger.logger.debug(s"Exception found in LetterAndControl - Code: 3 Reason: Large print required")
+      logger.debug(s"Exception found in LetterAndControl - Code: 3 Reason: Large print required")
       Some(LetterError.largePrint())
     case _ => None
   }
