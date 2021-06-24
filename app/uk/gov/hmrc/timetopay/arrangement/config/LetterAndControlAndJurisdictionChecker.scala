@@ -17,10 +17,12 @@
 package uk.gov.hmrc.timetopay.arrangement.config
 
 import javax.inject.{Inject, Singleton}
-import play.api.{Configuration, Environment}
+import play.api.{Configuration, Logger}
 
 @Singleton
-class LetterAndControlAndJurisdictionChecker @Inject() (config: Configuration, environment: Environment) {
+class LetterAndControlAndJurisdictionChecker @Inject() (config: Configuration) {
+  val logger: Logger = Logger(getClass)
+
   def createLetterAndControlConfig: LetterAndControlConfig = {
     LetterAndControlConfig(
       getConfString("letterAndControl.salutation", ""),

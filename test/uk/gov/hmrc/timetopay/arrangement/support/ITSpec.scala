@@ -18,9 +18,8 @@ package uk.gov.hmrc.timetopay.arrangement.support
 
 import java.time.format.DateTimeFormatter
 import java.time.{LocalDateTime, ZoneId, ZonedDateTime}
-
 import com.google.inject.AbstractModule
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{BeforeAndAfterEach, FreeSpecLike, Matchers}
 import org.scalatestplus.play.guice.GuiceOneServerPerTest
@@ -29,7 +28,7 @@ import play.api.mvc.Result
 import play.api.{Application, Configuration}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.HttpClient
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}

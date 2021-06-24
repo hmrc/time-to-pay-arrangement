@@ -22,9 +22,8 @@ import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class TTPArrangementRepositorySpec extends ITSpec {
+  val logger: Logger = Logger(getClass)
 
   private val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
   private val arrangement = Json.parse(
@@ -147,15 +146,15 @@ class TTPArrangementRepositorySpec extends ITSpec {
 
   "should add save a TTPArrangement" in {
 
-    val result = arrangementRepo.save(arrangement).futureValue
+    val result = arrangementRepo.doInsert(arrangement).futureValue
     result.get.taxpayer.selfAssessment.utr shouldBe arrangement.taxpayer.selfAssessment.utr
 
   }
 
   "should get a TTPArrangement for given id" in {
 
-    Logger.warn(arrangement.toString)
-    arrangementRepo.save(arrangement).futureValue
+    logger.warn(arrangement.toString)
+    arrangementRepo.doInsert(arrangement).futureValue
 
     val loaded = arrangementRepo.findByIdLocal(arrangement.id.get).futureValue.get
     assert(loaded.toString.contains("desArrangement"))
@@ -163,7 +162,7 @@ class TTPArrangementRepositorySpec extends ITSpec {
   }
 
   "should not save any personal data in" in {
-    arrangementRepo.save(arrangement).futureValue
+    arrangementRepo.doInsert(arrangement).futureValue
 
     val loaded = arrangementRepo.findByIdLocal(arrangement.id.get).futureValue.get
     assert(!loaded.toString.contains("Customer Name"))

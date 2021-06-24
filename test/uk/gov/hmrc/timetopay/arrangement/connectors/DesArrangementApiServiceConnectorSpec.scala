@@ -32,7 +32,7 @@ class DesArrangementApiServiceConnectorSpec extends ITSpec {
 
     val result = connector.submitArrangement(taxpayer, request).futureValue
 
-    result.right.value shouldBe SubmissionSuccess()
+    result.right.get shouldBe SubmissionSuccess()
 
   }
   "Calling submitArrangement should return 400 response" in {

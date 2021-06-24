@@ -18,7 +18,6 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
-import uk.gov.hmrc.timetopay.arrangement.config.LetterAndControlAndJurisdictionChecker
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
 import uk.gov.hmrc.timetopay.arrangement.resources._
@@ -28,8 +27,8 @@ import java.time.LocalDate
 
 class DesTTPArrangementBuilderSpec extends ITSpec {
 
-  private val LetterAndControlConfigInject = fakeApplication.injector.instanceOf[LetterAndControlAndJurisdictionChecker]
-  private val desTTPArrangementService = new DesTTPArrangementBuilder(LetterAndControlConfigInject, config)
+  //  private val LetterAndControlConfigInject = fakeApplication.injector.instanceOf[LetterAndControlAndJurisdictionChecker]
+  private val desTTPArrangementService = new DesTTPArrangementBuilder(config)
   private val taxPayerData = Table(
     ("taxPayer", "enforcementFlag", "message"),
     (taxPayerWithScottishAddress, "Summary Warrant", "single scottish postcode"),

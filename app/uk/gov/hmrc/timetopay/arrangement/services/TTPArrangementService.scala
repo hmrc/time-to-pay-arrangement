@@ -36,6 +36,7 @@ class TTPArrangementService @Inject() (
     desArrangementApiService: DesArrangementApiServiceConnector,
     ttpArrangementRepository: TTPArrangementRepository,
     letterAndControlBuilder:  LetterAndControlBuilder) {
+  val logger: Logger = Logger(getClass)
 
   def byId(id: String): Future[Option[JsValue]] = ttpArrangementRepository.findByIdLocal(id)
 
@@ -43,7 +44,7 @@ class TTPArrangementService @Inject() (
    * Builds and submits the TTPArrangement to Des. Also saves to Mongo
    */
   def submit(arrangement: TTPArrangement)(implicit hc: HeaderCarrier): Future[Option[TTPArrangement]] = {
-    Logger.logger.info(s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' " +
+    logger.info(s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' " +
       s"and PP '${arrangement.paymentPlanReference}'")
 
     val letterAndControl = letterAndControlBuilder.create(arrangement)
@@ -57,7 +58,7 @@ class TTPArrangementService @Inject() (
       result =>
         result._1.fold(
           error => Future.failed(DesApiException(error.code, error.message)),
-          success => Future.successful(result._2))
+          _ => Future.successful(result._2))
     }
   }
 
@@ -70,7 +71,7 @@ class TTPArrangementService @Inject() (
       createdOn      = Some(LocalDateTime.now()),
       desArrangement = Some(desSubmissionRequest))
 
-    Try(ttpArrangementRepository.save(toSave)).getOrElse(Future.successful(None))
+    Try(ttpArrangementRepository.doInsert(toSave)).getOrElse(Future.successful(None))
   }
 
 }

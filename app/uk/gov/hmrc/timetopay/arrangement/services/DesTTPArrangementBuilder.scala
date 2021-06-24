@@ -21,10 +21,12 @@ import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import play.api.{Configuration, Logger}
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig, LetterAndControlAndJurisdictionChecker}
+import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig}
 import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionTypes.Scottish
 
-class DesTTPArrangementBuilder @Inject() (l: LetterAndControlAndJurisdictionChecker, configuration: Configuration) {
+class DesTTPArrangementBuilder @Inject() (configuration: Configuration) {
+  val logger: Logger = Logger(getClass)
+
   val jurisdictionChecker: JurisdictionChecker = new JurisdictionChecker(JurisdictionCheckerConfig.create(configuration))
 
   val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
@@ -66,7 +68,7 @@ class DesTTPArrangementBuilder @Inject() (l: LetterAndControlAndJurisdictionChec
         case _        => "Distraint"
       }
       case _ =>
-        Logger.logger.info(s"Unable to determine enforcement flag as multiple mixed or no jurisdictions detected $addressTypes")
+        logger.info(s"Unable to determine enforcement flag as multiple mixed or no jurisdictions detected $addressTypes")
         "Other"
     }
   }
