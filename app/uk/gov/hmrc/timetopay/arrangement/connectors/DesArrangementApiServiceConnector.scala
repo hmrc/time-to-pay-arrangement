@@ -87,9 +87,7 @@ class DesArrangementApiServiceConnector @Inject() (
       case e: UpstreamErrorResponse => (e.reportAs, e.getMessage)
 
       case e: JsonParseException    => (Status.BAD_REQUEST, e.getMessage)
-      case e: Throwable             =>
-        println(s"asdasdasd: ${e}")
-        (Status.INTERNAL_SERVER_ERROR, e.getMessage)
+      case e: Throwable             => (Status.INTERNAL_SERVER_ERROR, e.getMessage)
     }
 
     logger.error(s"Failure from DES, code $code and body $message")

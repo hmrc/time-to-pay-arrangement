@@ -27,7 +27,6 @@ import java.time.LocalDate
 
 class DesTTPArrangementBuilderSpec extends ITSpec {
 
-  //  private val LetterAndControlConfigInject = fakeApplication.injector.instanceOf[LetterAndControlAndJurisdictionChecker]
   private val desTTPArrangementService = new DesTTPArrangementBuilder(config)
   private val taxPayerData = Table(
     ("taxPayer", "enforcementFlag", "message"),

@@ -24,12 +24,6 @@ import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers.taxPayerWithEnglish
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, WireMockResponses}
 
-//import scala.concurrent.ExecutionContext.Implicits.global
-
-//DesArrangementApiService = DesArrangementApiServiceConnectorConfig
-
-//DesArrangementService = DesArrangementApiServiceConnector
-
 class TTPArrangementServiceSpec extends ITSpec {
   val logger = Logger(getClass)
 
