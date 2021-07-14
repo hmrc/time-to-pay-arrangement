@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,14 @@
 
 package uk.gov.hmrc.timetopay.arrangement.config
 
-import com.google.inject.Inject
-
-case class LetterAndControlConfig @Inject()(salutation: String,
-                                   claimIndicateInt: String,
-                                   template: String,
-                                   officeName1: String,
-                                   officeName2: String,
-                                   officePostCode: String,
-                                   officePhone: String,
-                                   officeFax: String,
-                                   officeOpeningHours: String ){
+case class LetterAndControlConfig(
+    salutation:         String,
+    claimIndicateInt:   String,
+    template:           String,
+    officeName1:        String,
+    officeName2:        String,
+    officePostCode:     String,
+    officePhone:        String,
+    officeFax:          String,
+    officeOpeningHours: String) {
 }

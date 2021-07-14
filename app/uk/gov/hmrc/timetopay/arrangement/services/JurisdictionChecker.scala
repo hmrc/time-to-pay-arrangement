@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,40 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
+import enumeratum.{Enum, EnumEntry}
+import javax.inject.Singleton
 import uk.gov.hmrc.timetopay.arrangement.Address
 import uk.gov.hmrc.timetopay.arrangement.config.JurisdictionCheckerConfig
 
-object JurisdictionType extends Enumeration  {
-  type JurisdictionType = Value
-  val English, Scottish, Welsh = Value
+sealed abstract class JurisdictionType extends EnumEntry {
 }
-class JurisdictionChecker(config: JurisdictionCheckerConfig){
-  import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionType._
+
+object JurisdictionTypes extends Enum[JurisdictionType] {
+
+  case object English extends JurisdictionType {
+  }
+
+  case object Scottish extends JurisdictionType {
+  }
+
+  case object Welsh extends JurisdictionType {
+  }
+
+  override def values = findValues
+
+}
+
+@Singleton
+class JurisdictionChecker(config: JurisdictionCheckerConfig) {
+
   val scottishPostCodeRegex = config.scottishPrefix.r
   val welshPostCodeRegex = config.welshPrefix.r
 
-  def addressType(address: Address): JurisdictionType = {
-     address.postcode match {
-       case scottishPostCodeRegex(_) => Scottish
-       case welshPostCodeRegex(_) => Welsh
-       case _ =>  English
-     }
+  def addressType(address: Address): Option[JurisdictionType] = {
+    address.postcode.filterNot(_.trim.isEmpty).map {
+      case scottishPostCodeRegex(_) => JurisdictionTypes.Scottish
+      case welshPostCodeRegex(_)    => JurisdictionTypes.Welsh
+      case _                        => JurisdictionTypes.English
+    }
   }
 }

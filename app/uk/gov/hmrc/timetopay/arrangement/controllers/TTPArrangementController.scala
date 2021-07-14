@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,32 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.timetopay.arrangement
+package uk.gov.hmrc.timetopay.arrangement.controllers
 
 import javax.inject.Inject
 import play.api.Logger
+import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
-import play.api.mvc.{Action, AnyContent, RequestHeader, Result}
-import uk.gov.hmrc.play.microservice.controller.BaseController
+import play.api.mvc._
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
 import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.services.{DesApiException, TTPArrangementService}
 
 import scala.concurrent.Future._
 import scala.concurrent.{ExecutionContext, Future}
 
-class TTPArrangementController @Inject()(val arrangementService: TTPArrangementService)(implicit ec: ExecutionContext) extends BaseController {
+class TTPArrangementController @Inject() (arrangementService: TTPArrangementService, cc: ControllerComponents)(implicit ec: ExecutionContext)
+  extends BackendController(cc) {
+  val logger = Logger(getClass)
 
-
-  /** Turns the json into our representation of a TTPArrangement
-    * It calls the submit method and applys a location to the returning result.
-    */
-  def create() = Action.async(parse.json) {
+  /**
+   * Turns the json into our representation of a TTPArrangement
+   * It calls the submit method and applys a location to the returning result.
+   */
+  def create(): Action[JsValue] = Action.async(parse.json) {
     implicit request =>
+
       withJsonBody[TTPArrangement] {
         arrangement =>
           arrangementService.submit(arrangement).flatMap {
@@ -42,27 +47,28 @@ class TTPArrangementController @Inject()(val arrangementService: TTPArrangementS
           }.recover {
             case desApiException: DesApiException =>
               val desFailureMessage: String = s"Submission to DES failed, status code [${desApiException.code}] and response [${desApiException.message}]"
-              Logger.logger.error(desFailureMessage)
+              logger.error(desFailureMessage)
               InternalServerError(s"$desFailureMessage")
-            case failure: Throwable =>
-              Logger.logger.error(s"Failed to submit arrangement $failure")
+            case failure =>
+              logger.error(s"Failed to submit arrangement $failure")
               InternalServerError(failure.getMessage)
           }
       }
   }
 
+  private def createdNoLocation = Future.successful[Result](Created)
+
+  private def createdWithLocation(id: String)(implicit reqHead: RequestHeader) = Future.successful[Result](Created.withHeaders(LOCATION -> s"$protocol://${reqHead.host}/ttparrangements/$id"))
+
+  def protocol(implicit reqHead: RequestHeader): String = if (reqHead.secure) "https" else "http"
 
   def arrangement(id: String): Action[AnyContent] = Action.async {
-    implicit request =>
-      Logger.logger.debug(s"Requested arrangement $id")
+    _ =>
+      // implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
+
+      logger.debug(s"Requested arrangement $id")
       arrangementService.byId(id).flatMap {
         _.fold(successful(NotFound(s"arrangement with $id does not exist")))(r => successful(Ok(toJson(r))))
       }
   }
-
-  def protocol(implicit reqHead: RequestHeader): String = if (reqHead.secure) "https" else "http"
-
-  private def createdNoLocation = Future.successful[Result](Created)
-
-  private def createdWithLocation(id: String)(implicit reqHead: RequestHeader) = Future.successful[Result](Created.withHeaders(LOCATION -> s"$protocol://${reqHead.host}/ttparrangements/$id"))
 }

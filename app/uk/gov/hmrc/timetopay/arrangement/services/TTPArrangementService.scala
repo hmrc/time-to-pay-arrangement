@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,30 +18,33 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import java.time.LocalDateTime
 import java.util.UUID
-import javax.inject.Inject
 
+import javax.inject.Inject
 import play.api.Logger
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiService
+import uk.gov.hmrc.timetopay.arrangement.connectors.DesArrangementApiServiceConnector
+import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementRepository
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Try
 
-class TTPArrangementService @Inject()(desTTPArrangementBuilder: DesTTPArrangementBuilder,
-                                      desArrangementApiService: DesArrangementApiService,
-                                      ttpArrangementRepository: TTPArrangementRepository,
-                                      letterAndControlBuilder: LetterAndControlBuilder) {
+class TTPArrangementService @Inject() (
+    desTTPArrangementBuilder: DesTTPArrangementBuilder,
+    desArrangementApiService: DesArrangementApiServiceConnector,
+    ttpArrangementRepository: TTPArrangementRepository,
+    letterAndControlBuilder:  LetterAndControlBuilder) {
+  val logger: Logger = Logger(getClass)
 
   def byId(id: String): Future[Option[JsValue]] = ttpArrangementRepository.findByIdLocal(id)
 
   /**
-    * Builds and submits the TTPArrangement to Des. Also saves to Mongo
-    */
+   * Builds and submits the TTPArrangement to Des. Also saves to Mongo
+   */
   def submit(arrangement: TTPArrangement)(implicit hc: HeaderCarrier): Future[Option[TTPArrangement]] = {
-    Logger.logger.info(s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' " +
+    logger.info(s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' " +
       s"and PP '${arrangement.paymentPlanReference}'")
 
     val letterAndControl = letterAndControlBuilder.create(arrangement)
@@ -53,20 +56,22 @@ class TTPArrangementService @Inject()(desTTPArrangementBuilder: DesTTPArrangemen
       ttp <- saveArrangement(arrangement, request)
     } yield (response, ttp)).flatMap {
       result =>
-        result._1.fold(error => Future.failed(DesApiException(error.code, error.message)),
-          success => Future.successful(result._2))
+        result._1.fold(
+          error => Future.failed(DesApiException(error.code, error.message)),
+          _ => Future.successful(result._2))
     }
   }
 
   /**
-    * Saves the TTPArrangement to our mongoDB and adds in a Id
-    */
+   * Saves the TTPArrangement to our mongoDB and adds in a Id
+   */
   private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[TTPArrangement]] = {
-    val toSave = arrangement.copy(id = Some(UUID.randomUUID().toString),
-      createdOn = Some(LocalDateTime.now()),
+    val toSave = arrangement.copy(
+      id             = Some(UUID.randomUUID().toString),
+      createdOn      = Some(LocalDateTime.now()),
       desArrangement = Some(desSubmissionRequest))
 
-    Try(ttpArrangementRepository.save(toSave)).getOrElse(Future.successful(None))
+    Try(ttpArrangementRepository.doInsert(toSave)).getOrElse(Future.successful(None))
   }
 
 }
