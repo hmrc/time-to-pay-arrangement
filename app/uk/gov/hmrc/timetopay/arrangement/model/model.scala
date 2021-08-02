@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.timetopay.arrangement
+package uk.gov.hmrc.timetopay.arrangement.model
 
 import java.time.{LocalDate, LocalDateTime}
+
 import play.api.libs.json._
 
 case class Schedule(
@@ -99,6 +100,9 @@ case class TTPArrangement(
     taxpayer:             Taxpayer,
     schedule:             Schedule,
     desArrangement:       Option[DesSubmissionRequest])
+object TTPArrangement {
+  implicit val ttpArrangementFormat: OFormat[TTPArrangement] = Json.format[TTPArrangement]
+}
 
 case class DesTTPArrangement(
     startDate:               LocalDate,
@@ -177,5 +181,5 @@ object modelFormat {
   implicit val desTTArrangementFormat: OFormat[DesTTPArrangement] = Json.format[DesTTPArrangement]
   implicit val letterAndControlFormat: OFormat[LetterAndControl] = Json.format[LetterAndControl]
   implicit val desSubmissionRequestFormat: OFormat[DesSubmissionRequest] = Json.format[DesSubmissionRequest]
-  implicit val ttpArrangementFormat: OFormat[TTPArrangement] = Json.format[TTPArrangement]
+
 }

@@ -17,13 +17,12 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
 import org.scalatest.prop.TableDrivenPropertyChecks._
-import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
-import uk.gov.hmrc.timetopay.arrangement.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
-
 import java.time.LocalDate
+
+import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangement
 
 class DesTTPArrangementBuilderSpec extends ITSpec {
 

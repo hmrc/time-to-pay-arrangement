@@ -24,9 +24,8 @@ import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.BSONDocument
 import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
-import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
-
 import javax.inject.Inject
+import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangement
 
 import scala.concurrent.{ExecutionContext, Future}
 //The below is needed !

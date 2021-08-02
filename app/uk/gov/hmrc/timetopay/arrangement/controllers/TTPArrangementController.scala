@@ -22,8 +22,7 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
 import play.api.mvc._
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
-import uk.gov.hmrc.timetopay.arrangement.modelFormat._
+import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangement
 import uk.gov.hmrc.timetopay.arrangement.services.{DesApiException, TTPArrangementService}
 
 import scala.concurrent.Future._
