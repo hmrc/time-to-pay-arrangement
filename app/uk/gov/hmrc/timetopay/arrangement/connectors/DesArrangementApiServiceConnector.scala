@@ -17,7 +17,6 @@
 package uk.gov.hmrc.timetopay.arrangement.connectors
 
 import com.fasterxml.jackson.core.JsonParseException
-
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.http.Status
@@ -27,8 +26,8 @@ import uk.gov.hmrc.http.Authorization
 import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiServiceConnectorConfig
-import uk.gov.hmrc.timetopay.arrangement.modelFormat._
-import uk.gov.hmrc.timetopay.arrangement.{DesSubmissionRequest, Taxpayer}
+import uk.gov.hmrc.timetopay.arrangement.model.modelFormat._
+import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, Taxpayer}
 
 import scala.concurrent.{ExecutionContext, Future}
 

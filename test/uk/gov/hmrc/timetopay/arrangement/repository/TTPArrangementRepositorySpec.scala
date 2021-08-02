@@ -18,8 +18,7 @@ package uk.gov.hmrc.timetopay.arrangement.repository
 
 import play.api.Logger
 import play.api.libs.json.Json
-import uk.gov.hmrc.timetopay.arrangement.TTPArrangement
-import uk.gov.hmrc.timetopay.arrangement.modelFormat._
+import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangement
 import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
 
 class TTPArrangementRepositorySpec extends ITSpec {

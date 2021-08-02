@@ -21,8 +21,9 @@ import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
-
 import java.time.LocalDate.now
+
+import uk.gov.hmrc.timetopay.arrangement.model.{Instalment, Schedule, TTPArrangement}
 
 class LetterAndControlBuilderSpec extends ITSpec {
   private val letterAndControlBuilder = fakeApplication().injector.instanceOf[LetterAndControlBuilder]

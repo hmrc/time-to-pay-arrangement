@@ -25,6 +25,7 @@ import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.connectors.DesArrangementApiServiceConnector
+import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, TTPArrangement}
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementRepository
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -49,7 +50,7 @@ class TTPArrangementService @Inject() (
 
     val letterAndControl = letterAndControlBuilder.create(arrangement)
     val desTTPArrangement = desTTPArrangementBuilder.create(arrangement)
-
+    //todo perhaps hack in here
     val request: DesSubmissionRequest = DesSubmissionRequest(desTTPArrangement, letterAndControl)
     (for {
       response <- desArrangementApiService.submitArrangement(arrangement.taxpayer, request)

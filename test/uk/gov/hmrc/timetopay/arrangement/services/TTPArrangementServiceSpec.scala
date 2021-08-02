@@ -18,7 +18,8 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import play.api.Logger
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.modelFormat._
+import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangement
+import uk.gov.hmrc.timetopay.arrangement.model.modelFormat._
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementRepository
 import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers.taxPayerWithEnglishAddress
 import uk.gov.hmrc.timetopay.arrangement.resources._

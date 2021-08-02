@@ -18,8 +18,8 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import enumeratum.{Enum, EnumEntry}
 import javax.inject.Singleton
-import uk.gov.hmrc.timetopay.arrangement.Address
 import uk.gov.hmrc.timetopay.arrangement.config.JurisdictionCheckerConfig
+import uk.gov.hmrc.timetopay.arrangement.model.Address
 
 sealed abstract class JurisdictionType extends EnumEntry {
 }

@@ -20,6 +20,7 @@ import javax.inject.Inject
 import play.api.{Configuration, Logger}
 import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig, LetterAndControlAndJurisdictionChecker}
+import uk.gov.hmrc.timetopay.arrangement.model.{Address, CommunicationPreferences, LetterAndControl, Schedule, TTPArrangement, Taxpayer}
 
 import scala.util.Try
 
