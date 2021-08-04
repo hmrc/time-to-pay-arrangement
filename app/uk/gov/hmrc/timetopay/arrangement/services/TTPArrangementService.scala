@@ -97,7 +97,7 @@ class TTPArrangementService @Inject() (
     val jodaLocalDateTime = new DateTime(time.atZone(ZoneId.systemDefault).toInstant.toEpochMilli)
     //todo change availableUntil when we do config
     ttpArrangementRepositoryWorkItem.pushNew(
-      TTPArrangementWorkItem(time, time, arrangement.directDebitReference, arrangement), jodaLocalDateTime)
+      TTPArrangementWorkItem(time, time.plusHours(1), arrangement.directDebitReference, arrangement), jodaLocalDateTime)
 
   }
 
