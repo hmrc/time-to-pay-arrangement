@@ -37,7 +37,7 @@ class DesArrangementApiServiceConnectorSpec extends ITSpec {
   }
   "Calling submitArrangement should return 400 response" in {
 
-    WireMockResponses.desArrangementApiBadRequest(taxpayer.selfAssessment.utr)
+    WireMockResponses.desArrangementApiBadRequestClientError(taxpayer.selfAssessment.utr)
 
     val result = connector.submitArrangement(taxpayer, request).futureValue
 

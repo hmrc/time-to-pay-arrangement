@@ -25,7 +25,6 @@ import reactivemongo.play.json.ImplicitBSONHandlers._
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangementWorkItem
 import uk.gov.hmrc.workitem._
 
-
 class TTPArrangementWorkItemRepository @Inject() (configuration: Configuration, reactiveMongoComponent: ReactiveMongoComponent) extends WorkItemRepository[TTPArrangementWorkItem, BSONObjectID](
   collectionName = "TTPArrangementsWorkItem",
   mongo          = reactiveMongoComponent.mongoConnector.db,
@@ -34,7 +33,8 @@ class TTPArrangementWorkItemRepository @Inject() (configuration: Configuration, 
 ) {
   override def now: DateTime =
     DateTime.now
-//todo change these
+  //todo change these
+  //todo do mongo encrpt stuff
   override lazy val workItemFields: WorkItemFieldNames =
     new WorkItemFieldNames {
       val receivedAt = "receivedAt"

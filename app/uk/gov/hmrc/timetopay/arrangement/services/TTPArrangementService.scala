@@ -16,27 +16,31 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import java.time.LocalDateTime
+import java.time.{Clock, LocalDateTime, ZoneId}
 import java.util.UUID
 
 import javax.inject.Inject
+import org.joda.time.DateTime
 import play.api.Logger
+import play.api.http.Status
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.connectors.DesArrangementApiServiceConnector
-import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, TTPArrangement}
-import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementRepository
+import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, TTPArrangement, TTPArrangementWorkItem}
+import uk.gov.hmrc.timetopay.arrangement.repository.{TTPArrangementRepository, TTPArrangementWorkItemRepository}
+import uk.gov.hmrc.workitem.WorkItem
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Try
 
 class TTPArrangementService @Inject() (
-    desTTPArrangementBuilder: DesTTPArrangementBuilder,
-    desArrangementApiService: DesArrangementApiServiceConnector,
-    ttpArrangementRepository: TTPArrangementRepository,
-    letterAndControlBuilder:  LetterAndControlBuilder) {
+    desTTPArrangementBuilder:         DesTTPArrangementBuilder,
+    desArrangementApiService:         DesArrangementApiServiceConnector,
+    ttpArrangementRepository:         TTPArrangementRepository,
+    ttpArrangementRepositoryWorkItem: TTPArrangementWorkItemRepository,
+    val clock:                        Clock,
+    letterAndControlBuilder:          LetterAndControlBuilder) {
   val logger: Logger = Logger(getClass)
 
   def byId(id: String): Future[Option[JsValue]] = ttpArrangementRepository.findByIdLocal(id)
@@ -50,7 +54,7 @@ class TTPArrangementService @Inject() (
 
     val letterAndControl = letterAndControlBuilder.create(arrangement)
     val desTTPArrangement = desTTPArrangementBuilder.create(arrangement)
-    //todo perhaps hack in here
+
     val request: DesSubmissionRequest = DesSubmissionRequest(desTTPArrangement, letterAndControl)
     (for {
       response <- desArrangementApiService.submitArrangement(arrangement.taxpayer, request)
@@ -58,7 +62,16 @@ class TTPArrangementService @Inject() (
     } yield (response, ttp)).flatMap {
       result =>
         result._1.fold(
-          error => Future.failed(DesApiException(error.code, error.message)),
+          error => {
+            val isSeverError = error.code >= Status.INTERNAL_SERVER_ERROR
+            val returnedError = Future.failed(DesApiException(error.code, error.message))
+            if (isSeverError) {
+              sendToTTPArrangementWorkRepo(arrangementToSave(arrangement, request)).flatMap { _ =>
+                returnedError
+              }
+            } else
+              returnedError
+          },
           _ => Future.successful(result._2))
     }
   }
@@ -67,12 +80,25 @@ class TTPArrangementService @Inject() (
    * Saves the TTPArrangement to our mongoDB and adds in a Id
    */
   private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[TTPArrangement]] = {
-    val toSave = arrangement.copy(
+    val toSave = arrangementToSave(arrangement, desSubmissionRequest)
+
+    Try(ttpArrangementRepository.doInsert(toSave)).getOrElse(Future.successful(None))
+  }
+
+  def arrangementToSave(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest) = {
+    arrangement.copy(
       id             = Some(UUID.randomUUID().toString),
       createdOn      = Some(LocalDateTime.now()),
       desArrangement = Some(desSubmissionRequest))
+  }
 
-    Try(ttpArrangementRepository.doInsert(toSave)).getOrElse(Future.successful(None))
+  private def sendToTTPArrangementWorkRepo(arrangement: TTPArrangement): Future[WorkItem[TTPArrangementWorkItem]] = {
+    val time = LocalDateTime.now(clock)
+    val jodaLocalDateTime = new DateTime(time.atZone(ZoneId.systemDefault).toInstant.toEpochMilli)
+    //todo change availableUntil when we do config
+    ttpArrangementRepositoryWorkItem.pushNew(
+      TTPArrangementWorkItem(time, time, arrangement.directDebitReference, arrangement), jodaLocalDateTime)
+
   }
 
 }

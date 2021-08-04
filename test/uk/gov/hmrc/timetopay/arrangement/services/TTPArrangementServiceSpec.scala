@@ -17,27 +17,29 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
 import play.api.Logger
-import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangement
-import uk.gov.hmrc.timetopay.arrangement.model.modelFormat._
-import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementRepository
+import uk.gov.hmrc.timetopay.arrangement.model.{TTPArrangement, TTPArrangementWorkItem}
+import uk.gov.hmrc.timetopay.arrangement.repository.{TTPArrangementRepository, TTPArrangementWorkItemRepository}
 import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers.taxPayerWithEnglishAddress
 import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, WireMockResponses}
+import uk.gov.hmrc.workitem.WorkItem
 
 class TTPArrangementServiceSpec extends ITSpec {
   val logger = Logger(getClass)
 
   private val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
+  private val arrangementWorkItemRepo = fakeApplication.injector.instanceOf[TTPArrangementWorkItemRepository]
   private val tTPArrangementService = fakeApplication().injector.instanceOf[TTPArrangementService]
   private val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement].copy(taxpayer = taxPayerWithEnglishAddress)
 
   override def beforeEach(): Unit = {
+    arrangementWorkItemRepo.collection.drop(false).futureValue
     arrangementRepo.collection.drop(false).futureValue
     ()
   }
 
   override def afterEach(): Unit = {
+    arrangementWorkItemRepo.collection.drop(false).futureValue
     arrangementRepo.collection.drop(false).futureValue
     ()
   }
@@ -59,10 +61,21 @@ class TTPArrangementServiceSpec extends ITSpec {
 
   }
 
-  "TTPArrangementService should return failed future for DES Bad request" in {
+  "TTPArrangementService should return failed future for DES Bad request in the 500's range and save to the work item db in" in {
 
-    WireMockResponses.desArrangementApiBadRequest(arrangement.taxpayer.selfAssessment.utr)
+    WireMockResponses.desArrangementApiBadRequestSeverError(arrangement.taxpayer.selfAssessment.utr)
     val response = tTPArrangementService.submit(arrangement).failed.futureValue
+    val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.findAll().futureValue.headOption
+    workItem should not be None
+    response.getMessage should include("SERVICE_UNAVAILABLE")
+  }
+
+  "TTPArrangementService should return failed future for DES Bad request in the 400's range and not save to the work item db in" in {
+
+    WireMockResponses.desArrangementApiBadRequestClientError(arrangement.taxpayer.selfAssessment.utr)
+    val response = tTPArrangementService.submit(arrangement).failed.futureValue
+    val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.findAll().futureValue.headOption
+    workItem shouldBe None
     response.getMessage should include("DES httpCode: 400")
   }
 }
