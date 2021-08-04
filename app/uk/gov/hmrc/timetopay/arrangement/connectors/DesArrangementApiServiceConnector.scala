@@ -65,7 +65,7 @@ class DesArrangementApiServiceConnector @Inject() (
         ec
       )
       .map {
-        case res if res.status == Status.OK =>
+        case res if res.status == Status.ACCEPTED =>
           logger.info(s"Submission successful for '${taxpayer.selfAssessment.utr}'")
           Right(SubmissionSuccess())
 

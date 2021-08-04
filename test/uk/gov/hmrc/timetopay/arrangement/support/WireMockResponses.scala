@@ -26,7 +26,7 @@ object WireMockResponses {
       post(
         urlEqualTo(s"/time-to-pay/taxpayers/${utr}/arrangements")).willReturn(
           aResponse()
-            .withStatus(200)
+            .withStatus(202)
             .withBody("{}")
         ))
   }
