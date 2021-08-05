@@ -21,7 +21,8 @@ import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import play.api.{Configuration, Logger}
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig}
+import uk.gov.hmrc.timetopay.arrangement.config.JurisdictionCheckerConfig
+import uk.gov.hmrc.timetopay.arrangement.model.{DesDebit, DesTTPArrangement, Instalment, Schedule, TTPArrangement, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionTypes.Scottish
 
 class DesTTPArrangementBuilder @Inject() (configuration: Configuration) {

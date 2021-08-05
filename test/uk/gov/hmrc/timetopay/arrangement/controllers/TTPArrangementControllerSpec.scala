@@ -65,7 +65,7 @@ class TTPArrangementControllerSpec extends ITSpec {
 
   "POST /ttparrangements should return 500 if arrangement service fails" in {
 
-    WireMockResponses.desArrangementApiBadRequest("1234567890")
+    WireMockResponses.desArrangementApiBadRequestClientError("1234567890")
     val result = httpClient.POST[JsValue, HttpResponse](s"$baseUrl/ttparrangements", ttparrangementRequest)
       .futureValue
 

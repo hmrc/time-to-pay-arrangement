@@ -26,18 +26,31 @@ object WireMockResponses {
       post(
         urlEqualTo(s"/time-to-pay/taxpayers/${utr}/arrangements")).willReturn(
           aResponse()
-            .withStatus(200)
+            .withStatus(202)
             .withBody("{}")
         ))
   }
 
-  def desArrangementApiBadRequest(utr: String): StubMapping = {
+  def desArrangementApiBadRequestClientError(utr: String): StubMapping = {
     stubFor(
       post(
         urlEqualTo(s"/time-to-pay/taxpayers/${utr}/arrangements")).willReturn(
           aResponse()
             .withStatus(400)
             .withBody("Bad JSON")))
+  }
+
+  def desArrangementApiBadRequestSeverError(utr: String): StubMapping = {
+    stubFor(
+      post(
+        urlEqualTo(s"/time-to-pay/taxpayers/${utr}/arrangements")).willReturn(
+          aResponse()
+            .withStatus(500)
+            .withBody(
+              """{
+            "code": "SERVICE_UNAVAILABLE",
+            "reason": "Dependent systems are currently not responding."
+}""".stripMargin)))
   }
 
 }

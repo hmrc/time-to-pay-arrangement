@@ -7,7 +7,8 @@ object AppDependencies {
     ws,
     "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.4.0",
     "uk.gov.hmrc" %% "simple-reactivemongo" % "8.0.0-play-28",
-    "com.beachape" %% "enumeratum" % "1.5.13"
+    "com.beachape" %% "enumeratum" % "1.5.13",
+    "uk.gov.hmrc" %% "work-item-repo" % "8.0.0-play-28"
   )
 
   val test = Seq(

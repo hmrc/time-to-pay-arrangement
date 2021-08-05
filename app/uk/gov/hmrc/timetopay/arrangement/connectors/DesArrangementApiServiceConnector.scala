@@ -16,19 +16,14 @@
 
 package uk.gov.hmrc.timetopay.arrangement.connectors
 
-import com.fasterxml.jackson.core.JsonParseException
-
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.http.Status
-import play.api.libs.json.JsValue
-import uk.gov.hmrc.http._
-import uk.gov.hmrc.http.Authorization
-import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.{Authorization, HttpClient, _}
 import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiServiceConnectorConfig
-import uk.gov.hmrc.timetopay.arrangement.modelFormat._
-import uk.gov.hmrc.timetopay.arrangement.{DesSubmissionRequest, Taxpayer}
+import uk.gov.hmrc.timetopay.arrangement.model.modelFormat._
+import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, Taxpayer}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -61,7 +56,7 @@ class DesArrangementApiServiceConnector @Inject() (
 
     val serviceUrl = s"time-to-pay/taxpayers/${taxpayer.selfAssessment.utr}/arrangements"
 
-    httpClient.POST[DesSubmissionRequest, JsValue](
+    httpClient.POST[DesSubmissionRequest, HttpResponse](
       s"${config.desArrangementUrl}/$serviceUrl",
       desSubmissionRequest)(
         implicitly,
@@ -69,28 +64,13 @@ class DesArrangementApiServiceConnector @Inject() (
         desHc,
         ec
       )
-      .map(_ => {
-        logger.info(s"Submission successful for '${taxpayer.selfAssessment.utr}'")
-        Right(SubmissionSuccess())
-      }).recover {
-        case e: Throwable =>
+      .map {
+        case res if res.status == Status.ACCEPTED =>
+          logger.info(s"Submission successful for '${taxpayer.selfAssessment.utr}'")
+          Right(SubmissionSuccess())
 
-          onError(e)
-
+        case res => Left(SubmissionError(res.status, res.body))
       }
   }
 
-  private def onError(ex: Throwable): SubmissionResult = {
-    val (code, message) = ex match {
-      case e: HttpException         => (e.responseCode, e.getMessage)
-
-      case e: UpstreamErrorResponse => (e.reportAs, e.getMessage)
-
-      case e: JsonParseException    => (Status.BAD_REQUEST, e.getMessage)
-      case e: Throwable             => (Status.INTERNAL_SERVER_ERROR, e.getMessage)
-    }
-
-    logger.error(s"Failure from DES, code $code and body $message")
-    Left(SubmissionError(code, message))
-  }
 }

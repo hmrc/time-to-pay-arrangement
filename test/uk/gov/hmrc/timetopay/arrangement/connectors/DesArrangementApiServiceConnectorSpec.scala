@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.timetopay.arrangement.connectors
 
-import uk.gov.hmrc.timetopay.arrangement.DesSubmissionRequest
+import uk.gov.hmrc.timetopay.arrangement.model.DesSubmissionRequest
 import uk.gov.hmrc.timetopay.arrangement.resources.{submitArrangementLetterAndControl, submitArrangementTTPArrangement, taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, WireMockResponses}
 
@@ -37,7 +37,7 @@ class DesArrangementApiServiceConnectorSpec extends ITSpec {
   }
   "Calling submitArrangement should return 400 response" in {
 
-    WireMockResponses.desArrangementApiBadRequest(taxpayer.selfAssessment.utr)
+    WireMockResponses.desArrangementApiBadRequestClientError(taxpayer.selfAssessment.utr)
 
     val result = connector.submitArrangement(taxpayer, request).futureValue
 
