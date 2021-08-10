@@ -16,17 +16,70 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import javax.inject.Inject
-import uk.gov.hmrc.timetopay.arrangement.config.QueueConfig
-import uk.gov.hmrc.timetopay.arrangement.connectors.DesArrangementApiServiceConnector
-import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementWorkItemRepository
+import java.time.{Clock, LocalDateTime}
 
-//class PollerService @Inject() (
-//    desArrangementApiService:         DesArrangementApiServiceConnector,
-//    ttpArrangementRepositoryWorkItem: TTPArrangementWorkItemRepository,
-//    queueConfig:                      QueueConfig) {
-//
-//  //its neeeds to take the ones with todo and retrn them
-//
-//}
-//
+import akka.actor.ActorSystem
+import javax.inject.Inject
+import play.api.Logger
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.timetopay.arrangement.config.QueueConfig
+import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangementWorkItem
+import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementWorkItemRepository
+import uk.gov.hmrc.workitem.{Failed, PermanentlyFailed, WorkItem}
+
+import scala.concurrent.{ExecutionContext, Future}
+
+class PollerService @Inject() (
+    actorSystem:                      ActorSystem,
+    desArrangementApiService:         TTPArrangementService,
+    ttpArrangementRepositoryWorkItem: TTPArrangementWorkItemRepository,
+    queueConfig:                      QueueConfig,
+    val clock: Clock)(
+    implicit
+    ec: ExecutionContext,
+    hc: HeaderCarrier
+) {
+
+  private val logger: Logger = Logger(this.getClass.getSimpleName)
+  val initialDelay = queueConfig.initialDelay
+  val interval = queueConfig.interval
+//todo hack up tests tomorrow
+  def run() = {
+    actorSystem.scheduler.scheduleWithFixedDelay(initialDelay, interval)(() => {
+      logger.info("Running poller ")
+      process()
+      ()
+    })
+  }
+  def isAvailable(workItem:TTPArrangementWorkItem): Boolean = {
+    val time = LocalDateTime.now(clock)
+    time.isBefore(workItem.availableUntil)
+  }
+
+  @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
+  def process(): Future[Unit] =
+    ttpArrangementRepositoryWorkItem.pullOutstanding
+      .flatMap {
+        case None => Future.successful(())
+        case Some(wi) =>
+          logger.info("Retrying call to des api for " + wi.toString)
+          if(isAvailable(wi.item)){
+          desArrangementApiService.submit(wi.item.ttpArrangement).flatMap {
+            case _ =>
+              ttpArrangementRepositoryWorkItem.complete(wi.id)
+              process()
+
+          }.recover {
+            case DesApiException(_, _) =>
+              ttpArrangementRepositoryWorkItem.markAs(wi.id, Failed, None)
+              process()
+              ()
+          }
+      }else {
+            ttpArrangementRepositoryWorkItem.markAs(wi.id, PermanentlyFailed, None)
+            process()
+          }
+
+      }
+}
+

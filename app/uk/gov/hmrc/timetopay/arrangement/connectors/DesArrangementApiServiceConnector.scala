@@ -22,8 +22,8 @@ import play.api.http.Status
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{Authorization, HttpClient, _}
 import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiServiceConnectorConfig
+import uk.gov.hmrc.timetopay.arrangement.model.DesSubmissionRequest
 import uk.gov.hmrc.timetopay.arrangement.model.modelFormat._
-import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, Taxpayer}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -41,7 +41,7 @@ class DesArrangementApiServiceConnector @Inject() (
   type SubmissionResult = Either[SubmissionError, SubmissionSuccess]
 
   def submitArrangement(
-      taxpayer:             Taxpayer,
+      utr:                  String,
       desSubmissionRequest: DesSubmissionRequest
   )(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[SubmissionResult] = {
     //we put sessionId and requestId into hc so auditor can populate these fields when auditing
@@ -54,7 +54,7 @@ class DesArrangementApiServiceConnector @Inject() (
         extraHeaders  = Seq("Environment" -> config.serviceEnvironment)
       )
 
-    val serviceUrl = s"time-to-pay/taxpayers/${taxpayer.selfAssessment.utr}/arrangements"
+    val serviceUrl = s"time-to-pay/taxpayers/${utr}/arrangements"
 
     httpClient.POST[DesSubmissionRequest, HttpResponse](
       s"${config.desArrangementUrl}/$serviceUrl",
@@ -66,7 +66,7 @@ class DesArrangementApiServiceConnector @Inject() (
       )
       .map {
         case res if res.status == Status.ACCEPTED =>
-          logger.info(s"Submission successful for '${taxpayer.selfAssessment.utr}'")
+          logger.info(s"Submission successful for '${utr}'")
           Right(SubmissionSuccess())
 
         case res => Left(SubmissionError(res.status, res.body))

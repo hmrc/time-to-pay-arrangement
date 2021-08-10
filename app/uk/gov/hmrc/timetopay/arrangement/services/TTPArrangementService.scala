@@ -59,7 +59,7 @@ class TTPArrangementService @Inject() (
 
     val request: DesSubmissionRequest = DesSubmissionRequest(desTTPArrangement, letterAndControl)
     (for {
-      response <- desArrangementApiService.submitArrangement(arrangement.taxpayer, request)
+      response <- desArrangementApiService.submitArrangement(arrangement.taxpayer.selfAssessment.utr, request)
       ttp <- saveArrangement(arrangement, request)
     } yield (response, ttp)).flatMap {
       result =>
@@ -68,9 +68,11 @@ class TTPArrangementService @Inject() (
             val isSeverError = error.code >= Status.INTERNAL_SERVER_ERROR
             val returnedError = Future.failed(DesApiException(error.code, error.message))
             if (isSeverError) {
-              sendToTTPArrangementWorkRepo(arrangementToSave(arrangement, request)).flatMap { _ =>
-                returnedError
-              }
+              sendToTTPArrangementWorkRepo(
+                arrangement.taxpayer.selfAssessment.utr,
+                arrangementToSave(arrangement, request)).flatMap { _ =>
+                  returnedError
+                }
             } else
               returnedError
           },
@@ -94,12 +96,12 @@ class TTPArrangementService @Inject() (
       desArrangement = Some(desSubmissionRequest))
   }
 
-  private def sendToTTPArrangementWorkRepo(arrangement: TTPArrangement): Future[WorkItem[TTPArrangementWorkItem]] = {
+  private def sendToTTPArrangementWorkRepo(utr: String, arrangement: TTPArrangement): Future[WorkItem[TTPArrangementWorkItem]] = {
     val time = LocalDateTime.now(clock)
     val jodaLocalDateTime = new DateTime(time.atZone(ZoneId.systemDefault).toInstant.toEpochMilli)
     //todo change availableUntil when we do config
     ttpArrangementRepositoryWorkItem.pushNew(
-      TTPArrangementWorkItem(time, time.plusHours(queueConfig.availableFor._1), arrangement.directDebitReference, arrangement), jodaLocalDateTime)
+      TTPArrangementWorkItem(time, time.plusHours(queueConfig.availableFor._1), utr, arrangement), jodaLocalDateTime)
 
   }
 
