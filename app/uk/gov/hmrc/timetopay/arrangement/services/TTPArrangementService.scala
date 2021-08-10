@@ -25,6 +25,7 @@ import play.api.Logger
 import play.api.http.Status
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.timetopay.arrangement.config.QueueConfig
 import uk.gov.hmrc.timetopay.arrangement.connectors.DesArrangementApiServiceConnector
 import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, TTPArrangement, TTPArrangementWorkItem}
 import uk.gov.hmrc.timetopay.arrangement.repository.{TTPArrangementRepository, TTPArrangementWorkItemRepository}
@@ -40,7 +41,8 @@ class TTPArrangementService @Inject() (
     ttpArrangementRepository:         TTPArrangementRepository,
     ttpArrangementRepositoryWorkItem: TTPArrangementWorkItemRepository,
     val clock:                        Clock,
-    letterAndControlBuilder:          LetterAndControlBuilder) {
+    letterAndControlBuilder:          LetterAndControlBuilder,
+    queueConfig:                      QueueConfig) {
   val logger: Logger = Logger(getClass)
 
   def byId(id: String): Future[Option[JsValue]] = ttpArrangementRepository.findByIdLocal(id)
@@ -97,7 +99,7 @@ class TTPArrangementService @Inject() (
     val jodaLocalDateTime = new DateTime(time.atZone(ZoneId.systemDefault).toInstant.toEpochMilli)
     //todo change availableUntil when we do config
     ttpArrangementRepositoryWorkItem.pushNew(
-      TTPArrangementWorkItem(time, time.plusHours(1), arrangement.directDebitReference, arrangement), jodaLocalDateTime)
+      TTPArrangementWorkItem(time, time.plusHours(queueConfig.availableFor._1), arrangement.directDebitReference, arrangement), jodaLocalDateTime)
 
   }
 
