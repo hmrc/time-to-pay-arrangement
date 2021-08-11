@@ -22,11 +22,10 @@ import akka.actor.ActorSystem
 import javax.inject.Inject
 import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.backend.controller.BackendHeaderCarrierProvider
 import uk.gov.hmrc.timetopay.arrangement.config.QueueConfig
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangementWorkItem
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementWorkItemRepository
-import uk.gov.hmrc.workitem.{Failed, PermanentlyFailed, WorkItem}
+import uk.gov.hmrc.workitem.{Failed, PermanentlyFailed}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -43,7 +42,7 @@ class PollerService @Inject() (
   private val logger: Logger = Logger(this.getClass.getSimpleName)
   val initialDelay = queueConfig.initialDelay
   val interval = queueConfig.interval
-  //todo hack up tests tomorrow
+
   def run() = {
     actorSystem.scheduler.scheduleWithFixedDelay(initialDelay, interval)(() => {
       logger.info("Running poller ")
@@ -55,7 +54,7 @@ class PollerService @Inject() (
     val time = LocalDateTime.now(clock)
     time.isBefore(workItem.availableUntil)
   }
-  //todo perhaps add some limit in I dont think there will be too many failed arrangments in Prod?
+  //todo perhaps add some limit in I dont think there will be too many failed arrangment's in Prod?
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   def process(): Future[Unit] =
     ttpArrangementRepositoryWorkItem.pullOutstanding
@@ -65,7 +64,7 @@ class PollerService @Inject() (
         case Some(wi) =>
           logger.info("Retrying call to des api for " + wi.toString)
           if (isAvailable(wi.item)) {
-            //todo change check that this works!!
+            //todo change check that this works must be cleaner way to get hc!!
             implicit val hc: HeaderCarrier = HeaderCarrier()
             desArrangementApiService.submit(wi.item.ttpArrangement).flatMap {
               case _ =>
@@ -73,8 +72,8 @@ class PollerService @Inject() (
                 process()
 
             }.recover {
-              case x@DesApiException(_, _) =>
-                logger.warn("Call failed for " + wi.toString + " reason " + x)
+              case des @ DesApiException(_, _) =>
+                logger.warn("Call failed for " + wi.toString + " reason " + des.toString)
                 ttpArrangementRepositoryWorkItem.markAs(wi.id, Failed, None)
                 process()
                 ()

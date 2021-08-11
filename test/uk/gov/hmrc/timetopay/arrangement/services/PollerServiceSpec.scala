@@ -66,12 +66,12 @@ class PollerServiceSpec extends ITSpec {
     }
   }
 
-  "pollerService should set it to complete if des call is successful  " in {
+  "pollerService should set it to complete if des call is successful and remove from repo " in {
     WireMockResponses.desArrangementApiSucccess(arrangement.taxpayer.selfAssessment.utr)
     arrangementWorkItemRepo.pushNew(ttpArrangementWorkItem.copy(availableUntil = now(clock).plusMinutes(10)), jodaDateTime).futureValue
     pollerService.process().futureValue
     eventually {
-      arrangementWorkItemRepo.findAll().futureValue.head.status shouldBe Succeeded
+      arrangementWorkItemRepo.findAll().futureValue.size shouldBe 0
     }
   }
 }
