@@ -83,8 +83,8 @@ class PollerService @Inject() (
         case None =>
           Future.successful(())
         case Some(wi) =>
-          logger.info("Retrying call to des api for " + wi.toString)
           if (isAvailable(wi.item)) {
+            logger.info("Retrying call to des api for " + wi.toString)
             tryDesCallAgain(wi)
           } else {
             logger.error("Call failed and will not be tried again for " + wi.toString)
