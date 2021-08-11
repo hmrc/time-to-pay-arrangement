@@ -19,6 +19,7 @@ package uk.gov.hmrc.timetopay.arrangement.services
 import java.time.{Clock, LocalDateTime}
 
 import akka.actor.ActorSystem
+import com.google.inject.Singleton
 import javax.inject.Inject
 import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
@@ -32,6 +33,7 @@ import uk.gov.hmrc.play.scheduling.ExclusiveScheduledJob
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
+@Singleton
 class PollerService @Inject() (
     actorSystem:                       ActorSystem,
     desArrangementApiServiceConnector: DesArrangementApiServiceConnector,
