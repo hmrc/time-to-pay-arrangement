@@ -21,14 +21,15 @@ import java.time.{Clock, LocalDateTime}
 import akka.actor.ActorSystem
 import com.google.inject.Singleton
 import javax.inject.Inject
-import play.api.Logger
+import play.api.{Application, Logger}
+import play.api.inject.ApplicationLifecycle
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.timetopay.arrangement.config.QueueConfig
 import uk.gov.hmrc.timetopay.arrangement.connectors.{DesArrangementApiServiceConnector, SubmissionError, SubmissionSuccess}
 import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, TTPArrangementWorkItem}
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementWorkItemRepository
 import uk.gov.hmrc.workitem.{Failed, PermanentlyFailed, WorkItem}
-import uk.gov.hmrc.play.scheduling.ExclusiveScheduledJob
+import uk.gov.hmrc.play.scheduling.{ExclusiveScheduledJob, RunningOfScheduledJobs, ScheduledJob}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}

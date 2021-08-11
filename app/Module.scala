@@ -17,6 +17,7 @@
 import java.time.{Clock, ZoneOffset}
 
 import com.google.inject.{AbstractModule, Provides, Singleton}
+import uk.gov.hmrc.timetopay.arrangement.services.PollerService
 
 class Module extends AbstractModule {
 
@@ -24,4 +25,7 @@ class Module extends AbstractModule {
   @Singleton
   def clock(): Clock = Clock.systemDefaultZone.withZone(ZoneOffset.UTC)
 
+  override def configure(): Unit = {
+    bind(classOf[PollerService]).asEagerSingleton()
+  }
 }
