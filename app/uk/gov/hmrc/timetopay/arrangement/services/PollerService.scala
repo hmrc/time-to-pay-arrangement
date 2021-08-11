@@ -28,7 +28,9 @@ import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, TTPArrange
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementWorkItemRepository
 import uk.gov.hmrc.workitem.{Failed, PermanentlyFailed, WorkItem}
 import uk.gov.hmrc.play.scheduling.ExclusiveScheduledJob
+
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 class PollerService @Inject() (
     actorSystem:                       ActorSystem,
@@ -52,8 +54,16 @@ class PollerService @Inject() (
   def callExecutor(name: String)(implicit ec: ExecutionContext) = {
     actorSystem.scheduler.scheduleWithFixedDelay(initialDelay, interval)(() => {
       logger.info("Running poller " + name)
-      process()
-      ()
+      executor(name)
+    })
+  }
+
+  def executor(name: String)(implicit ec: ExecutionContext): Unit = {
+    execute.onComplete({
+      case Success(Result(res)) =>
+        logger.debug(res)
+      case Failure(throwable) =>
+        logger.error(s"$name: Exception completing work item", throwable)
     })
   }
 
