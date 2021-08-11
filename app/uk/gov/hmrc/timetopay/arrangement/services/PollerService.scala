@@ -27,7 +27,7 @@ import uk.gov.hmrc.timetopay.arrangement.connectors.{DesArrangementApiServiceCon
 import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, TTPArrangementWorkItem}
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementWorkItemRepository
 import uk.gov.hmrc.workitem.{Failed, PermanentlyFailed, WorkItem}
-
+import uk.gov.hmrc.play.scheduling.ExclusiveScheduledJob
 import scala.concurrent.{ExecutionContext, Future}
 
 class PollerService @Inject() (
@@ -38,21 +38,24 @@ class PollerService @Inject() (
     val clock:                         Clock)(
     implicit
     ec: ExecutionContext
-) {
+) extends ExclusiveScheduledJob {
 
   private val logger: Logger = Logger(this.getClass.getSimpleName)
   val initialDelay = queueConfig.initialDelay
   val interval = queueConfig.interval
 
-  run()
-  def run() = {
+  override def executeInMutex(implicit ec: ExecutionContext): Future[Result] =
+    process().map(_ => Result(""))
+
+  override def name: String = "TTP Arrangement Poller"
+  callExecutor(name)
+  def callExecutor(name: String)(implicit ec: ExecutionContext) = {
     actorSystem.scheduler.scheduleWithFixedDelay(initialDelay, interval)(() => {
-      logger.info("Running poller ")
+      logger.info("Running poller " + name)
       process()
       ()
     })
   }
-
 
   def isAvailable(workItem: TTPArrangementWorkItem): Boolean = {
     val time = LocalDateTime.now(clock)
@@ -77,7 +80,6 @@ class PollerService @Inject() (
     }
   }
 
-  //todo perhaps add some limit in I dont think there will be too many failed arrangment's in Prod?
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   def process(): Future[Unit] =
     ttpArrangementRepositoryWorkItem.pullOutstanding
@@ -92,7 +94,7 @@ class PollerService @Inject() (
             logger.error("Call failed and will not be tried again for " + wi.toString)
             ttpArrangementRepositoryWorkItem.markAs(wi.id, PermanentlyFailed, None).flatMap(_ => process())
           }
-
       }
+
 }
 
