@@ -58,8 +58,9 @@ class TTPArrangementService @Inject() (
     val desTTPArrangement = desTTPArrangementBuilder.create(arrangement)
 
     val request: DesSubmissionRequest = DesSubmissionRequest(desTTPArrangement, letterAndControl)
+    val utr = arrangement.taxpayer.selfAssessment.utr
     (for {
-      response <- desArrangementApiService.submitArrangement(arrangement.taxpayer.selfAssessment.utr, request)
+      response <- desArrangementApiService.submitArrangement(utr, request)
       ttp <- saveArrangement(arrangement, request)
     } yield (response, ttp)).flatMap {
       result =>
@@ -69,7 +70,7 @@ class TTPArrangementService @Inject() (
             val returnedError = Future.failed(DesApiException(error.code, error.message))
             if (isSeverError) {
               sendToTTPArrangementWorkRepo(
-                arrangement.taxpayer.selfAssessment.utr,
+                utr,
                 arrangementToSave(arrangement, request)).flatMap { _ =>
                   returnedError
                 }
@@ -89,7 +90,7 @@ class TTPArrangementService @Inject() (
     Try(ttpArrangementRepository.doInsert(toSave)).getOrElse(Future.successful(None))
   }
 
-  def arrangementToSave(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest) = {
+  def arrangementToSave(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): TTPArrangement = {
     arrangement.copy(
       id             = Some(UUID.randomUUID().toString),
       createdOn      = Some(LocalDateTime.now()),
