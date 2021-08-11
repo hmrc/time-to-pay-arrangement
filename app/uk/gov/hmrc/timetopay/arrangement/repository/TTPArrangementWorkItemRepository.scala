@@ -45,9 +45,7 @@ class TTPArrangementWorkItemRepository @Inject() (configuration:          Config
   override def inProgressRetryAfterProperty: String = queueConfig.retryAfter
   lazy val retryIntervalMillis: Long = configuration.getMillis(inProgressRetryAfterProperty)
   override lazy val inProgressRetryAfter: Duration = Duration.millis(retryIntervalMillis)
-  private lazy val ttlInSeconds = {
-    queueConfig.ttl
-  }.toSeconds
+  private lazy val ttlInSeconds = queueConfig.ttl.toSeconds
 
   override def indexes: Seq[Index] = super.indexes ++ Seq(
     Index(key     = Seq("receivedAt" -> IndexType.Ascending), name = Some("receivedAtTime"), options = BSONDocument("expireAfterSeconds" -> ttlInSeconds)))

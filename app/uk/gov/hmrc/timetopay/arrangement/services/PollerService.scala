@@ -23,18 +23,19 @@ import javax.inject.Inject
 import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.timetopay.arrangement.config.QueueConfig
-import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangementWorkItem
+import uk.gov.hmrc.timetopay.arrangement.connectors.{DesArrangementApiServiceConnector, SubmissionError, SubmissionSuccess}
+import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, TTPArrangementWorkItem}
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementWorkItemRepository
-import uk.gov.hmrc.workitem.{Failed, PermanentlyFailed}
+import uk.gov.hmrc.workitem.{Failed, PermanentlyFailed, WorkItem}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class PollerService @Inject() (
-    actorSystem:                      ActorSystem,
-    desArrangementApiService:         TTPArrangementService,
-    ttpArrangementRepositoryWorkItem: TTPArrangementWorkItemRepository,
-    queueConfig:                      QueueConfig,
-    val clock:                        Clock)(
+    actorSystem:                       ActorSystem,
+    desArrangementApiServiceConnector: DesArrangementApiServiceConnector,
+    ttpArrangementRepositoryWorkItem:  TTPArrangementWorkItemRepository,
+    queueConfig:                       QueueConfig,
+    val clock:                         Clock)(
     implicit
     ec: ExecutionContext
 ) {
@@ -50,10 +51,30 @@ class PollerService @Inject() (
       ()
     })
   }
+
   def isAvailable(workItem: TTPArrangementWorkItem): Boolean = {
     val time = LocalDateTime.now(clock)
     time.isBefore(workItem.availableUntil)
   }
+
+  def tryDesCallAgain(wi: WorkItem[TTPArrangementWorkItem]) = {
+    implicit val hc: HeaderCarrier = HeaderCarrier()
+    val arrangment = wi.item.ttpArrangement
+    val utr = arrangment.taxpayer.selfAssessment.utr
+    val desSubmissionRequest: DesSubmissionRequest = arrangment.desArrangement
+      .getOrElse(throw new RuntimeException("Saved ttp in work item repo had no desArrangement to send " + wi.toString))
+
+    desArrangementApiServiceConnector.submitArrangement(utr, desSubmissionRequest).map {
+      case Right(_) =>
+        ttpArrangementRepositoryWorkItem.complete(wi.id).map(_ => process())
+        ()
+      case Left(error) =>
+        logger.warn("Call failed for " + wi.toString + " reason " + error.toString)
+        ttpArrangementRepositoryWorkItem.markAs(wi.id, Failed, None).map(_ => process())
+        ()
+    }
+  }
+
   //todo perhaps add some limit in I dont think there will be too many failed arrangment's in Prod?
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   def process(): Future[Unit] =
@@ -64,24 +85,10 @@ class PollerService @Inject() (
         case Some(wi) =>
           logger.info("Retrying call to des api for " + wi.toString)
           if (isAvailable(wi.item)) {
-            //todo change check that this works must be cleaner way to get hc!!
-            implicit val hc: HeaderCarrier = HeaderCarrier()
-            desArrangementApiService.submit(wi.item.ttpArrangement).flatMap {
-              case _ =>
-                ttpArrangementRepositoryWorkItem.complete(wi.id)
-                process()
-
-            }.recover {
-              case des @ DesApiException(_, _) =>
-                logger.warn("Call failed for " + wi.toString + " reason " + des.toString)
-                ttpArrangementRepositoryWorkItem.markAs(wi.id, Failed, None)
-                process()
-                ()
-            }
+            tryDesCallAgain(wi)
           } else {
             logger.error("Call failed and will not be tried again for " + wi.toString)
-            ttpArrangementRepositoryWorkItem.markAs(wi.id, PermanentlyFailed, None)
-            process()
+            ttpArrangementRepositoryWorkItem.markAs(wi.id, PermanentlyFailed, None).flatMap(_ => process())
           }
 
       }
