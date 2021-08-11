@@ -22,6 +22,7 @@ import akka.actor.ActorSystem
 import javax.inject.Inject
 import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendHeaderCarrierProvider
 import uk.gov.hmrc.timetopay.arrangement.config.QueueConfig
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangementWorkItem
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementWorkItemRepository
@@ -34,16 +35,15 @@ class PollerService @Inject() (
     desArrangementApiService:         TTPArrangementService,
     ttpArrangementRepositoryWorkItem: TTPArrangementWorkItemRepository,
     queueConfig:                      QueueConfig,
-    val clock: Clock)(
+    val clock:                        Clock)(
     implicit
-    ec: ExecutionContext,
-    hc: HeaderCarrier
+    ec: ExecutionContext
 ) {
 
   private val logger: Logger = Logger(this.getClass.getSimpleName)
   val initialDelay = queueConfig.initialDelay
   val interval = queueConfig.interval
-//todo hack up tests tomorrow
+  //todo hack up tests tomorrow
   def run() = {
     actorSystem.scheduler.scheduleWithFixedDelay(initialDelay, interval)(() => {
       logger.info("Running poller ")
@@ -51,31 +51,36 @@ class PollerService @Inject() (
       ()
     })
   }
-  def isAvailable(workItem:TTPArrangementWorkItem): Boolean = {
+  def isAvailable(workItem: TTPArrangementWorkItem): Boolean = {
     val time = LocalDateTime.now(clock)
     time.isBefore(workItem.availableUntil)
   }
-
+  //todo perhaps add some limit in I dont think there will be too many failed arrangments in Prod?
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   def process(): Future[Unit] =
     ttpArrangementRepositoryWorkItem.pullOutstanding
       .flatMap {
-        case None => Future.successful(())
+        case None =>
+          Future.successful(())
         case Some(wi) =>
           logger.info("Retrying call to des api for " + wi.toString)
-          if(isAvailable(wi.item)){
-          desArrangementApiService.submit(wi.item.ttpArrangement).flatMap {
-            case _ =>
-              ttpArrangementRepositoryWorkItem.complete(wi.id)
-              process()
+          if (isAvailable(wi.item)) {
+            //todo change check that this works!!
+            implicit val hc: HeaderCarrier = HeaderCarrier()
+            desArrangementApiService.submit(wi.item.ttpArrangement).flatMap {
+              case _ =>
+                ttpArrangementRepositoryWorkItem.complete(wi.id)
+                process()
 
-          }.recover {
-            case DesApiException(_, _) =>
-              ttpArrangementRepositoryWorkItem.markAs(wi.id, Failed, None)
-              process()
-              ()
-          }
-      }else {
+            }.recover {
+              case x@DesApiException(_, _) =>
+                logger.warn("Call failed for " + wi.toString + " reason " + x)
+                ttpArrangementRepositoryWorkItem.markAs(wi.id, Failed, None)
+                process()
+                ()
+            }
+          } else {
+            logger.error("Call failed and will not be tried again for " + wi.toString)
             ttpArrangementRepositoryWorkItem.markAs(wi.id, PermanentlyFailed, None)
             process()
           }
