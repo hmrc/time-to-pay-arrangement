@@ -44,6 +44,7 @@ class PollerService @Inject() (
   val initialDelay = queueConfig.initialDelay
   val interval = queueConfig.interval
 
+  run()
   def run() = {
     actorSystem.scheduler.scheduleWithFixedDelay(initialDelay, interval)(() => {
       logger.info("Running poller ")
@@ -51,6 +52,7 @@ class PollerService @Inject() (
       ()
     })
   }
+
 
   def isAvailable(workItem: TTPArrangementWorkItem): Boolean = {
     val time = LocalDateTime.now(clock)
