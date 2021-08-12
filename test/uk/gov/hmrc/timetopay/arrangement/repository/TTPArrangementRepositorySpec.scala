@@ -22,8 +22,6 @@ import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangement
 import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
 import uk.gov.hmrc.timetopay.arrangement.repository.TestDataTtp.arrangement
 class TTPArrangementRepositorySpec extends ITSpec {
-  //  val logger: Logger = Logger(getClass)
-
   private val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
 
   override def beforeEach(): Unit = {

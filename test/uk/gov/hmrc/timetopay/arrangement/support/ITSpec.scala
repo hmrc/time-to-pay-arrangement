@@ -71,7 +71,6 @@ trait ITSpec
   override def fakeApplication(): Application = new GuiceApplicationBuilder()
     .overrides(GuiceableModule.fromGuiceModules(Seq(overridingsModule)))
     .configure(Map[String, Any](
-      //      "mongodb.uri " -> "mongodb://localhost:27017/time-to-pay-arrangement-it",
       "mongodb.uri" -> mongoUri,
       "microservice.services.des-arrangement-api.host" -> "localhost",
       "microservice.services.des-arrangement-api.environment" -> "localhost",

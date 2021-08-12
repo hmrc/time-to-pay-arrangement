@@ -33,10 +33,6 @@ class TTPArrangementWorkItemRepositorySpec extends ITSpec {
   private lazy val repo = fakeApplication.injector.instanceOf[TTPArrangementWorkItemRepository]
   private val jodaDateTime: DateTime = DateTime.now()
 
-  //  override def beforeEach(): Unit = {
-  //    val _ = repo.removeAll().futureValue
-  //        super.beforeEach()
-  //  }
   private val clock: Clock = systemUTC()
 
   val ttpArrangementWorkItem = TTPArrangementWorkItem(now(clock), now(clock), "", arrangement)
