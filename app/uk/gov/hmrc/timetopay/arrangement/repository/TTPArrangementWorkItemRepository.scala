@@ -17,24 +17,39 @@
 package uk.gov.hmrc.timetopay.arrangement.repository
 
 import com.google.inject.Inject
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, Duration}
 import play.api.Configuration
+import play.api.libs.json.{JsObject, Json}
 import play.modules.reactivemongo.ReactiveMongoComponent
-import reactivemongo.bson.BSONObjectID
+import reactivemongo.api.indexes.{Index, IndexType}
+import reactivemongo.bson.{BSONDocument, BSONObjectID}
 import reactivemongo.play.json.ImplicitBSONHandlers._
+import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
+import uk.gov.hmrc.timetopay.arrangement.config.QueueConfig
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangementWorkItem
 import uk.gov.hmrc.workitem._
 
-class TTPArrangementWorkItemRepository @Inject() (configuration: Configuration, reactiveMongoComponent: ReactiveMongoComponent) extends WorkItemRepository[TTPArrangementWorkItem, BSONObjectID](
-  collectionName = "TTPArrangementsWorkItem",
-  mongo          = reactiveMongoComponent.mongoConnector.db,
-  itemFormat     = WorkItem.workItemMongoFormat[TTPArrangementWorkItem],
-  config         = configuration.underlying
-) {
+import scala.concurrent.{ExecutionContext, Future}
+
+class TTPArrangementWorkItemRepository @Inject() (configuration:          Configuration,
+                                                  queueConfig:            QueueConfig,
+                                                  reactiveMongoComponent: ReactiveMongoComponent)
+  extends WorkItemRepository[TTPArrangementWorkItem, BSONObjectID](
+    collectionName = "TTPArrangementsWorkItem",
+    mongo          = reactiveMongoComponent.mongoConnector.db,
+    itemFormat     = WorkItem.workItemMongoFormat[TTPArrangementWorkItem],
+    config         = configuration.underlying
+  ) {
   override def now: DateTime =
     DateTime.now
-  //todo change these
-  //todo do mongo encrpt stuff
+  override def inProgressRetryAfterProperty: String = queueConfig.retryAfter
+  lazy val retryIntervalMillis: Long = configuration.getMillis(inProgressRetryAfterProperty)
+  override lazy val inProgressRetryAfter: Duration = Duration.millis(retryIntervalMillis)
+  private lazy val ttlInSeconds = queueConfig.ttl.toSeconds
+
+  override def indexes: Seq[Index] = super.indexes ++ Seq(
+    Index(key     = Seq("receivedAt" -> IndexType.Ascending), name = Some("receivedAtTime"), options = BSONDocument("expireAfterSeconds" -> ttlInSeconds)))
+
   override lazy val workItemFields: WorkItemFieldNames =
     new WorkItemFieldNames {
       val receivedAt = "receivedAt"
@@ -45,6 +60,17 @@ class TTPArrangementWorkItemRepository @Inject() (configuration: Configuration, 
       val failureCount = "failureCount"
     }
 
-  override val inProgressRetryAfterProperty: String =
-    "queue.retryAfter"
+  def pullOutstanding(implicit ec: ExecutionContext): Future[Option[WorkItem[TTPArrangementWorkItem]]] =
+    super.pullOutstanding(now.minusMillis(retryIntervalMillis.toInt), now)
+
+  def complete(id: BSONObjectID)(implicit ec: ExecutionContext): Future[Boolean] = {
+    val selector = JsObject(
+      Seq("_id" -> Json.toJson(id)(ReactiveMongoFormats.objectIdFormats), "status" -> Json.toJson(InProgress: ProcessingStatus)))
+    collection.delete().one(selector).map(_.n > 0)
+  }
+
+  def failed(id: BSONObjectID)(implicit ec: ExecutionContext): Future[Boolean] = {
+    markAs(id, Failed, Some(now.plusMillis(retryIntervalMillis.toInt)))
+  }
+
 }

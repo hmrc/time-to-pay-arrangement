@@ -25,7 +25,6 @@ import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, WireMockResponses}
 import uk.gov.hmrc.workitem.WorkItem
 
 class TTPArrangementServiceSpec extends ITSpec {
-  val logger = Logger(getClass)
 
   private val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
   private val arrangementWorkItemRepo = fakeApplication.injector.instanceOf[TTPArrangementWorkItemRepository]

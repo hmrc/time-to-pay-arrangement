@@ -30,7 +30,7 @@ class DesArrangementApiServiceConnectorSpec extends ITSpec {
 
     WireMockResponses.desArrangementApiSucccess(taxpayer.selfAssessment.utr)
 
-    val result = connector.submitArrangement(taxpayer, request).futureValue
+    val result = connector.submitArrangement(taxpayer.selfAssessment.utr, request).futureValue
 
     result.right.get shouldBe SubmissionSuccess()
 
@@ -39,7 +39,7 @@ class DesArrangementApiServiceConnectorSpec extends ITSpec {
 
     WireMockResponses.desArrangementApiBadRequestClientError(taxpayer.selfAssessment.utr)
 
-    val result = connector.submitArrangement(taxpayer, request).futureValue
+    val result = connector.submitArrangement(taxpayer.selfAssessment.utr, request).futureValue
 
     result.left.value.code shouldBe 400
   }

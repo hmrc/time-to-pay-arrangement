@@ -25,6 +25,7 @@ import play.api.Logger
 import play.api.http.Status
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.timetopay.arrangement.config.QueueConfig
 import uk.gov.hmrc.timetopay.arrangement.connectors.DesArrangementApiServiceConnector
 import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, TTPArrangement, TTPArrangementWorkItem}
 import uk.gov.hmrc.timetopay.arrangement.repository.{TTPArrangementRepository, TTPArrangementWorkItemRepository}
@@ -40,7 +41,8 @@ class TTPArrangementService @Inject() (
     ttpArrangementRepository:         TTPArrangementRepository,
     ttpArrangementRepositoryWorkItem: TTPArrangementWorkItemRepository,
     val clock:                        Clock,
-    letterAndControlBuilder:          LetterAndControlBuilder) {
+    letterAndControlBuilder:          LetterAndControlBuilder,
+    queueConfig:                      QueueConfig) {
   val logger: Logger = Logger(getClass)
 
   def byId(id: String): Future[Option[JsValue]] = ttpArrangementRepository.findByIdLocal(id)
@@ -56,8 +58,9 @@ class TTPArrangementService @Inject() (
     val desTTPArrangement = desTTPArrangementBuilder.create(arrangement)
 
     val request: DesSubmissionRequest = DesSubmissionRequest(desTTPArrangement, letterAndControl)
+    val utr = arrangement.taxpayer.selfAssessment.utr
     (for {
-      response <- desArrangementApiService.submitArrangement(arrangement.taxpayer, request)
+      response <- desArrangementApiService.submitArrangement(utr, request)
       ttp <- saveArrangement(arrangement, request)
     } yield (response, ttp)).flatMap {
       result =>
@@ -66,9 +69,11 @@ class TTPArrangementService @Inject() (
             val isSeverError = error.code >= Status.INTERNAL_SERVER_ERROR
             val returnedError = Future.failed(DesApiException(error.code, error.message))
             if (isSeverError) {
-              sendToTTPArrangementWorkRepo(arrangementToSave(arrangement, request)).flatMap { _ =>
-                returnedError
-              }
+              sendToTTPArrangementWorkRepo(
+                utr,
+                arrangementToSave(arrangement, request)).flatMap { _ =>
+                  returnedError
+                }
             } else
               returnedError
           },
@@ -85,19 +90,19 @@ class TTPArrangementService @Inject() (
     Try(ttpArrangementRepository.doInsert(toSave)).getOrElse(Future.successful(None))
   }
 
-  def arrangementToSave(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest) = {
+  def arrangementToSave(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): TTPArrangement = {
     arrangement.copy(
       id             = Some(UUID.randomUUID().toString),
       createdOn      = Some(LocalDateTime.now()),
       desArrangement = Some(desSubmissionRequest))
   }
 
-  private def sendToTTPArrangementWorkRepo(arrangement: TTPArrangement): Future[WorkItem[TTPArrangementWorkItem]] = {
+  private def sendToTTPArrangementWorkRepo(utr: String, arrangement: TTPArrangement): Future[WorkItem[TTPArrangementWorkItem]] = {
     val time = LocalDateTime.now(clock)
     val jodaLocalDateTime = new DateTime(time.atZone(ZoneId.systemDefault).toInstant.toEpochMilli)
-    //todo change availableUntil when we do config
+
     ttpArrangementRepositoryWorkItem.pushNew(
-      TTPArrangementWorkItem(time, time.plusHours(1), arrangement.directDebitReference, arrangement), jodaLocalDateTime)
+      TTPArrangementWorkItem(time, time.plusHours(queueConfig.availableFor._1), utr, arrangement), jodaLocalDateTime)
 
   }
 
