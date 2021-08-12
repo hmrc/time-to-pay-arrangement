@@ -14,6 +14,7 @@ object AppDependencies {
 
   val test = Seq(
     "com.vladsch.flexmark" % "flexmark-all" % "0.35.10" % Test,
+    "uk.gov.hmrc" %% "reactivemongo-test" % "5.0.0-play-28" % Test,
     "org.scalatest" %% "scalatest" % "3.0.9" % Test,
     "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
     "org.pegdown" % "pegdown" % "1.6.0",

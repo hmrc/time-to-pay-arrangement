@@ -18,24 +18,25 @@ package uk.gov.hmrc.timetopay.arrangement.repository
 
 import java.time.Clock
 import java.time.Clock.systemUTC
-
 import org.joda.time.DateTime
 import play.api.libs.json.Json
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangementWorkItem
-import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
+import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, MongoSupport}
 import uk.gov.hmrc.timetopay.arrangement.repository.TestDataTtp.arrangement
-import java.time.LocalDateTime.now
 
+import java.time.LocalDateTime.now
 import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.workitem.{Cancelled, Deferred, Duplicate, Failed, Ignored, InProgress, PermanentlyFailed, Succeeded, WorkItem}
+
 class TTPArrangementWorkItemRepositorySpec extends ITSpec {
 
   private lazy val repo = fakeApplication.injector.instanceOf[TTPArrangementWorkItemRepository]
   private val jodaDateTime: DateTime = DateTime.now()
-  override def beforeEach(): Unit = {
-    val _ = repo.removeAll().futureValue
-    super.beforeEach()
-  }
+
+  //  override def beforeEach(): Unit = {
+  //    val _ = repo.removeAll().futureValue
+  //        super.beforeEach()
+  //  }
   private val clock: Clock = systemUTC()
 
   val ttpArrangementWorkItem = TTPArrangementWorkItem(now(clock), now(clock), "", arrangement)

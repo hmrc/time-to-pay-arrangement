@@ -31,8 +31,6 @@ import uk.gov.hmrc.workitem.{Failed, PermanentlyFailed, Succeeded}
 
 class PollerServiceSpec extends ITSpec {
 
-  val logger = Logger(getClass)
-
   private val pollerService = fakeApplication.injector.instanceOf[PollerService]
   private val arrangementWorkItemRepo = fakeApplication.injector.instanceOf[TTPArrangementWorkItemRepository]
 
