@@ -16,21 +16,19 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import java.time.{Clock, LocalDateTime}
-
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, Cancellable}
 import com.google.inject.Singleton
-import javax.inject.Inject
-import play.api.{Application, Logger}
-import play.api.inject.ApplicationLifecycle
+import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.scheduling.ExclusiveScheduledJob
 import uk.gov.hmrc.timetopay.arrangement.config.QueueConfig
-import uk.gov.hmrc.timetopay.arrangement.connectors.{DesArrangementApiServiceConnector, SubmissionError, SubmissionSuccess}
+import uk.gov.hmrc.timetopay.arrangement.connectors.DesArrangementApiServiceConnector
 import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, TTPArrangementWorkItem}
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementWorkItemRepository
 import uk.gov.hmrc.workitem.{Failed, PermanentlyFailed, WorkItem}
-import uk.gov.hmrc.play.scheduling.{ExclusiveScheduledJob, RunningOfScheduledJobs, ScheduledJob}
 
+import java.time.{Clock, LocalDateTime}
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -54,7 +52,7 @@ class PollerService @Inject() (
 
   override def name: String = "TTP Arrangement Poller"
   callExecutor(name)
-  def callExecutor(name: String)(implicit ec: ExecutionContext) = {
+  def callExecutor(name: String)(implicit ec: ExecutionContext): Cancellable = {
     actorSystem.scheduler.scheduleWithFixedDelay(initialDelay, interval)(() => {
       logger.info("Running poller " + name)
       executor(name)
@@ -75,7 +73,7 @@ class PollerService @Inject() (
     time.isBefore(workItem.availableUntil)
   }
 
-  def tryDesCallAgain(wi: WorkItem[TTPArrangementWorkItem]) = {
+  def tryDesCallAgain(wi: WorkItem[TTPArrangementWorkItem]): Future[Unit] = {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     val arrangment = wi.item.ttpArrangement
     val utr = arrangment.taxpayer.selfAssessment.utr

@@ -29,26 +29,27 @@ import uk.gov.hmrc.timetopay.arrangement.config.QueueConfig
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangementWorkItem
 import uk.gov.hmrc.workitem._
 
+import java.time.{Clock, ZoneId}
 import scala.concurrent.{ExecutionContext, Future}
 
 class TTPArrangementWorkItemRepository @Inject() (configuration:          Configuration,
                                                   queueConfig:            QueueConfig,
-                                                  reactiveMongoComponent: ReactiveMongoComponent)
+                                                  reactiveMongoComponent: ReactiveMongoComponent,
+                                                  val clock:              Clock,
+                                                 )
   extends WorkItemRepository[TTPArrangementWorkItem, BSONObjectID](
     collectionName = "TTPArrangementsWorkItem",
     mongo          = reactiveMongoComponent.mongoConnector.db,
     itemFormat     = WorkItem.workItemMongoFormat[TTPArrangementWorkItem],
     config         = configuration.underlying
   ) {
-  override def now: DateTime =
-    DateTime.now
+
+  override def now: DateTime = new DateTime(clock.millis())
+
   override def inProgressRetryAfterProperty: String = queueConfig.retryAfter
   lazy val retryIntervalMillis: Long = configuration.getMillis(inProgressRetryAfterProperty)
   override lazy val inProgressRetryAfter: Duration = Duration.millis(retryIntervalMillis)
   private lazy val ttlInSeconds = queueConfig.ttl.toSeconds
-
-  override def indexes: Seq[Index] = super.indexes ++ Seq(
-    Index(key     = Seq("receivedAt" -> IndexType.Ascending), name = Some("receivedAtTime"), options = BSONDocument("expireAfterSeconds" -> ttlInSeconds)))
 
   override lazy val workItemFields: WorkItemFieldNames =
     new WorkItemFieldNames {
@@ -59,6 +60,13 @@ class TTPArrangementWorkItemRepository @Inject() (configuration:          Config
       val id = "_id"
       val failureCount = "failureCount"
     }
+
+  override def indexes: Seq[Index] = super.indexes ++ Seq(
+    Index(
+      key     = Seq(workItemFields.receivedAt -> IndexType.Ascending),
+      name    = Some("receivedAtTime"),
+      options = BSONDocument("expireAfterSeconds" -> ttlInSeconds)
+    ))
 
   def pullOutstanding(implicit ec: ExecutionContext): Future[Option[WorkItem[TTPArrangementWorkItem]]] =
     super.pullOutstanding(now.minusMillis(retryIntervalMillis.toInt), now)
