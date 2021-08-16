@@ -16,15 +16,19 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
+import org.scalatest.{FreeSpecLike, Matchers}
 import org.scalatest.prop.TableDrivenPropertyChecks._
+import org.scalatestplus.play.guice.GuiceOneServerPerTest
+import play.api.Configuration
 import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
 import uk.gov.hmrc.timetopay.arrangement.resources._
-import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
-import java.time.LocalDate
 
+import java.time.LocalDate
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangement
 
-class DesTTPArrangementBuilderSpec extends ITSpec {
+class DesTTPArrangementBuilderSpec extends FreeSpecLike with GuiceOneServerPerTest with Matchers {
+
+  lazy val config = fakeApplication.injector.instanceOf[Configuration]
 
   private val desTTPArrangementService = new DesTTPArrangementBuilder(config)
   private val taxPayerData = Table(

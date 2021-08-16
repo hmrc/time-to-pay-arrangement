@@ -42,6 +42,7 @@ class TTPArrangementService @Inject() (
     ttpArrangementRepositoryWorkItem: TTPArrangementWorkItemRepository,
     val clock:                        Clock,
     letterAndControlBuilder:          LetterAndControlBuilder,
+    crypto:                           CryptoService,
     queueConfig:                      QueueConfig) {
   val logger: Logger = Logger(getClass)
 
@@ -102,7 +103,7 @@ class TTPArrangementService @Inject() (
     val jodaLocalDateTime = new DateTime(time.atZone(ZoneId.systemDefault).toInstant.toEpochMilli)
 
     ttpArrangementRepositoryWorkItem.pushNew(
-      TTPArrangementWorkItem(time, time.plusHours(queueConfig.availableFor._1), utr, arrangement), jodaLocalDateTime)
+      TTPArrangementWorkItem(time, time.plusHours(queueConfig.availableFor._1), utr, crypto.encrypt(arrangement)), jodaLocalDateTime)
 
   }
 

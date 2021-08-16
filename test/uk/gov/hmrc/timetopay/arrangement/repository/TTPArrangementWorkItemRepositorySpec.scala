@@ -26,16 +26,18 @@ import uk.gov.hmrc.timetopay.arrangement.repository.TestDataTtp.arrangement
 
 import java.time.LocalDateTime.now
 import reactivemongo.bson.BSONObjectID
+import uk.gov.hmrc.timetopay.arrangement.services.CryptoService
 import uk.gov.hmrc.workitem.{Cancelled, Deferred, Duplicate, Failed, Ignored, InProgress, PermanentlyFailed, Succeeded, WorkItem}
 
 class TTPArrangementWorkItemRepositorySpec extends ITSpec {
 
   private lazy val repo = fakeApplication.injector.instanceOf[TTPArrangementWorkItemRepository]
+  private val crypto = fakeApplication.injector.instanceOf[CryptoService]
   private val jodaDateTime: DateTime = DateTime.now()
 
   private val clock: Clock = systemUTC()
 
-  val ttpArrangementWorkItem = TTPArrangementWorkItem(now(clock), now(clock), "", arrangement)
+  val ttpArrangementWorkItem = TTPArrangementWorkItem(now(clock), now(clock), "", crypto.encrypt(arrangement))
   "Count should be 0 with empty repo" in {
     collectionSize shouldBe 0
   }
@@ -53,7 +55,7 @@ class TTPArrangementWorkItemRepositorySpec extends ITSpec {
     found match {
       case Some(x) =>
         x.status shouldBe uk.gov.hmrc.workitem.ToDo
-        x.item.ttpArrangement shouldBe arrangement
+        crypto.decrypt(x.item.ttpArrangement) shouldBe Some(arrangement)
       case None => "failed" shouldBe "to find a value"
     }
   }
@@ -64,7 +66,7 @@ class TTPArrangementWorkItemRepositorySpec extends ITSpec {
     outstanding match {
       case Some(x) =>
         x.status shouldBe uk.gov.hmrc.workitem.InProgress
-        x.item.ttpArrangement shouldBe arrangement
+        crypto.decrypt(x.item.ttpArrangement) shouldBe Some(arrangement)
       case None => "failed" shouldBe "to find a value"
     }
 

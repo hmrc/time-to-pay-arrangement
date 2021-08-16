@@ -40,6 +40,7 @@ class PollerService @Inject() (
     desArrangementApiServiceConnector: DesArrangementApiServiceConnector,
     ttpArrangementRepositoryWorkItem:  TTPArrangementWorkItemRepository,
     queueConfig:                       QueueConfig,
+    crypto:                            CryptoService,
     val clock:                         Clock)(
     implicit
     ec: ExecutionContext
@@ -77,7 +78,8 @@ class PollerService @Inject() (
 
   def tryDesCallAgain(wi: WorkItem[TTPArrangementWorkItem]) = {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val arrangment = wi.item.ttpArrangement
+    val arrangment = crypto.decrypt(wi.item.ttpArrangement)
+      .getOrElse(throw new RuntimeException("Saved ttp in work item repo had invalid encrypted item " + wi.toString))
     val utr = arrangment.taxpayer.selfAssessment.utr
     val desSubmissionRequest: DesSubmissionRequest = arrangment.desArrangement
       .getOrElse(throw new RuntimeException("Saved ttp in work item repo had no desArrangement to send " + wi.toString))

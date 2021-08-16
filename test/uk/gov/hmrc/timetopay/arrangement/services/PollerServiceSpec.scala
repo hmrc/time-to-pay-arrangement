@@ -33,6 +33,7 @@ class PollerServiceSpec extends ITSpec {
 
   private val pollerService = fakeApplication.injector.instanceOf[PollerService]
   private val arrangementWorkItemRepo = fakeApplication.injector.instanceOf[TTPArrangementWorkItemRepository]
+  private val crypto = fakeApplication.injector.instanceOf[CryptoService]
 
   override def beforeEach(): Unit = {
     arrangementWorkItemRepo.collection.drop(false).futureValue
@@ -45,7 +46,7 @@ class PollerServiceSpec extends ITSpec {
   }
   private val clock: Clock = systemUTC()
   private val jodaDateTime: DateTime = DateTime.now()
-  val ttpArrangementWorkItem = TTPArrangementWorkItem(now(clock), now(clock), "", arrangement)
+  val ttpArrangementWorkItem = TTPArrangementWorkItem(now(clock), now(clock), "", crypto.encrypt(arrangement))
   protected def numberOfQueuedNotifications: Integer = arrangementWorkItemRepo.count(Json.obj()).futureValue
 
   "pollerService should set it to PermanentlyFailed failed if availableUntil is passed" in {
