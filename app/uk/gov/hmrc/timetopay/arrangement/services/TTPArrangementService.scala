@@ -103,8 +103,8 @@ class TTPArrangementService @Inject() (
     val jodaLocalDateTime = new DateTime(time.atZone(ZoneId.systemDefault).toInstant.toEpochMilli)
 
     ttpArrangementRepositoryWorkItem.pushNew(
-      TTPArrangementWorkItem(time, time.plusHours(queueConfig.availableFor._1), utr, crypto.encrypt(arrangement)), jodaLocalDateTime)
-
+      TTPArrangementWorkItem(time, time.plusHours(queueConfig.availableFor._1), utr, crypto.encrypt(arrangement)), jodaLocalDateTime
+    )
   }
 
 }
