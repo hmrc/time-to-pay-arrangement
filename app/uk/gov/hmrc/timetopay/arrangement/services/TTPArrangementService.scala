@@ -99,8 +99,8 @@ class TTPArrangementService @Inject() (
   }
 
   private def sendToTTPArrangementWorkRepo(utr: String, arrangement: TTPArrangement): Future[WorkItem[TTPArrangementWorkItem]] = {
-    val time = LocalDateTime.now(clock)
-    val jodaLocalDateTime = new DateTime(time.atZone(ZoneId.systemDefault).toInstant.toEpochMilli)
+    val time: LocalDateTime = LocalDateTime.now(clock)
+    val jodaLocalDateTime: DateTime = ttpArrangementRepositoryWorkItem.now
 
     ttpArrangementRepositoryWorkItem.pushNew(
       TTPArrangementWorkItem(time, time.plusHours(queueConfig.availableFor._1), utr, crypto.encrypt(arrangement)), jodaLocalDateTime
