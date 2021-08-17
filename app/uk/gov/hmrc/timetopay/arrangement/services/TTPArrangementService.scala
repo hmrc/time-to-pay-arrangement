@@ -16,9 +16,8 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import java.time.{Clock, LocalDateTime, ZoneId}
+import java.time.{Clock, Duration, LocalDateTime, ZoneId}
 import java.util.UUID
-
 import javax.inject.Inject
 import org.joda.time.DateTime
 import play.api.Logger
@@ -100,6 +99,8 @@ class TTPArrangementService @Inject() (
 
   private def sendToTTPArrangementWorkRepo(utr: String, arrangement: TTPArrangement): Future[WorkItem[TTPArrangementWorkItem]] = {
     val time: LocalDateTime = LocalDateTime.now(clock)
+    val availableUntil = time.plus(Duration.ofMillis(queueConfig.availableFor.toMillis))
+
     val jodaLocalDateTime: DateTime = ttpArrangementRepositoryWorkItem.now
 
     ttpArrangementRepositoryWorkItem.pushNew(
