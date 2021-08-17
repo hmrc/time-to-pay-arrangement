@@ -104,7 +104,7 @@ class TTPArrangementService @Inject() (
     val jodaLocalDateTime: DateTime = ttpArrangementRepositoryWorkItem.now
 
     ttpArrangementRepositoryWorkItem.pushNew(
-      TTPArrangementWorkItem(time, time.plusHours(queueConfig.availableFor._1), utr, crypto.encrypt(arrangement)), jodaLocalDateTime
+      TTPArrangementWorkItem(time, availableUntil, utr, crypto.encrypt(arrangement)), jodaLocalDateTime
     )
   }
 
