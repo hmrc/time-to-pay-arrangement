@@ -104,7 +104,7 @@ class PollerService @Inject() (
             logger.info("Retrying call to des api for " + wi.toString)
             tryDesCallAgain(wi)
           } else {
-            logger.error("Call failed and will not be tried again for " + wi.toString)
+            logger.error("ZONK ERROR! Call failed and will not be tried again for " + wi.toString)
             ttpArrangementRepositoryWorkItem.markAs(wi.id, PermanentlyFailed, None).flatMap(_ => process())
           }
       }
