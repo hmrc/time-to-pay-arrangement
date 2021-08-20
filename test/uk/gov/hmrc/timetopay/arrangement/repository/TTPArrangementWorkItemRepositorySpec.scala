@@ -22,7 +22,7 @@ import org.joda.time.DateTime
 import play.api.libs.json.Json
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangementWorkItem
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, MongoSupport}
-import uk.gov.hmrc.timetopay.arrangement.repository.TestDataTtp.arrangement
+import uk.gov.hmrc.timetopay.arrangement.repository.TestDataTtp.{arrangement, auditTags}
 
 import java.time.LocalDateTime.now
 import reactivemongo.bson.BSONObjectID
@@ -37,7 +37,7 @@ class TTPArrangementWorkItemRepositorySpec extends ITSpec {
 
   private val clock: Clock = systemUTC()
 
-  val ttpArrangementWorkItem = TTPArrangementWorkItem(now(clock), now(clock), "", crypto.encryptTtpa(arrangement))
+  val ttpArrangementWorkItem = TTPArrangementWorkItem(now(clock), now(clock), "", crypto.encryptTtpa(arrangement), crypto.encryptAuditTags(auditTags))
   "Count should be 0 with empty repo" in {
     collectionSize shouldBe 0
   }

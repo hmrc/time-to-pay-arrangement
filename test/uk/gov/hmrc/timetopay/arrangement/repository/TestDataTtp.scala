@@ -17,9 +17,21 @@
 package uk.gov.hmrc.timetopay.arrangement.repository
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangement
+import uk.gov.hmrc.timetopay.arrangement.model.{BankDetails, TTPArrangement}
 
 object TestDataTtp {
+
+  val bankDetails: BankDetails = BankDetails(
+    sortCode      = "12-34-56",
+    accountNumber = "12345678",
+    accountName   = "Mr John Campbell"
+  )
+
+  val auditTags = Map(
+    "tag1" -> "value1",
+    "tag2" -> "value2"
+  )
+
   val arrangement = Json.parse(
     s"""
        |{

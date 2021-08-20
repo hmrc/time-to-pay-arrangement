@@ -19,13 +19,12 @@ package uk.gov.hmrc.timetopay.arrangement.services
 import java.time.Clock
 import java.time.Clock.systemUTC
 import java.time.LocalDateTime.now
-
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangementWorkItem
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementWorkItemRepository
-import uk.gov.hmrc.timetopay.arrangement.repository.TestDataTtp.arrangement
+import uk.gov.hmrc.timetopay.arrangement.repository.TestDataTtp.{arrangement, auditTags}
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, WireMockResponses}
 import uk.gov.hmrc.workitem.{Failed, PermanentlyFailed, Succeeded}
 
@@ -46,7 +45,7 @@ class PollerServiceSpec extends ITSpec {
   }
   private val clock: Clock = systemUTC()
   private val jodaDateTime: DateTime = DateTime.now()
-  val ttpArrangementWorkItem = TTPArrangementWorkItem(now(clock), now(clock), "", crypto.encryptTtpa(arrangement))
+  val ttpArrangementWorkItem = TTPArrangementWorkItem(now(clock), now(clock), "", crypto.encryptTtpa(arrangement), crypto.encryptAuditTags(auditTags))
   protected def numberOfQueuedNotifications: Integer = arrangementWorkItemRepo.count(Json.obj()).futureValue
 
   "pollerService should set it to PermanentlyFailed failed if availableUntil is passed" in {

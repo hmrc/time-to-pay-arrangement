@@ -17,7 +17,7 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
 import play.api.libs.json.{JsObject, Json}
-import play.api.mvc.Request
+import play.api.mvc.{Request, RequestHeader}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
@@ -105,7 +105,7 @@ class AuditService @Inject() (auditConnector: AuditConnector)(implicit ec: Execu
 }
 
 object AuditService {
-  def auditTags(implicit request: Request[_]): Map[String, String] = {
+  def auditTags(implicit request: RequestHeader): Map[String, String] = {
     val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
 
     Map(

@@ -25,6 +25,8 @@ import org.scalatest.{BeforeAndAfterEach, FreeSpecLike, Matchers}
 import org.scalatestplus.play.guice.GuiceOneServerPerTest
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.mvc.Result
+import play.api.test.CSRFTokenHelper.CSRFRequest
+import play.api.test.FakeRequest
 import play.api.{Application, Configuration}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -59,6 +61,8 @@ trait ITSpec
   lazy val servicesConfig = fakeApplication.injector.instanceOf[ServicesConfig]
   lazy val config = fakeApplication.injector.instanceOf[Configuration]
   val baseUrl: String = s"http://localhost:$port"
+
+  implicit def fakeRequest: FakeRequest[_] = FakeRequest("", "").withCSRFToken.asInstanceOf[FakeRequest[_]]
 
   override implicit val patienceConfig = PatienceConfig(
     timeout  = scaled(Span(3, Seconds)),

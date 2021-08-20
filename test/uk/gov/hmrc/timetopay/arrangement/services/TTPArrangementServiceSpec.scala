@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import play.api.Logger
 import uk.gov.hmrc.timetopay.arrangement.model.{TTPArrangement, TTPArrangementWorkItem}
 import uk.gov.hmrc.timetopay.arrangement.repository.{TTPArrangementRepository, TTPArrangementWorkItemRepository}
 import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers.taxPayerWithEnglishAddress
