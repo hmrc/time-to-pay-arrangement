@@ -24,7 +24,8 @@ case class TTPArrangementWorkItem(
     createdOn:      LocalDateTime,
     availableUntil: LocalDateTime,
     reference:      String,
-    ttpArrangement: String) {
+    ttpArrangement: String,
+    auditTags:      String) {
 
   override def toString: String =
     s"TTPArrangementWorkItem for Reference $reference ... {createdOn: $createdOn, availableUntil: $availableUntil,notification: ${ttpArrangement.toString}"

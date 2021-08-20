@@ -39,6 +39,7 @@ class PollerService @Inject() (
     ttpArrangementRepositoryWorkItem:  TTPArrangementWorkItemRepository,
     queueConfig:                       QueueConfig,
     crypto:                            CryptoService,
+    auditService:                      AuditService,
     val clock:                         Clock)(
     implicit
     ec: ExecutionContext
@@ -76,18 +77,25 @@ class PollerService @Inject() (
 
   def tryDesCallAgain(wi: WorkItem[TTPArrangementWorkItem]): Future[Unit] = {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val arrangment = crypto.decrypt(wi.item.ttpArrangement)
+
+    val arrangment = crypto.decryptTtpa(wi.item.ttpArrangement)
       .getOrElse(throw new RuntimeException("Saved ttp in work item repo had invalid encrypted item " + wi.toString))
+    val auditTags = crypto.decryptAuditTags(wi.item.auditTags)
+      .getOrElse(throw new RuntimeException("Saved ttp in work item repo had invalid encrypted item " + wi.toString))
+
     val utr = arrangment.taxpayer.selfAssessment.utr
     val desSubmissionRequest: DesSubmissionRequest = arrangment.desArrangement
       .getOrElse(throw new RuntimeException("Saved ttp in work item repo had no desArrangement to send " + wi.toString))
 
     desArrangementApiServiceConnector.submitArrangement(utr, desSubmissionRequest).map {
       case Right(_) =>
+        auditService.sendSubmissionSucceededEvent(arrangment.taxpayer, arrangment.bankDetails, arrangment.schedule, auditTags)
+
         ttpArrangementRepositoryWorkItem.complete(wi.id).map(_ => process())
         ()
       case Left(error) =>
         logger.warn("Call failed for " + wi.toString + " reason " + error.toString)
+        auditService.sendArrangementSubmissionFailedEvent(arrangment.taxpayer, arrangment.bankDetails, arrangment.schedule, error, auditTags)
         ttpArrangementRepositoryWorkItem.markAs(wi.id, Failed, None).map(_ => process())
         ()
     }
@@ -105,6 +113,7 @@ class PollerService @Inject() (
             tryDesCallAgain(wi)
           } else {
             logger.error("ZONK ERROR! Call failed and will not be tried again for " + wi.toString)
+
             ttpArrangementRepositoryWorkItem.markAs(wi.id, PermanentlyFailed, None).flatMap(_ => process())
           }
       }

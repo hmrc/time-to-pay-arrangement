@@ -22,7 +22,7 @@ import javax.inject.Inject
 import play.api.{Configuration, Logger}
 import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.config.JurisdictionCheckerConfig
-import uk.gov.hmrc.timetopay.arrangement.model.{DesDebit, DesTTPArrangement, Instalment, Schedule, TTPArrangement, Taxpayer}
+import uk.gov.hmrc.timetopay.arrangement.model.{DesDebit, DesTTPArrangement, Instalment, PaymentSchedule, TTPArrangement, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionTypes.Scottish
 
 class DesTTPArrangementBuilder @Inject() (configuration: Configuration) {
@@ -34,7 +34,7 @@ class DesTTPArrangementBuilder @Inject() (configuration: Configuration) {
 
   def create(implicit ttpArrangement: TTPArrangement): DesTTPArrangement = {
 
-    val schedule: Schedule = ttpArrangement.schedule
+    val schedule: PaymentSchedule = ttpArrangement.schedule
     val firstPaymentInstalment: Instalment = schedule.instalments.head
 
     val firstPayment = firstPaymentAmount(schedule)
@@ -74,14 +74,14 @@ class DesTTPArrangementBuilder @Inject() (configuration: Configuration) {
     }
   }
 
-  private def firstPaymentAmount(schedule: Schedule): BigDecimal = {
+  private def firstPaymentAmount(schedule: PaymentSchedule): BigDecimal = {
     val firstPayment: Instalment = schedule.instalments.head
     val initialPayment = Option(schedule.initialPayment).getOrElse(BigDecimal(0.0))
     firstPayment.amount.+(initialPayment)
   }
 
   def saNote(ttpArrangement: TTPArrangement): String = {
-    val schedule: Schedule = ttpArrangement.schedule
+    val schedule: PaymentSchedule = ttpArrangement.schedule
     val initialPayment = firstPaymentAmount(schedule)
     val reviewDate = schedule.endDate.plusWeeks(3).format(formatter)
     val regularPaymentAmount = schedule.instalments.head.amount

@@ -19,6 +19,7 @@ package uk.gov.hmrc.timetopay.arrangement.connectors
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.http.Status
+import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{Authorization, HttpClient, _}
 import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiServiceConnectorConfig
@@ -30,6 +31,10 @@ import scala.concurrent.{ExecutionContext, Future}
 case class SubmissionSuccess()
 
 case class SubmissionError(code: Int, message: String)
+
+object SubmissionError {
+  implicit val format: OFormat[SubmissionError] = Json.format[SubmissionError]
+}
 
 @Singleton
 class DesArrangementApiServiceConnector @Inject() (

@@ -19,7 +19,7 @@ package uk.gov.hmrc.timetopay.arrangement
 import java.time.LocalDate
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.timetopay.arrangement.model.{Address, CommunicationPreferences, DesTTPArrangement, Instalment, LetterAndControl, Schedule, SelfAssessment, Taxpayer}
+import uk.gov.hmrc.timetopay.arrangement.model.{Address, CommunicationPreferences, DesTTPArrangement, Instalment, LetterAndControl, PaymentSchedule, SelfAssessment, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.model.modelFormat._
 
 package object resources {
@@ -276,7 +276,7 @@ package object resources {
          |  }
          |}""".stripMargin).as[Taxpayer]
 
-  val schedule: Schedule = Schedule(LocalDate.now(), LocalDate.now(), 0.0, BigDecimal("2000.00"), 0.0, 0.0, 0.0, List(Instalment(LocalDate.now(), 0.0)))
+  val schedule: PaymentSchedule = PaymentSchedule(LocalDate.now(), LocalDate.now(), 0.0, BigDecimal("2000.00"), 0.0, 0.0, 0.0, List(Instalment(LocalDate.now(), 0.0)))
   val happyCommsPref = CommunicationPreferences(welshLanguageIndicator = false, audioIndicator = false, largePrintIndicator = false, brailleIndicator = false)
   val selfAssessment = SelfAssessment("XXX", Some(happyCommsPref), List())
   val selfAssessmentNoCommsPref = SelfAssessment("XXX", None, List())

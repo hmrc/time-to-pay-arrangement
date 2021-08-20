@@ -23,7 +23,7 @@ import uk.gov.hmrc.timetopay.arrangement.resources._
 import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
 import java.time.LocalDate.now
 
-import uk.gov.hmrc.timetopay.arrangement.model.{Instalment, Schedule, TTPArrangement}
+import uk.gov.hmrc.timetopay.arrangement.model.{Instalment, PaymentSchedule, TTPArrangement}
 
 class LetterAndControlBuilderSpec extends ITSpec {
   private val letterAndControlBuilder = fakeApplication().injector.instanceOf[LetterAndControlBuilder]
@@ -60,7 +60,7 @@ class LetterAndControlBuilderSpec extends ITSpec {
   }
 
   "LetterAndControlService should Format the clmPymtString correctly" in {
-    val scheduleWithInstalments: Schedule = Schedule(now(), now(), 0.0, BigDecimal("100.98"), 100, 0.98, 100.98,
+    val scheduleWithInstalments: PaymentSchedule = PaymentSchedule(now(), now(), 0.0, BigDecimal("100.98"), 100, 0.98, 100.98,
                                                      List(
         Instalment(now(), 10.0),
         Instalment(now(), 10.0),
@@ -78,7 +78,7 @@ class LetterAndControlBuilderSpec extends ITSpec {
   }
 
   "LetterAndControlService should Format the clmPymtString correctly for large numbers in" in {
-    val scheduleWithInstalments: Schedule = Schedule(now(), now(), 5000000.0, BigDecimal("15000000.00"), 100, 0.00, 100.98,
+    val scheduleWithInstalments: PaymentSchedule = PaymentSchedule(now(), now(), 5000000.0, BigDecimal("15000000.00"), 100, 0.00, 100.98,
                                                      List(
         Instalment(now(), 100000000.00),
         Instalment(now(), 100000000.00),
@@ -89,7 +89,7 @@ class LetterAndControlBuilderSpec extends ITSpec {
 
   "LetterAndControlService should Format the clmPymtString correctly for a 2 month schedule with only a first and final payment" in {
     val scheduleWithInstalments =
-      Schedule(now(), now(), 5000000.0, BigDecimal("15000000.00"), 100, 0.00, 100.98, List(Instalment(now(), 100000000.00), Instalment(now(), 100000000.00)))
+      PaymentSchedule(now(), now(), 5000000.0, BigDecimal("15000000.00"), 100, 0.00, 100.98, List(Instalment(now(), 100000000.00), Instalment(now(), 100000000.00)))
 
     val result = letterAndControlBuilder.create(TTPArrangement(None, None, "XXX", "XXX", taxpayer, scheduleWithInstalments, None))
     result.clmPymtString shouldBe "Initial payment of £105,000,000.00 then a final payment of £100,000,000.00"

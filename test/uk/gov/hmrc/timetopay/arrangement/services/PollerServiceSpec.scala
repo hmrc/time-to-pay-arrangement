@@ -46,7 +46,7 @@ class PollerServiceSpec extends ITSpec {
   }
   private val clock: Clock = systemUTC()
   private val jodaDateTime: DateTime = DateTime.now()
-  val ttpArrangementWorkItem = TTPArrangementWorkItem(now(clock), now(clock), "", crypto.encrypt(arrangement))
+  val ttpArrangementWorkItem = TTPArrangementWorkItem(now(clock), now(clock), "", crypto.encryptTtpa(arrangement))
   protected def numberOfQueuedNotifications: Integer = arrangementWorkItemRepo.count(Json.obj()).futureValue
 
   "pollerService should set it to PermanentlyFailed failed if availableUntil is passed" in {

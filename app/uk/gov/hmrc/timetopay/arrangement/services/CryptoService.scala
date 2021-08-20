@@ -28,11 +28,18 @@ class CryptoService @Inject() (configuration: Configuration) {
 
   private lazy val crypto = new CryptoWithKeysFromConfig("mongodb.encryption", configuration.underlying)
 
-  def encrypt(desSubmissionRequest: TTPArrangement): String = {
+  def encryptTtpa(desSubmissionRequest: TTPArrangement): String = {
     crypto.encrypt(PlainText(Json.stringify(Json.toJson(desSubmissionRequest)))).value
   }
 
-  def decrypt(encrypted: String): Option[TTPArrangement] =
+  def decryptTtpa(encrypted: String): Option[TTPArrangement] =
     Json.fromJson[TTPArrangement](Json.parse(crypto.decrypt(Crypted(encrypted)).value)).asOpt
+
+  def encryptAuditTags(tags: Map[String, String]): String = {
+    crypto.encrypt(PlainText(Json.stringify(Json.toJson(tags)))).value
+  }
+
+  def decryptAuditTags(encrypted: String): Option[Map[String, String]] =
+    Json.fromJson[Map[String, String]](Json.parse(crypto.decrypt(Crypted(encrypted)).value)).asOpt
 
 }
