@@ -18,16 +18,21 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import uk.gov.hmrc.timetopay.arrangement._
-import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
-import uk.gov.hmrc.timetopay.arrangement.resources._
-import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
+import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestData}
 
 import java.time.LocalDate.now
 import uk.gov.hmrc.timetopay.arrangement.model.{BankDetails, Instalment, PaymentSchedule, TTPArrangement}
-import uk.gov.hmrc.timetopay.arrangement.repository.TestDataTtp.bankDetails
 
-class LetterAndControlBuilderSpec extends ITSpec {
+class LetterAndControlBuilderSpec extends ITSpec with TestData {
   private val letterAndControlBuilder = fakeApplication().injector.instanceOf[LetterAndControlBuilder]
+
+  import Taxpayers._
+
+  lazy val bankDetails: BankDetails = BankDetails(
+    sortCode      = "12-34-56",
+    accountNumber = "12345678",
+    accountName   = "Mr John Campbell"
+  )
 
   private val taxPayerData = Table(
     ("taxPayer", "exceptionCode", "exceptionReason", "message"),

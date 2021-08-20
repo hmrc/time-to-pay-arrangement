@@ -18,7 +18,7 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import play.api.Configuration
 import play.api.libs.json.Json
-import uk.gov.hmrc.timetopay.arrangement.model.{TTPArrangement}
+import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangement
 import uk.gov.hmrc.crypto.{Crypted, CryptoWithKeysFromConfig, PlainText}
 
 import javax.inject.{Inject, Singleton}

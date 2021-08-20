@@ -20,13 +20,14 @@ import org.scalatest.{FreeSpecLike, Matchers}
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatestplus.play.guice.GuiceOneServerPerTest
 import play.api.Configuration
-import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers._
-import uk.gov.hmrc.timetopay.arrangement.resources._
 
 import java.time.LocalDate
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangement
+import uk.gov.hmrc.timetopay.arrangement.support.TestData
 
-class DesTTPArrangementBuilderSpec extends FreeSpecLike with GuiceOneServerPerTest with Matchers {
+class DesTTPArrangementBuilderSpec extends FreeSpecLike with GuiceOneServerPerTest with Matchers with TestData {
+
+  import Taxpayers._
 
   lazy val config = fakeApplication.injector.instanceOf[Configuration]
 

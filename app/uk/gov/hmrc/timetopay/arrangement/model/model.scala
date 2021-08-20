@@ -49,25 +49,6 @@ object Taxpayer {
   implicit val format: OFormat[Taxpayer] = Json.format
 }
 
-final case class BankDetails(
-    sortCode: String, accountNumber: String, accountName: String, maybeDDIRefNumber: Option[String] = None) {
-
-  def obfuscate: BankDetails = BankDetails(
-    sortCode          = "***",
-    accountNumber     = "***",
-    accountName       = "***",
-    maybeDDIRefNumber = maybeDDIRefNumber.map(_ => "***")
-  )
-
-  override def toString: String = {
-    obfuscate.productIterator.mkString(productPrefix + "(", ",", ")")
-  }
-}
-
-object BankDetails {
-  implicit val format: Format[BankDetails] = Json.format[BankDetails]
-}
-
 case class SelfAssessment(
     utr:                      String,
     communicationPreferences: Option[CommunicationPreferences],

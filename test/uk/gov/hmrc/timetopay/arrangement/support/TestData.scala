@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.timetopay.arrangement
+package uk.gov.hmrc.timetopay.arrangement.support
 
 import java.time.LocalDate
 
@@ -22,7 +22,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.timetopay.arrangement.model.{Address, CommunicationPreferences, DesTTPArrangement, Instalment, LetterAndControl, PaymentSchedule, SelfAssessment, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.model.modelFormat._
 
-package object resources {
+trait TestData {
 
   val ttparrangementRequest = Json.parse(
     s"""
@@ -56,6 +56,11 @@ package object resources {
        |        }
        |      ]
        |    }
+       |  },
+       |  "bankDetails": {
+       |    "sortCode": "12-34-56",
+       |    "accountNumber": "12345678",
+       |    "accountName": "Mr John Campbell"
        |  },
        |  "schedule": {
        |    "startDate": "2016-09-01",
@@ -108,7 +113,7 @@ package object resources {
        |    "selfAssessment": {
        |      "utr": "1234567890",
        |
-                                            |      "communicationPreferences": {
+       |      "communicationPreferences": {
        |        "welshLanguageIndicator": false,
        |        "audioIndicator": false,
        |        "largePrintIndicator": false,
@@ -121,6 +126,11 @@ package object resources {
        |        }
        |      ]
        |    }
+       |  },
+       |  "bankDetails": {
+       |    "sortCode": "12-34-56",
+       |    "accountNumber": "12345678",
+       |    "accountName": "Mr John Campbell"
        |  },
        |  "schedule": {
        |    "startDate": "2016-09-01",
@@ -193,7 +203,7 @@ package object resources {
        |    }
        |  }
        |
-                                            |}
+       |}
        |""".stripMargin)
 
   val submitArrangementTTPArrangement: DesTTPArrangement =

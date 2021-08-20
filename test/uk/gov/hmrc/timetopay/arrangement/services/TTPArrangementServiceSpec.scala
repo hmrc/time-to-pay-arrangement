@@ -18,12 +18,12 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import uk.gov.hmrc.timetopay.arrangement.model.{TTPArrangement, TTPArrangementWorkItem}
 import uk.gov.hmrc.timetopay.arrangement.repository.{TTPArrangementRepository, TTPArrangementWorkItemRepository}
-import uk.gov.hmrc.timetopay.arrangement.resources.Taxpayers.taxPayerWithEnglishAddress
-import uk.gov.hmrc.timetopay.arrangement.resources._
-import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, WireMockResponses}
+import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestData, WireMockResponses}
 import uk.gov.hmrc.workitem.WorkItem
 
-class TTPArrangementServiceSpec extends ITSpec {
+class TTPArrangementServiceSpec extends ITSpec with TestData {
+
+  import Taxpayers._
 
   private val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
   private val arrangementWorkItemRepo = fakeApplication.injector.instanceOf[TTPArrangementWorkItemRepository]

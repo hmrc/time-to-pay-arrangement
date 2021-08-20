@@ -21,10 +21,9 @@ import play.api.libs.json._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementRepository
-import uk.gov.hmrc.timetopay.arrangement.resources._
-import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, WireMockResponses}
+import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestData, WireMockResponses}
 
-class TTPArrangementControllerSpec extends ITSpec {
+class TTPArrangementControllerSpec extends ITSpec with TestData {
 
   private val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
 
