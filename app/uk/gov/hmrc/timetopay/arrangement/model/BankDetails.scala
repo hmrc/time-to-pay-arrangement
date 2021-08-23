@@ -16,22 +16,23 @@
 
 package uk.gov.hmrc.timetopay.arrangement.model
 
-import java.time.LocalDateTime
+import play.api.libs.json.{Format, Json}
 
-import play.api.libs.json.{Json, OFormat}
+final case class BankDetails(
+    sortCode: String, accountNumber: String, accountName: String, maybeDDIRefNumber: Option[String] = None) {
 
-case class TTPArrangementWorkItem(
-    createdOn:      LocalDateTime,
-    availableUntil: LocalDateTime,
-    reference:      String,
-    ttpArrangement: String,
-    auditTags:      String) {
+  def obfuscate: BankDetails = BankDetails(
+    sortCode          = "***",
+    accountNumber     = "***",
+    accountName       = "***",
+    maybeDDIRefNumber = maybeDDIRefNumber.map(_ => "***")
+  )
 
-  override def toString: String =
-    s"TTPArrangementWorkItem for Reference $reference ... {createdOn: $createdOn, availableUntil: $availableUntil,notification: ${ttpArrangement.toString}"
+  override def toString: String = {
+    obfuscate.productIterator.mkString(productPrefix + "(", ",", ")")
+  }
 }
 
-object TTPArrangementWorkItem {
-  implicit val format: OFormat[TTPArrangementWorkItem] = Json.format[TTPArrangementWorkItem]
+object BankDetails {
+  implicit val format: Format[BankDetails] = Json.format[BankDetails]
 }
-

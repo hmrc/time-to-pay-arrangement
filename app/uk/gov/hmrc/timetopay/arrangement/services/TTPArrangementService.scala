@@ -23,7 +23,9 @@ import org.joda.time.DateTime
 import play.api.Logger
 import play.api.http.Status
 import play.api.libs.json.JsValue
+import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.timetopay.arrangement.config.QueueConfig
 import uk.gov.hmrc.timetopay.arrangement.connectors.DesArrangementApiServiceConnector
 import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, TTPArrangement, TTPArrangementWorkItem}
@@ -50,9 +52,11 @@ class TTPArrangementService @Inject() (
   /**
    * Builds and submits the TTPArrangement to Des. Also saves to Mongo
    */
-  def submit(arrangement: TTPArrangement)(implicit hc: HeaderCarrier): Future[Option[TTPArrangement]] = {
+  def submit(arrangement: TTPArrangement)(implicit r: Request[_]): Future[Option[TTPArrangement]] = {
     logger.info(s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' " +
       s"and PP '${arrangement.paymentPlanReference}'")
+
+    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(r)
 
     val letterAndControl = letterAndControlBuilder.create(arrangement)
     val desTTPArrangement = desTTPArrangementBuilder.create(arrangement)
@@ -97,14 +101,23 @@ class TTPArrangementService @Inject() (
       desArrangement = Some(desSubmissionRequest))
   }
 
-  private def sendToTTPArrangementWorkRepo(utr: String, arrangement: TTPArrangement): Future[WorkItem[TTPArrangementWorkItem]] = {
+  private def sendToTTPArrangementWorkRepo(
+      utr:         String,
+      arrangement: TTPArrangement
+  )(implicit request: Request[_]): Future[WorkItem[TTPArrangementWorkItem]] = {
     val time: LocalDateTime = LocalDateTime.now(clock)
     val availableUntil = time.plus(Duration.ofMillis(queueConfig.availableFor.toMillis))
 
     val jodaLocalDateTime: DateTime = ttpArrangementRepositoryWorkItem.now
 
     ttpArrangementRepositoryWorkItem.pushNew(
-      TTPArrangementWorkItem(time, availableUntil, utr, crypto.encrypt(arrangement)), jodaLocalDateTime
+      TTPArrangementWorkItem(
+        time,
+        availableUntil,
+        utr,
+        crypto.encryptTtpa(arrangement),
+        crypto.encryptAuditTags(AuditService.auditTags)
+      ), jodaLocalDateTime
     )
   }
 

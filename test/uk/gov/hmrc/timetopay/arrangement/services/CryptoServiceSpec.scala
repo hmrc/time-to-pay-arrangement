@@ -18,21 +18,33 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import org.scalatest.{FreeSpecLike, Matchers}
 import org.scalatestplus.play.guice.GuiceOneServerPerTest
-import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, Schedule, SelfAssessment, TTPArrangement, Taxpayer}
-import uk.gov.hmrc.timetopay.arrangement.resources.{submitArrangementLetterAndControl, submitArrangementTTPArrangement}
+import uk.gov.hmrc.timetopay.arrangement.model.{BankDetails, DesSubmissionRequest, PaymentSchedule, SelfAssessment, TTPArrangement, Taxpayer}
+import uk.gov.hmrc.timetopay.arrangement.support.TestData
 
 import java.time.LocalDate
 
-class CryptoServiceSpec extends FreeSpecLike with GuiceOneServerPerTest with Matchers {
+class CryptoServiceSpec extends FreeSpecLike with GuiceOneServerPerTest with Matchers with TestData {
 
   val cryptoService = fakeApplication.injector.instanceOf[CryptoService]
 
+  lazy val bankDetails: BankDetails = BankDetails(
+    sortCode      = "12-34-56",
+    accountNumber = "12345678",
+    accountName   = "Mr John Campbell"
+  )
+
   "check encrypted -> decripted match" in {
     val des: DesSubmissionRequest = DesSubmissionRequest(submitArrangementTTPArrangement, submitArrangementLetterAndControl)
-    val request: TTPArrangement = TTPArrangement(None, None, "", "", Taxpayer("", List.empty, SelfAssessment("", None, List.empty)), Schedule(LocalDate.now(), LocalDate.now(), 0, 0, 0, 0, 0, List.empty), Some(des))
+    val request: TTPArrangement = TTPArrangement(
+      None, None, "", "",
+      Taxpayer("", List.empty, SelfAssessment("", None, List.empty)),
+      bankDetails,
+      PaymentSchedule(LocalDate.now(), LocalDate.now(), 0, 0, 0, 0, 0, List.empty),
+      Some(des)
+    )
 
-    val encrypted = cryptoService.encrypt(request)
-    val decripted = cryptoService.decrypt(encrypted)
+    val encrypted = cryptoService.encryptTtpa(request)
+    val decripted = cryptoService.decryptTtpa(encrypted)
 
     decripted shouldBe Some(request)
   }

@@ -20,7 +20,7 @@ import java.time.{LocalDate, LocalDateTime}
 
 import play.api.libs.json._
 
-case class Schedule(
+case class PaymentSchedule(
     startDate:            LocalDate,
     endDate:              LocalDate,
     initialPayment:       BigDecimal,
@@ -30,8 +30,8 @@ case class Schedule(
     totalPayable:         BigDecimal,
     instalments:          List[Instalment])
 
-object Schedule {
-  implicit val format: OFormat[Schedule] = Json.format
+object PaymentSchedule {
+  implicit val format: OFormat[PaymentSchedule] = Json.format
 }
 
 case class Instalment(paymentDate: LocalDate, amount: BigDecimal)
@@ -98,7 +98,8 @@ case class TTPArrangement(
     paymentPlanReference: String,
     directDebitReference: String,
     taxpayer:             Taxpayer,
-    schedule:             Schedule,
+    bankDetails:          BankDetails,
+    schedule:             PaymentSchedule,
     desArrangement:       Option[DesSubmissionRequest])
 object TTPArrangement {
   implicit val ttpArrangementFormat: OFormat[TTPArrangement] = Json.format[TTPArrangement]
@@ -170,7 +171,7 @@ object modelFormat {
   }
 
   implicit val instalmentFormat: OFormat[Instalment] = Json.format[Instalment]
-  implicit val scheduleFormat: OFormat[Schedule] = Json.format[Schedule]
+  implicit val scheduleFormat: OFormat[PaymentSchedule] = Json.format[PaymentSchedule]
   implicit val addressFormat: OFormat[Address] = Json.format[Address]
   implicit val desDebitFormat: OFormat[DesDebit] = Json.format[DesDebit]
   implicit val debitFormat: OFormat[Debit] = Json.format[Debit]

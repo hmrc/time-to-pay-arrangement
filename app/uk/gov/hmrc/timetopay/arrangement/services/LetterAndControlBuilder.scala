@@ -20,7 +20,7 @@ import javax.inject.Inject
 import play.api.{Configuration, Logger}
 import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig, LetterAndControlAndJurisdictionChecker}
-import uk.gov.hmrc.timetopay.arrangement.model.{Address, CommunicationPreferences, LetterAndControl, Schedule, TTPArrangement, Taxpayer}
+import uk.gov.hmrc.timetopay.arrangement.model.{Address, CommunicationPreferences, LetterAndControl, PaymentSchedule, TTPArrangement, Taxpayer}
 
 import scala.util.Try
 
@@ -74,7 +74,7 @@ class LetterAndControlBuilder @Inject() (letterAndControlAndJurisdictionChecker:
 
   }
 
-  private def paymentMessage(schedule: Schedule) = {
+  private def paymentMessage(schedule: PaymentSchedule) = {
     val instalmentSize = schedule.instalments.size - 2
     val regularPaymentAmount = schedule.instalments.head.amount.setScale(2)
     val lastPaymentAmount = schedule.instalments.last.amount.setScale(2)

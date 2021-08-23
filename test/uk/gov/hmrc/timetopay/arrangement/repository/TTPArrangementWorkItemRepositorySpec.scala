@@ -22,7 +22,7 @@ import org.joda.time.DateTime
 import play.api.libs.json.Json
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangementWorkItem
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, MongoSupport}
-import uk.gov.hmrc.timetopay.arrangement.repository.TestDataTtp.arrangement
+import uk.gov.hmrc.timetopay.arrangement.repository.TestDataTtp.{arrangement, auditTags}
 
 import java.time.LocalDateTime.now
 import reactivemongo.bson.BSONObjectID
@@ -37,7 +37,7 @@ class TTPArrangementWorkItemRepositorySpec extends ITSpec {
 
   private val clock: Clock = systemUTC()
 
-  val ttpArrangementWorkItem = TTPArrangementWorkItem(now(clock), now(clock), "", crypto.encrypt(arrangement))
+  val ttpArrangementWorkItem = TTPArrangementWorkItem(now(clock), now(clock), "", crypto.encryptTtpa(arrangement), crypto.encryptAuditTags(auditTags))
   "Count should be 0 with empty repo" in {
     collectionSize shouldBe 0
   }
@@ -55,7 +55,7 @@ class TTPArrangementWorkItemRepositorySpec extends ITSpec {
     found match {
       case Some(x) =>
         x.status shouldBe uk.gov.hmrc.workitem.ToDo
-        crypto.decrypt(x.item.ttpArrangement) shouldBe Some(arrangement)
+        crypto.decryptTtpa(x.item.ttpArrangement) shouldBe Some(arrangement)
       case None => "failed" shouldBe "to find a value"
     }
   }
@@ -66,7 +66,7 @@ class TTPArrangementWorkItemRepositorySpec extends ITSpec {
     outstanding match {
       case Some(x) =>
         x.status shouldBe uk.gov.hmrc.workitem.InProgress
-        crypto.decrypt(x.item.ttpArrangement) shouldBe Some(arrangement)
+        crypto.decryptTtpa(x.item.ttpArrangement) shouldBe Some(arrangement)
       case None => "failed" shouldBe "to find a value"
     }
 
