@@ -88,6 +88,17 @@ Input
 | 201 | TTP Arrangement created with header location  |
 | 401 | Not authorised to submit the TTP arrangement  |
 
+Sending the new arrangement to the core api via DES is now executed in a resilient manner. Failures will be retried periodically.
+The retry mechanism has the following configuration parameters in application.conf
+
+| Configuration Parameter | Description |
+|---|---|
+| queue.retryAfter | the time to wait before retrying a failed submission to DES  |
+| queue.available.for | the time the request remains available to be retried after the initial failure |
+| queue.ttl | the time the request remains in the queue  |
+| poller.initialDelay | the time the retry mechanism should wait at startup before it begins checking for failed submissions |
+| poller.interval | the interval between checks for failed submissions to DES |
+
 #### GET /ttparrangements/{arrangement-identifier}
 
 Returns a specific arrangement based on the identifier. This api is for internal use only and the data lives for 30 days
