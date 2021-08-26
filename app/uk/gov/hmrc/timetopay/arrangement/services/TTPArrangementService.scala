@@ -56,8 +56,6 @@ class TTPArrangementService @Inject() (
     logger.info(s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' " +
       s"and PP '${arrangement.paymentPlanReference}'")
 
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(r)
-
     val letterAndControl = letterAndControlBuilder.create(arrangement)
     val desTTPArrangement = desTTPArrangementBuilder.create(arrangement)
 
