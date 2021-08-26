@@ -31,4 +31,9 @@ final case class DesArrangementApiServiceConnectorConfig(desArrangementUrl: Stri
       serviceEnvironment = configuration.get[String]("microservice.services.des-arrangement-api.environment"),
       authorisationToken = configuration.get[String]("microservice.services.des-arrangement-api.authorization-token"))
   }
+
+  val desHeaders: Seq[(String, String)] = Seq(
+    "Authorization" -> s"Bearer $authorisationToken",
+    "Environment" -> serviceEnvironment
+  )
 }

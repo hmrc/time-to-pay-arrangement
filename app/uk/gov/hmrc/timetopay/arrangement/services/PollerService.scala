@@ -76,12 +76,10 @@ class PollerService @Inject() (
   }
 
   def tryDesCallAgain(wi: WorkItem[TTPArrangementWorkItem]): Future[Unit] = {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-
     val arrangment = crypto.decryptTtpa(wi.item.ttpArrangement)
       .getOrElse(throw new RuntimeException("Saved ttp in work item repo had invalid encrypted item " + wi.toString))
     val auditTags = crypto.decryptAuditTags(wi.item.auditTags)
-      .getOrElse(throw new RuntimeException("Saved ttp in work item repo had invalid encrypted item " + wi.toString))
+      .getOrElse(throw new RuntimeException("Saved ttp in work item repo had invalid encrypted audit tags " + wi.toString))
 
     val utr = arrangment.taxpayer.selfAssessment.utr
     val desSubmissionRequest: DesSubmissionRequest = arrangment.desArrangement
