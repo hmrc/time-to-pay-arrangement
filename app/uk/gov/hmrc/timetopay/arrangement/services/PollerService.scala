@@ -75,7 +75,7 @@ class PollerService @Inject() (
     time.isBefore(workItem.availableUntil)
   }
 
-  def tryDesCallAgain(wi: WorkItem[TTPArrangementWorkItem]): Future[Unit] = {
+  def tryDesCallAgain(wi: WorkItem[TTPArrangementWorkItem], finalAttempt: Boolean): Future[Unit] = {
     val arrangment = crypto.decryptTtpa(wi.item.ttpArrangement)
       .getOrElse(throw new RuntimeException("Saved ttp in work item repo had invalid encrypted item " + wi.toString))
     val auditTags = crypto.decryptAuditTags(wi.item.auditTags)
@@ -92,9 +92,17 @@ class PollerService @Inject() (
         ttpArrangementRepositoryWorkItem.complete(wi.id).map(_ => process())
         ()
       case Left(error) =>
-        logger.warn("Call failed for " + wi.toString + " reason " + error.toString)
-        auditService.sendArrangementSubmissionFailedEvent(arrangment.taxpayer, arrangment.bankDetails, arrangment.schedule, error, auditTags)
-        ttpArrangementRepositoryWorkItem.markAs(wi.id, Failed, None).map(_ => process())
+        if (finalAttempt) {
+          logger.error("ZONK ERROR! Call failed and will not be tried again for " + wi.toString)
+
+          auditService.sendArrangementSubmissionFailedEvent(arrangment.taxpayer, arrangment.bankDetails, arrangment.schedule, error, auditTags)
+          ttpArrangementRepositoryWorkItem.markAs(wi.id, PermanentlyFailed, None).flatMap(_ => process())
+        } else {
+          logger.warn("Call failed for " + wi.toString + " reason " + error.toString)
+
+          ttpArrangementRepositoryWorkItem.markAs(wi.id, Failed, None).map(_ => process())
+        }
+
         ()
     }
   }
@@ -106,14 +114,10 @@ class PollerService @Inject() (
         case None =>
           Future.successful(())
         case Some(wi) =>
-          if (isAvailable(wi.item)) {
-            logger.info("Retrying call to des api for " + wi.toString)
-            tryDesCallAgain(wi)
-          } else {
-            logger.error("ZONK ERROR! Call failed and will not be tried again for " + wi.toString)
+          val finalAttempt = !isAvailable(wi.item)
 
-            ttpArrangementRepositoryWorkItem.markAs(wi.id, PermanentlyFailed, None).flatMap(_ => process())
-          }
+          logger.info("Retrying call to des api for " + wi.toString)
+          tryDesCallAgain(wi, finalAttempt)
       }
 
 }
