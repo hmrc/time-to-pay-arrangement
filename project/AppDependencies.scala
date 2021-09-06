@@ -10,7 +10,7 @@ object AppDependencies {
     "com.beachape" %% "enumeratum" % "1.5.13",
     "uk.gov.hmrc"  %% "play-scheduling-play-27"   % "7.10.0",
     "uk.gov.hmrc"  %% "crypto"     % "6.0.0",
-    "uk.gov.hmrc" %% "work-item-repo" % "8.0.0-play-28"
+    "uk.gov.hmrc" %% "work-item-repo" % "8.1.0-play-28"
   )
 
   val test = Seq(
