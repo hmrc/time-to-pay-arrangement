@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.timetopay.arrangement.support
 
+import com.codahale.metrics.SharedMetricRegistries
+
 import java.time.format.DateTimeFormatter
 import java.time.{LocalDateTime, ZoneId, ZonedDateTime}
 import com.google.inject.AbstractModule
@@ -54,6 +56,11 @@ trait ITSpec
     LocalDateTime.parse("2018-11-02T16:28:55.185", formatter).atZone(ZoneId.of("Europe/London"))
   }
 
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    SharedMetricRegistries.clear()
+  }
+
   implicit lazy val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
   lazy val overridingsModule = new AbstractModule {
     override def configure(): Unit = ()
@@ -76,6 +83,9 @@ trait ITSpec
     .overrides(GuiceableModule.fromGuiceModules(Seq(overridingsModule)))
     .configure(Map[String, Any](
       "mongodb.uri" -> mongoUri,
+      "metrics.enabled" -> false,
+      "metrics.jvm" -> false,
+      //      "microservice.metrics.graphite.enabled" -> false,
       "microservice.services.des-arrangement-api.host" -> "localhost",
       "microservice.services.des-arrangement-api.environment" -> "localhost",
       "microservice.services.des-arrangement-api.port" -> WireMockSupport.port)).build()
