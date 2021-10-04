@@ -19,11 +19,11 @@ package uk.gov.hmrc.timetopay.arrangement.services
 import org.scalatest.{FreeSpecLike, Matchers}
 import org.scalatestplus.play.guice.GuiceOneServerPerTest
 import uk.gov.hmrc.timetopay.arrangement.model.{BankDetails, DesSubmissionRequest, PaymentSchedule, SelfAssessment, TTPArrangement, Taxpayer}
-import uk.gov.hmrc.timetopay.arrangement.support.TestData
+import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestData}
 
 import java.time.LocalDate
 
-class CryptoServiceSpec extends FreeSpecLike with GuiceOneServerPerTest with Matchers with TestData {
+class CryptoServiceSpec extends ITSpec with TestData {
 
   val cryptoService = fakeApplication.injector.instanceOf[CryptoService]
 

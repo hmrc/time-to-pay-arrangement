@@ -23,13 +23,11 @@ import play.api.Configuration
 
 import java.time.LocalDate
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangement
-import uk.gov.hmrc.timetopay.arrangement.support.TestData
+import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestData}
 
-class DesTTPArrangementBuilderSpec extends FreeSpecLike with GuiceOneServerPerTest with Matchers with TestData {
+class DesTTPArrangementBuilderSpec extends ITSpec with TestData {
 
   import Taxpayers._
-
-  lazy val config = fakeApplication.injector.instanceOf[Configuration]
 
   private val desTTPArrangementService = new DesTTPArrangementBuilder(config)
   private val taxPayerData = Table(
