@@ -41,6 +41,7 @@ class TTPArrangementService @Inject() (
     desArrangementApiService:         DesArrangementApiServiceConnector,
     ttpArrangementRepository:         TTPArrangementRepository,
     ttpArrangementRepositoryWorkItem: TTPArrangementWorkItemRepository,
+    auditService:                     AuditService,
     val clock:                        Clock,
     letterAndControlBuilder:          LetterAndControlBuilder,
     crypto:                           CryptoService,
@@ -79,7 +80,11 @@ class TTPArrangementService @Inject() (
             } else
               returnedError
           },
-          _ => Future.successful(result._2))
+          _ => Future.successful {
+            auditService.sendSubmissionSucceededEvent(arrangement.taxpayer, arrangement.bankDetails, arrangement.schedule, AuditService.auditTags)
+
+            result._2
+          })
     }
   }
 
