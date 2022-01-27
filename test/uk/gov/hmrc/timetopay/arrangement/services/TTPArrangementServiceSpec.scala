@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +60,15 @@ class TTPArrangementServiceSpec extends ITSpec with TestData {
   }
 
   "TTPArrangementService should return failed future for DES Bad request in the 500's range and save to the work item db in" in {
+
+    WireMockResponses.desArrangementApiBadRequestSeverError(arrangement.taxpayer.selfAssessment.utr)
+    val response = tTPArrangementService.submit(arrangement).failed.futureValue
+    val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.findAll().futureValue.headOption
+    workItem should not be None
+    response.getMessage should include("SERVICE_UNAVAILABLE")
+  }
+
+  "TTPArrangementService should return failed future for nginx timeout (499) and save to the work item db in" in {
 
     WireMockResponses.desArrangementApiBadRequestSeverError(arrangement.taxpayer.selfAssessment.utr)
     val response = tTPArrangementService.submit(arrangement).failed.futureValue

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,8 @@ class TTPArrangementService @Inject() (
     queueConfig:                      QueueConfig) {
   val logger: Logger = Logger(getClass)
 
+  val CLIENT_CLOSED_REQUEST = 499 // Client closes the connection while nginx is processing the request.
+
   def byId(id: String): Future[Option[JsValue]] = ttpArrangementRepository.findByIdLocal(id)
 
   /**
@@ -69,7 +71,7 @@ class TTPArrangementService @Inject() (
       result =>
         result._1.fold(
           error => {
-            val isSeverError = error.code >= Status.INTERNAL_SERVER_ERROR
+            val isSeverError = error.code >= CLIENT_CLOSED_REQUEST
             val returnedError = Future.failed(DesApiException(error.code, error.message))
             if (isSeverError) {
               sendToTTPArrangementWorkRepo(
