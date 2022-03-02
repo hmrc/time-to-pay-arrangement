@@ -53,6 +53,11 @@ Input
       ]
     }
   },
+   "bankDetails": {
+    "sortCode": "12-34-56",
+    "accountNumber": "12345678",
+    "accountName": "Mr John Campbell"
+  },
   "schedule": {
     "startDate": "2016-09-01",
     "endDate": "2017-08-01",

@@ -26,7 +26,7 @@ import play.api.libs.json.JsValue
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import uk.gov.hmrc.timetopay.arrangement.config.QueueConfig
+import uk.gov.hmrc.timetopay.arrangement.config.{QueueConfig, QueueLogger}
 import uk.gov.hmrc.timetopay.arrangement.connectors.DesArrangementApiServiceConnector
 import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, TTPArrangement, TTPArrangementWorkItem}
 import uk.gov.hmrc.timetopay.arrangement.repository.{TTPArrangementRepository, TTPArrangementWorkItemRepository}
@@ -46,7 +46,7 @@ class TTPArrangementService @Inject() (
     letterAndControlBuilder:          LetterAndControlBuilder,
     crypto:                           CryptoService,
     queueConfig:                      QueueConfig) {
-  val logger: Logger = Logger(getClass)
+  val logger = QueueLogger(getClass)
 
   val CLIENT_CLOSED_REQUEST = 499 // Client closes the connection while nginx is processing the request.
 
@@ -56,7 +56,7 @@ class TTPArrangementService @Inject() (
    * Builds and submits the TTPArrangement to Des. Also saves to Mongo
    */
   def submit(arrangement: TTPArrangement)(implicit r: Request[_]): Future[Option[TTPArrangement]] = {
-    logger.info(s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' " +
+    logger.trace(arrangement, s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' " +
       s"and PP '${arrangement.paymentPlanReference}'")
 
     val letterAndControl = letterAndControlBuilder.create(arrangement)
@@ -71,18 +71,23 @@ class TTPArrangementService @Inject() (
       result =>
         result._1.fold(
           error => {
+            logger.trace(arrangement, "des failed: code: " + error.code.toString + " msg: " + error.message)
             val isSeverError = error.code >= CLIENT_CLOSED_REQUEST
             val returnedError = Future.failed(DesApiException(error.code, error.message))
             if (isSeverError) {
+              logger.trace(arrangement, "des failed: NOT adding to queue ")
               sendToTTPArrangementWorkRepo(
                 utr,
                 arrangementToSave(arrangement, request)).flatMap { _ =>
                   returnedError
                 }
-            } else
+            } else {
+              logger.trace(arrangement, "des failed: NOT adding to queue ")
               returnedError
+            }
           },
           _ => Future.successful {
+            logger.trace(arrangement, "successful sent to des")
             auditService.sendSubmissionSucceededEvent(arrangement.taxpayer, arrangement.bankDetails, arrangement.schedule, AuditService.auditTags)
 
             result._2
@@ -115,6 +120,8 @@ class TTPArrangementService @Inject() (
 
     val jodaLocalDateTime: DateTime = ttpArrangementRepositoryWorkItem.now
 
+    logger.trace(utr, "Item to add to workItem")
+
     ttpArrangementRepositoryWorkItem.pushNew(
       TTPArrangementWorkItem(
         time,
@@ -123,7 +130,10 @@ class TTPArrangementService @Inject() (
         crypto.encryptTtpa(arrangement),
         crypto.encryptAuditTags(AuditService.auditTags)
       ), jodaLocalDateTime
-    )
+    ).map{ workItem: WorkItem[TTPArrangementWorkItem] =>
+        logger.traceWorkItem(utr, workItem, "Pushed to work queue ")
+        workItem
+      }
   }
 
 }
