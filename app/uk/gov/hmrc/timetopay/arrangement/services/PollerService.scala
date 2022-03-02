@@ -19,6 +19,8 @@ package uk.gov.hmrc.timetopay.arrangement.services
 import akka.actor.{ActorSystem, Cancellable}
 import com.google.inject.Singleton
 import play.api.Logger
+import play.api.libs.json.Format.GenericFormat
+import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.scheduling.ExclusiveScheduledJob
 import uk.gov.hmrc.timetopay.arrangement.config.{QueueConfig, QueueLogger}
@@ -49,8 +51,14 @@ class PollerService @Inject() (
   val initialDelay = queueConfig.initialDelay
   val interval = queueConfig.interval
 
-  override def executeInMutex(implicit ec: ExecutionContext): Future[Result] =
+  override def executeInMutex(implicit ec: ExecutionContext): Future[Result] = {
+    ttpArrangementRepositoryWorkItem.find().map{ ls =>
+      val txt = ls.map(x => x.status).groupBy(x => x).map{ x => s"${x._1}: ${x._2.size}" }.mkString(", ")
+      logger.track("Retry poller - WorkItem counts- " + txt)
+    }
+
     process().map(_ => Result(""))
+  }
 
   override def name: String = "TTP Arrangement Poller"
   callExecutor(name)
@@ -120,9 +128,6 @@ class PollerService @Inject() (
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   def process(): Future[Unit] = {
     try {
-      ttpArrangementRepositoryWorkItem.collection.stats().map { s =>
-        logger.track("Retry poller - WorkItem count: " + s.count.toString)
-      }
 
       ttpArrangementRepositoryWorkItem.pullOutstanding
         .flatMap {
