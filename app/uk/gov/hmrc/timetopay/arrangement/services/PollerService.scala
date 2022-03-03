@@ -24,7 +24,7 @@ import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.scheduling.ExclusiveScheduledJob
 import uk.gov.hmrc.timetopay.arrangement.config.{QueueConfig, QueueLogger}
-import uk.gov.hmrc.timetopay.arrangement.connectors.DesArrangementApiServiceConnector
+import uk.gov.hmrc.timetopay.arrangement.connectors.{DesArrangementApiServiceConnector, SubmissionError, SubmissionSuccess}
 import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, TTPArrangementWorkItem}
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementWorkItemRepository
 import uk.gov.hmrc.workitem.{Failed, PermanentlyFailed, WorkItem}
@@ -97,14 +97,14 @@ class PollerService @Inject() (
         .getOrElse(throw new RuntimeException("Retry poller - Saved ttp in work item repo had no desArrangement to send " + wi.toString))
 
       desArrangementApiServiceConnector.submitArrangement(utr, desSubmissionRequest).map {
-        case Right(_) =>
+        case _: SubmissionSuccess =>
           logger.trace(utr, "Retry poller - SUCCESSFULLY send to DES")
 
           auditService.sendSubmissionSucceededEvent(arrangment.taxpayer, arrangment.bankDetails, arrangment.schedule, auditTags)
 
           ttpArrangementRepositoryWorkItem.complete(wi.id).map(_ => process())
           ()
-        case Left(error) =>
+        case error: SubmissionError =>
           if (finalAttempt) {
             logger.error("Retry poller - ZONK ERROR! Call failed and will not be tried again for " + wi.toString)
 

@@ -22,15 +22,17 @@ import play.api.http.Status
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{Authorization, HttpClient, _}
-import uk.gov.hmrc.timetopay.arrangement.config.DesArrangementApiServiceConnectorConfig
+import uk.gov.hmrc.timetopay.arrangement.config.{DesArrangementApiServiceConnectorConfig, QueueLogger}
 import uk.gov.hmrc.timetopay.arrangement.model.DesSubmissionRequest
 import uk.gov.hmrc.timetopay.arrangement.model.modelFormat._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class SubmissionSuccess()
+class SubmissionResult
 
-case class SubmissionError(code: Int, message: String)
+case class SubmissionSuccess() extends SubmissionResult
+
+case class SubmissionError(code: Int, message: String) extends SubmissionResult
 
 object SubmissionError {
   implicit val format: OFormat[SubmissionError] = Json.format[SubmissionError]
@@ -42,8 +44,7 @@ class DesArrangementApiServiceConnector @Inject() (
     config:     DesArrangementApiServiceConnectorConfig
 ) {
   val logger: Logger = Logger(getClass)
-
-  type SubmissionResult = Either[SubmissionError, SubmissionSuccess]
+  private val zonkLogger = QueueLogger(this.getClass)
 
   // external services require explicitly passed headers
   private implicit val emptyHc: HeaderCarrier = HeaderCarrier()
@@ -62,12 +63,21 @@ class DesArrangementApiServiceConnector @Inject() (
       s"${config.desArrangementUrl}/$serviceUrl",
       desSubmissionRequest, headers = headers)
       .map {
-        case res if res.status == Status.ACCEPTED =>
-          logger.info(s"Submission successful for '${utr}'")
-          Right(SubmissionSuccess())
+      case res if res.status == Status.ACCEPTED =>
+        logger.info(s"Submission successful for '${utr}'")
+        zonkLogger.trace(utr, "DES POST OK " + res.toString())
+        SubmissionSuccess()
 
-        case res => Left(SubmissionError(res.status, res.body))
-      }
+      case res =>
+        zonkLogger.trace(utr, "DES POST Failed " + res.toString())
+        logger.info(s"Submission FAILED for '${utr}'")
+        SubmissionError(res.status, res.body)
+    }.recover {
+      case _ =>
+        zonkLogger.trace(utr, "DES POST Failed TIMEOUT")
+        logger.info(s"Submission FAILED for '${utr}'")
+        SubmissionError(599, "network timeout exception")
+    }
   }
 
 }
