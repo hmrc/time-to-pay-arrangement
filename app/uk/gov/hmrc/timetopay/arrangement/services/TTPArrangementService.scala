@@ -68,7 +68,8 @@ class TTPArrangementService @Inject() (
     (for {
       response <- desArrangementApiService.submitArrangement(utr, request)
       ttp <- saveArrangement(arrangement, request)
-    } yield { response match {
+    } yield {
+      response match {
         case error: SubmissionError =>
           logger.trace(arrangement, "des failed: code: " + error.code.toString + " msg: " + error.message)
           val isSeverError = error.code >= CLIENT_CLOSED_REQUEST

@@ -63,21 +63,21 @@ class DesArrangementApiServiceConnector @Inject() (
       s"${config.desArrangementUrl}/$serviceUrl",
       desSubmissionRequest, headers = headers)
       .map {
-      case res if res.status == Status.ACCEPTED =>
-        logger.info(s"Submission successful for '${utr}'")
-        zonkLogger.trace(utr, "DES POST OK " + res.toString())
-        SubmissionSuccess()
+        case res if res.status == Status.ACCEPTED =>
+          logger.info(s"Submission successful for '${utr}'")
+          zonkLogger.trace(utr, "DES POST OK " + res.toString())
+          SubmissionSuccess()
 
-      case res =>
-        zonkLogger.trace(utr, "DES POST Failed " + res.toString())
-        logger.info(s"Submission FAILED for '${utr}'")
-        SubmissionError(res.status, res.body)
-    }.recover {
-      case _ =>
-        zonkLogger.trace(utr, "DES POST Failed TIMEOUT")
-        logger.info(s"Submission FAILED for '${utr}'")
-        SubmissionError(599, "network timeout exception")
-    }
+        case res =>
+          zonkLogger.trace(utr, "DES POST Failed " + res.toString())
+          logger.info(s"Submission FAILED for '${utr}'")
+          SubmissionError(res.status, res.body)
+      }.recover {
+        case _ =>
+          zonkLogger.trace(utr, "DES POST Failed TIMEOUT")
+          logger.info(s"Submission FAILED for '${utr}'")
+          SubmissionError(599, "network timeout exception")
+      }
   }
 
 }
