@@ -76,7 +76,7 @@ class DesArrangementApiServiceConnector @Inject() (
         case _ =>
           zonkLogger.trace(utr, "DES POST Failed TIMEOUT")
           logger.info(s"Submission FAILED for '${utr}'")
-          SubmissionError(408, "network timeout exception")
+          SubmissionError(599, "network timeout exception")
       }
   }
 

@@ -72,7 +72,7 @@ class TTPArrangementService @Inject() (
       response match {
         case error: SubmissionError =>
           logger.trace(arrangement, "des failed: code: " + error.code.toString + " msg: " + error.message)
-          val isSeverError = error.code >= CLIENT_CLOSED_REQUEST
+          val isSeverError = (error.code >= CLIENT_CLOSED_REQUEST) || (error.code == 408)
           val returnedError = Future.failed(DesApiException(error.code, error.message))
           if (isSeverError) {
             logger.trace(arrangement, "des failed: adding to queue ")
