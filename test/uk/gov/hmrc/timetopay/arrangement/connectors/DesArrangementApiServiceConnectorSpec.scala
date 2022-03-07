@@ -31,7 +31,7 @@ class DesArrangementApiServiceConnectorSpec extends ITSpec with TestData {
 
     val result = connector.submitArrangement(taxpayer.selfAssessment.utr, request).futureValue
 
-    result.right.get shouldBe SubmissionSuccess()
+    result shouldBe SubmissionSuccess()
 
   }
   "Calling submitArrangement should return 400 response" in {
@@ -40,7 +40,10 @@ class DesArrangementApiServiceConnectorSpec extends ITSpec with TestData {
 
     val result = connector.submitArrangement(taxpayer.selfAssessment.utr, request).futureValue
 
-    result.left.value.code shouldBe 400
+    result match {
+      case SubmissionError(code, _) => code shouldBe 400
+      case err                      => fail(err.toString)
+    }
   }
 
 }
