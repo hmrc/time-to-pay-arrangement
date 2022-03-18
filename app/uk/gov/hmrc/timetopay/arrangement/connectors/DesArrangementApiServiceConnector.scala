@@ -16,10 +16,12 @@
 
 package uk.gov.hmrc.timetopay.arrangement.connectors
 
+import jdk.nashorn.api.scripting.JSObject
+
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.http.Status
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{JsObject, JsString, Json, OFormat}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{Authorization, HttpClient, _}
 import uk.gov.hmrc.timetopay.arrangement.config.{DesArrangementApiServiceConnectorConfig, QueueLogger}
@@ -71,6 +73,9 @@ class DesArrangementApiServiceConnector @Inject() (
         case res =>
           zonkLogger.trace(utr, "DES POST Failed " + res.toString())
           logger.info(s"Submission FAILED for '${utr}'")
+          if (res.status == Status.BAD_REQUEST) {
+            logger.error(s"BadRequest for '${utr}' json: " + redaction(desSubmissionRequest))
+          }
           SubmissionError(res.status, res.body)
       }.recover {
         case _ =>
@@ -78,6 +83,49 @@ class DesArrangementApiServiceConnector @Inject() (
           logger.info(s"Submission FAILED for '${utr}'")
           SubmissionError(599, "network timeout exception")
       }
+  }
+
+  private def redaction(desSubmissionRequest: DesSubmissionRequest): String = {
+    val obj = Json.toJson(desSubmissionRequest).as[JsObject]
+
+    val letterAndControlKeys = List(
+      "customerName",
+      "salutation",
+      "addressLine1",
+      "addressLine2",
+      "addressLine3",
+      "addressLine4",
+      "addressLine5",
+      "clmPymtString",
+      "postCode",
+      "totalAll"
+    )
+
+    val ttpArrangementKeys = List(
+      "firstPaymentAmount",
+      "regularPaymentAmount",
+      "saNote"
+    )
+
+    val obj1 = obfuscate(obj, "ttpArrangement", ttpArrangementKeys)
+    val obj2 = obfuscate(obj1, "letterAndControl", letterAndControlKeys)
+
+    Json.prettyPrint(obj2)
+  }
+
+  def obfuscate(obj: JsObject, key: String, fields: List[String]): JsObject = {
+      def crypt(s: String): String = {
+        s.replaceAll("[a-zA-Z]", "X").replaceAll("[0-9]", "9")
+      }
+
+    val section = (obj \ key).as[JsObject]
+
+    obj ++ Json.obj(key -> fields.foldLeft(section){
+      (l, k) =>
+        (l \ k).asOpt[String].fold(l){
+          _ => l ++ Json.obj(k -> crypt((section \ k).as[String]))
+        }
+    })
   }
 
 }
