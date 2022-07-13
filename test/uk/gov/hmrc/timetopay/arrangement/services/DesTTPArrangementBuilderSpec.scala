@@ -58,12 +58,15 @@ class DesTTPArrangementBuilderSpec extends ITSpec with TestData {
     desArrangement.initials shouldBe "ZZZ"
     desArrangement.startDate shouldBe LocalDate.parse("2016-09-01")
     desArrangement.regularPaymentFrequency shouldBe "Monthly"
-    desArrangement.firstPaymentAmount shouldBe "1298.95"
-    val expectedResult: String = "DDI 12345678901234567890123456789012345678900123456, PP 12345678901234567890123456789012345678900123456, First Payment Due Date 01/10/2016, First Payment " +
-      "£1298.95, Regular Payment £1248.95, " +
-      "Frequency Monthly, " +
-      "Final Payment £1248.95, Review Date 22/08"
-    desArrangement.saNote.length shouldBe 250
+    desArrangement.firstPaymentAmount shouldBe "50.00"
+    desArrangement.endDate shouldBe LocalDate.parse("2017-08-01")
+    val expectedResult: String = "DDI 12345678901234567890, PP 12345678901234567890, " +
+      "initial payment of £50 on 01/09/2016, " +
+      "first regular payment of £1248.95 " +
+      "from 01/10/2016, frequency monthly, " +
+      "final payment of £1248.95 on 01/08/2017, " +
+      "review date 22/08/2017"
+    desArrangement.saNote.length should be <= 250
     desArrangement.saNote shouldBe expectedResult
   }
 

@@ -22,6 +22,7 @@ import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig, LetterAndControlAndJurisdictionChecker}
 import uk.gov.hmrc.timetopay.arrangement.model.{Address, CommunicationPreferences, LetterAndControl, PaymentSchedule, TTPArrangement, Taxpayer}
 
+import scala.math.BigDecimal.exact
 import scala.util.Try
 
 class LetterAndControlBuilder @Inject() (letterAndControlAndJurisdictionChecker: LetterAndControlAndJurisdictionChecker, configuration: Configuration) {
@@ -75,17 +76,13 @@ class LetterAndControlBuilder @Inject() (letterAndControlAndJurisdictionChecker:
   }
 
   private def paymentMessage(schedule: PaymentSchedule) = {
-    val instalmentSize = schedule.instalments.size - 2
+    val instalmentSize = schedule.instalments.size
     val regularPaymentAmount = schedule.instalments.head.amount.setScale(2)
     val lastPaymentAmount = schedule.instalments.last.amount.setScale(2)
+    val initialPayment = Try(schedule.initialPayment).getOrElse(BigDecimal(0.0)).setScale(2)
 
-    val initialPayment = (Try(schedule.initialPayment).getOrElse(BigDecimal(0.0)) + schedule.instalments.head.amount).setScale(2)
-
-    instalmentSize match {
-      case 0 => f"Initial payment of £$initialPayment%,.2f then a final payment of £$lastPaymentAmount%,.2f"
-      case _ => f"Initial payment of £$initialPayment%,.2f then $instalmentSize payments of £$regularPaymentAmount%,.2f and final payment of £" +
-        f"$lastPaymentAmount%,.2f"
-    }
+    f"${if (initialPayment > exact(0)) f"Initial payment of £$initialPayment%,.2f then " else ""}" +
+      f"${instalmentSize - 1} payments of £$regularPaymentAmount%,.2f and final payment of £$lastPaymentAmount%,.2f"
   }
 
   private def validateAddressFormat(address: Address): Address = Address(
