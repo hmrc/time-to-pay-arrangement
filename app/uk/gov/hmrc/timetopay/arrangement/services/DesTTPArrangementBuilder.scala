@@ -17,13 +17,15 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
 import java.time.format.DateTimeFormatter
-
 import javax.inject.Inject
 import play.api.{Configuration, Logger}
 import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.config.JurisdictionCheckerConfig
 import uk.gov.hmrc.timetopay.arrangement.model.{DesDebit, DesTTPArrangement, Instalment, PaymentSchedule, TTPArrangement, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionTypes.Scottish
+
+import scala.math.BigDecimal.exact
+import scala.math.Numeric.BigDecimalIsFractional
 
 class DesTTPArrangementBuilder @Inject() (configuration: Configuration) {
   val logger: Logger = Logger(getClass)
@@ -37,13 +39,11 @@ class DesTTPArrangementBuilder @Inject() (configuration: Configuration) {
     val schedule: PaymentSchedule = ttpArrangement.schedule
     val firstPaymentInstalment: Instalment = schedule.instalments.head
 
-    val firstPayment = firstPaymentAmount(schedule)
-
     DesTTPArrangement(
       startDate            = schedule.startDate,
       endDate              = schedule.endDate,
       firstPaymentDate     = firstPaymentInstalment.paymentDate,
-      firstPaymentAmount   = firstPayment.setScale(2).toString(),
+      firstPaymentAmount   = schedule.initialPayment.setScale(2).toString(),
       regularPaymentAmount = firstPaymentInstalment.amount.setScale(2).toString(),
       reviewDate           = schedule.instalments.last.paymentDate.plusWeeks(3),
       enforcementAction    = enforcementFlag(ttpArrangement.taxpayer),
@@ -74,26 +74,24 @@ class DesTTPArrangementBuilder @Inject() (configuration: Configuration) {
     }
   }
 
-  private def firstPaymentAmount(schedule: PaymentSchedule): BigDecimal = {
-    val firstPayment: Instalment = schedule.instalments.head
-    val initialPayment = Option(schedule.initialPayment).getOrElse(BigDecimal(0.0))
-    firstPayment.amount.+(initialPayment)
-  }
-
   def saNote(ttpArrangement: TTPArrangement): String = {
     val schedule: PaymentSchedule = ttpArrangement.schedule
-    val initialPayment = firstPaymentAmount(schedule)
+    val initialPayment = Option(schedule.initialPayment).getOrElse(BigDecimal(0.0)).setScale(2)
     val reviewDate = schedule.endDate.plusWeeks(3).format(formatter)
-    val regularPaymentAmount = schedule.instalments.head.amount
+    val regularPaymentAmount = schedule.instalments.head.amount.setScale(2)
     val initialPaymentDate = schedule.instalments.head.paymentDate.format(formatter)
+    val startDate = schedule.startDate.format(formatter)
+    val endDate = schedule.endDate.format(formatter)
     val directDebitReference = ttpArrangement.directDebitReference
     val paymentPlanReference = ttpArrangement.paymentPlanReference
-    val finalPayment = ttpArrangement.schedule.instalments.last.amount
+    val finalPayment = schedule.instalments.last.amount.setScale(2)
 
-    val saNotes = s"DDI $directDebitReference, PP $paymentPlanReference, " +
-      s"First Payment Due Date $initialPaymentDate, First Payment £$initialPayment, " +
-      s"Regular Payment £$regularPaymentAmount, Frequency Monthly, " +
-      s"Final Payment £$finalPayment, Review Date $reviewDate"
+    val saNotes =
+      s"DDI $directDebitReference, PP $paymentPlanReference, " +
+        s"${if (initialPayment > exact(0)) s"initial payment of £$initialPayment on $startDate, " else ""}" +
+        s"first regular payment of £$regularPaymentAmount " +
+        s"from $initialPaymentDate, frequency monthly, final payment of £$finalPayment on $endDate, " +
+        s"review date $reviewDate"
 
     saNotes.take(250)
   }
