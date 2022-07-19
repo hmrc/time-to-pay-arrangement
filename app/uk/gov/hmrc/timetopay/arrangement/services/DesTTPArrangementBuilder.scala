@@ -76,18 +76,18 @@ class DesTTPArrangementBuilder @Inject() (configuration: Configuration) {
 
   def saNote(ttpArrangement: TTPArrangement): String = {
     val schedule: PaymentSchedule = ttpArrangement.schedule
-    val initialPayment = Option(schedule.initialPayment).getOrElse(BigDecimal(0.0))
+    val initialPayment = Option(schedule.initialPayment).getOrElse(BigDecimal(0.0)).setScale(2)
     val reviewDate = schedule.endDate.plusWeeks(3).format(formatter)
-    val regularPaymentAmount = schedule.instalments.head.amount
+    val regularPaymentAmount = schedule.instalments.head.amount.setScale(2)
     val initialPaymentDate = schedule.instalments.head.paymentDate.format(formatter)
     val startDate = schedule.startDate.format(formatter)
     val endDate = schedule.endDate.format(formatter)
     val directDebitReference = ttpArrangement.directDebitReference
     val paymentPlanReference = ttpArrangement.paymentPlanReference
-    val finalPayment = schedule.instalments.last.amount
+    val finalPayment = schedule.instalments.last.amount.setScale(2)
 
     val saNotes =
-      s"DDI $directDebitReference PP $paymentPlanReference, " +
+      s"DDI $directDebitReference, PP $paymentPlanReference, " +
         s"${if (initialPayment > exact(0)) s"initial payment of £$initialPayment on $startDate, " else ""}" +
         s"first regular payment of £$regularPaymentAmount " +
         s"from $initialPaymentDate, frequency monthly, final payment of £$finalPayment on $endDate, " +
