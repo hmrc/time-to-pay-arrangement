@@ -43,7 +43,7 @@ class DesTTPArrangementBuilder @Inject() (configuration: Configuration) {
       startDate            = schedule.startDate,
       endDate              = schedule.endDate,
       firstPaymentDate     = firstPaymentInstalment.paymentDate,
-      firstPaymentAmount   = schedule.initialPayment.setScale(2).toString(),
+      firstPaymentAmount   = firstPaymentInstalment.amount.setScale(2).toString(),
       regularPaymentAmount = firstPaymentInstalment.amount.setScale(2).toString(),
       reviewDate           = schedule.instalments.last.paymentDate.plusWeeks(3),
       enforcementAction    = enforcementFlag(ttpArrangement.taxpayer),
