@@ -52,7 +52,7 @@ class TTPArrangementServiceSpec extends ITSpec with TestData {
 
     logger.warn(desSubmissionRequest.toString)
 
-    desSubmissionRequest.ttpArrangement.firstPaymentAmount shouldBe "50.00"
+    desSubmissionRequest.ttpArrangement.firstPaymentAmount shouldBe "1248.95"
     desSubmissionRequest.ttpArrangement.enforcementAction shouldBe "Distraint"
     desSubmissionRequest.ttpArrangement.regularPaymentAmount shouldBe "1248.95"
     desSubmissionRequest.letterAndControl.clmPymtString shouldBe "Initial payment of £50.00 then 3 payments of £1,248.95 and final payment of £1,248.95"

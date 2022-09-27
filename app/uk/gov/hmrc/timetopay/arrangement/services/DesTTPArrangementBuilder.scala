@@ -19,13 +19,10 @@ package uk.gov.hmrc.timetopay.arrangement.services
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import play.api.{Configuration, Logger}
-import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.config.JurisdictionCheckerConfig
 import uk.gov.hmrc.timetopay.arrangement.model.{DesDebit, DesTTPArrangement, Instalment, PaymentSchedule, TTPArrangement, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.services.JurisdictionTypes.Scottish
-
 import scala.math.BigDecimal.exact
-import scala.math.Numeric.BigDecimalIsFractional
 
 class DesTTPArrangementBuilder @Inject() (configuration: Configuration) {
   val logger: Logger = Logger(getClass)
@@ -43,7 +40,7 @@ class DesTTPArrangementBuilder @Inject() (configuration: Configuration) {
       startDate            = schedule.startDate,
       endDate              = schedule.endDate,
       firstPaymentDate     = firstPaymentInstalment.paymentDate,
-      firstPaymentAmount   = schedule.initialPayment.setScale(2).toString(),
+      firstPaymentAmount   = firstPaymentInstalment.amount.setScale(2).toString(),
       regularPaymentAmount = firstPaymentInstalment.amount.setScale(2).toString(),
       reviewDate           = schedule.instalments.last.paymentDate.plusWeeks(3),
       enforcementAction    = enforcementFlag(ttpArrangement.taxpayer),
