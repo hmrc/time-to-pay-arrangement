@@ -66,7 +66,7 @@ trait TestData {
        |    "startDate": "2016-09-01",
        |    "endDate": "2017-08-01",
        |    "initialPayment": 50.00,
-       |    "amountToPay": 50000000,
+       |    "amountToPay": 5000,
        |    "instalmentBalance": 4950,
        |    "totalInterestCharged": 45.83,
        |    "totalPayable": 5045.83,
