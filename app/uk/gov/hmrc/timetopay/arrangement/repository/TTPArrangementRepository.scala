@@ -16,17 +16,21 @@
 
 package uk.gov.hmrc.timetopay.arrangement.repository
 
+import org.mongodb.scala.model.{IndexModel, IndexOptions, Indexes}
 import play.api.libs.json._
-import play.modules.reactivemongo.ReactiveMongoComponent
+import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import reactivemongo.api.ReadPreference
 import reactivemongo.api.commands.DefaultWriteResult
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.BSONDocument
-import uk.gov.hmrc.mongo.ReactiveRepository
+import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
 import javax.inject.Inject
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangement
 
+import java.util.concurrent.TimeUnit
 import scala.concurrent.{ExecutionContext, Future}
 //The below is needed !
 
@@ -74,8 +78,17 @@ object TTPArrangementMongoFormats {
   val id = "_id"
 }
 
-class TTPArrangementRepository @Inject() (reactiveMongoComponent: ReactiveMongoComponent)
-  extends ReactiveRepository[TTPArrangement, String]("ttparrangements", reactiveMongoComponent.mongoConnector.db, TTPArrangementMongoFormats.format, implicitly[Format[String]]) {
+class TTPArrangementRepository @Inject() (
+                                           mongo: MongoComponent,
+                                           config: ServicesConfig
+                                         )(implicit ec: ExecutionContext)
+  extends PlayMongoRepository[TTPArrangement](
+    mongoComponent = mongo,
+    collectionName = "ttparrangements-new-mongo",
+    domainFormat = TTPArrangementMongoFormats.format,
+    indexes = TTPArrangementRepository.indexes(config.getDuration("TTPArrangement.ttl").toSeconds),
+    replaceIndexes = true
+  ) {
 
   def findByIdLocal(id: String, readPreference: ReadPreference = ReadPreference.primaryPreferred)(implicit ec: ExecutionContext): Future[Option[JsValue]] = {
 
@@ -98,7 +111,13 @@ class TTPArrangementRepository @Inject() (reactiveMongoComponent: ReactiveMongoC
           None
       }
   }
+}
 
-  override def indexes: Seq[Index] = Seq(
-    Index(key     = Seq("createdOn" -> IndexType.Ascending), name = Some("expireAtIndex"), options = BSONDocument("expireAfterSeconds" -> 2592000)))
+object TTPArrangementRepository {
+  def indexes(cacheTtlInSeconds: Long): Seq[IndexModel] = Seq (
+    IndexModel(
+      keys = Indexes.ascending("expireAtIndex"),
+      indexOptions = IndexOptions().expireAfter(cacheTtlInSeconds, TimeUnit.SECONDS)
+    )
+  )
 }
