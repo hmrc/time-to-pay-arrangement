@@ -38,13 +38,13 @@ class TTPArrangementWorkItemRepository @Inject() (configuration:          Config
     mongoComponent = mongo,
     itemFormat     = TTPArrangementWorkItem.format,
     workItemFields = WorkItemFields(
-      receivedAt = "receivedAt",
-      updatedAt = "updatedAt",
-      availableAt = "receivedAt",
-      status = "status",
       id = "_id",
+      item = "item",
+      availableAt = "receivedAt",
+      receivedAt = "receivedAt",
       failureCount = "failureCount",
-      item = "item"
+      updatedAt = "updatedAt",
+      status = "status"
     ),
     replaceIndexes = false
   ) {
