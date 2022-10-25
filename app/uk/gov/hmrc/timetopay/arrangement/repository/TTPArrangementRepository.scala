@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.timetopay.arrangement.repository
 
-import org.mongodb.scala.model.{IndexModel, IndexOptions, Indexes}
+import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes}
+import org.mongodb.scala.result
 import play.api.libs.json._
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import reactivemongo.api.ReadPreference
@@ -90,26 +91,38 @@ class TTPArrangementRepository @Inject() (
     replaceIndexes = true
   ) {
 
-  def findByIdLocal(id: String, readPreference: ReadPreference = ReadPreference.primaryPreferred)(implicit ec: ExecutionContext): Future[Option[JsValue]] = {
+  def findByIdLocal(id: String): Future[Option[TTPArrangement]] = {
+    collection
+      .find(
+        filter = Filters.eq("_id", id)
+      )
+      .headOption()
 
-    collection.find(_id(id), None)(new OWrites[JsObject] {
-      def writes(o: JsObject): JsObject = o
-    }, new OWrites[JsObject] {
-      def writes(o: JsObject): JsObject = o
-    }).one[JsValue](readPreference)
+//    collection.find(_id(id), None)(new OWrites[JsObject] {
+//      def writes(o: JsObject): JsObject = o
+//    }, new OWrites[JsObject] {
+//      def writes(o: JsObject): JsObject = o
+//    }).one[JsValue](readPreference)
   }
 
-  def doInsert(ttpArrangement: TTPArrangement)(implicit ec: ExecutionContext): Future[Option[TTPArrangement]] = {
-    logger.debug("Saving ttparrangement record")
-    insert(ttpArrangement)
-      .collect {
-        case DefaultWriteResult(true, 1, Seq(), None, _, None) =>
-          logger.info(s"Arrangement record persisted ID: ${ttpArrangement.id}")
-          Some(ttpArrangement)
-        case DefaultWriteResult(false, 1, Seq(), None, _, Some(msg)) =>
-          logger.error(s"An error occurred saving record: $msg")
-          None
-      }
+  def doInsert(ttpArrangement: TTPArrangement): Future[Option[result.InsertOneResult]] = {
+//    logger.debug("Saving ttparrangement record")
+    collection
+      .insertOne(ttpArrangement)
+      .headOption()
+//      .toFutureOption()
+
+
+
+//    insert(ttpArrangement)
+//      .collect {
+//        case DefaultWriteResult(true, 1, Seq(), None, _, None) =>
+//          logger.info(s"Arrangement record persisted ID: ${ttpArrangement.id}")
+//          Some(ttpArrangement)
+//        case DefaultWriteResult(false, 1, Seq(), None, _, Some(msg)) =>
+//          logger.error(s"An error occurred saving record: $msg")
+//          None
+//      }
   }
 }
 
