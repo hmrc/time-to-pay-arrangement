@@ -17,68 +17,82 @@
 package uk.gov.hmrc.timetopay.arrangement.repository
 
 import com.google.inject.Inject
-import org.joda.time.{DateTime, Duration}
+import org.mongodb.scala.model.{IndexModel, IndexOptions, Indexes}
+import uk.gov.hmrc.mongo.MongoUtils
+import java.util.concurrent.TimeUnit
 import play.api.Configuration
-import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.mongo.workitem.{WorkItem, WorkItemFields, WorkItemRepository}
-import reactivemongo.api.indexes.{Index, IndexType}
-import reactivemongo.bson.{BSONDocument, BSONObjectID}
-import reactivemongo.play.json.ImplicitBSONHandlers._
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.timetopay.arrangement.config.QueueConfig
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangementWorkItem
-import uk.gov.hmrc.workitem._
-
-import java.time.{Clock, ZoneId}
+import java.time.{Clock, Instant, Duration}
 import scala.concurrent.{ExecutionContext, Future}
 
 class TTPArrangementWorkItemRepository @Inject() (configuration:          Configuration,
-//                                                  queueConfig:            QueueConfig,
+                                                  queueConfig:            QueueConfig,
                                                   mongo: MongoComponent,
                                                   val clock:              Clock,
                                                  )(implicit ec: ExecutionContext)
   extends WorkItemRepository[TTPArrangementWorkItem](
     collectionName = "TTPArrangementsWorkItem",
     mongoComponent = mongo,
-    itemFormat     = TTPArrangementWorkItem.mongoFormat,
-    workItemFields = WorkItemFields.default
+    itemFormat     = TTPArrangementWorkItem.format,
+    workItemFields = WorkItemFields(
+      receivedAt = "receivedAt",
+      updatedAt = "updatedAt",
+      availableAt = "receivedAt",
+      status = "status",
+      id = "_id",
+      failureCount = "failureCount",
+      item = "item"
+    )
   ) {
 
-  override def now: DateTime = new DateTime(clock.millis())
+  override def now: Instant = Instant.now()
 
-  override def inProgressRetryAfterProperty: String = queueConfig.retryAfter
+  def inProgressRetryAfterProperty: String = queueConfig.retryAfter
   lazy val retryIntervalMillis: Long = configuration.getMillis(inProgressRetryAfterProperty)
-  override lazy val inProgressRetryAfter: Duration = Duration.millis(retryIntervalMillis)
+  override lazy val inProgressRetryAfter: Duration = Duration.ofMillis(retryIntervalMillis)
   private lazy val ttlInSeconds = queueConfig.ttl.toSeconds
 
-  override lazy val workItemFields: WorkItemFieldNames =
-    new WorkItemFieldNames {
-      val receivedAt = "receivedAt"
-      val updatedAt = "updatedAt"
-      val availableAt = "receivedAt"
-      val status = "status"
-      val id = "_id"
-      val failureCount = "failureCount"
-    }
+//  override lazy val workItemFields: WorkItemFieldNames =
+//    new WorkItemFieldNames {
+//      val receivedAt = "receivedAt"
+//      val updatedAt = "updatedAt"
+//      val availableAt = "receivedAt"
+//      val status = "status"
+//      val id = "_id"
+//      val failureCount = "failureCount"
+//    }
 
-  override def indexes: Seq[Index] = super.indexes ++ Seq(
-    Index(
-      key     = Seq(workItemFields.receivedAt -> IndexType.Ascending),
-      name    = Some("receivedAtTime"),
-      options = BSONDocument("expireAfterSeconds" -> ttlInSeconds)
-    ))
+  override def ensureIndexes: Future[Seq[String]] =
+    MongoUtils.ensureIndexes(
+      collection,
+      indexes ++ additionalIndexes,
+      replaceIndexes = configuration.get[Boolean]("mongodb.replaceIndexes")
+    )
+
+  def additionalIndexes: Seq[IndexModel] = super.indexes ++ Seq(
+    IndexModel(
+      keys = Indexes.ascending("receivedAtTime"),
+      indexOptions = IndexOptions().expireAfter(ttlInSeconds, TimeUnit.SECONDS)
+    )
+  )
+
+
+//  override def indexes: Seq[Index] = super.indexes ++ Seq(
+//    Index(
+//      key     = Seq(workItemFields.receivedAt -> IndexType.Ascending),
+//      name    = Some("receivedAtTime"),
+//      options = BSONDocument("expireAfterSeconds" -> ttlInSeconds)
+//    ))
+
 
   def pullOutstanding(implicit ec: ExecutionContext): Future[Option[WorkItem[TTPArrangementWorkItem]]] =
     super.pullOutstanding(now.minusMillis(retryIntervalMillis.toInt), now)
 
-  def complete(id: BSONObjectID)(implicit ec: ExecutionContext): Future[Boolean] = {
-    val selector = JsObject(
-      Seq("_id" -> Json.toJson(id)(ReactiveMongoFormats.objectIdFormats), "status" -> Json.toJson(InProgress: ProcessingStatus)))
-    collection.delete().one(selector).map(_.n > 0)
-  }
-
-  def failed(id: BSONObjectID)(implicit ec: ExecutionContext): Future[Boolean] = {
-    markAs(id, Failed, Some(now.plusMillis(retryIntervalMillis.toInt)))
-  }
+//  def failed(id: BSONObjectID)(implicit ec: ExecutionContext): Future[Boolean] = {
+//    markAs(id, Failed, Some(now.plusMillis(retryIntervalMillis.toInt)))
+//  }
 
 }
