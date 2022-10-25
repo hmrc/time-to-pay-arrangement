@@ -18,7 +18,7 @@ package uk.gov.hmrc.timetopay.arrangement.config
 
 import play.api.Logger
 import uk.gov.hmrc.timetopay.arrangement.model.{TTPArrangement, TTPArrangementWorkItem}
-import uk.gov.hmrc.workitem.WorkItem
+import uk.gov.hmrc.mongo.workitem.WorkItem
 
 case class QueueLogger(log: Class[_]) {
   private val logger: Logger = Logger(log.getSimpleName)

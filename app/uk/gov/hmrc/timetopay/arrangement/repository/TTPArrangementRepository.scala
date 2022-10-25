@@ -80,14 +80,14 @@ object TTPArrangementMongoFormats {
 }
 
 class TTPArrangementRepository @Inject() (
-                                           mongo: MongoComponent,
-                                           config: ServicesConfig
-                                         )(implicit ec: ExecutionContext)
+    mongo:  MongoComponent,
+    config: ServicesConfig
+)(implicit ec: ExecutionContext)
   extends PlayMongoRepository[TTPArrangement](
     mongoComponent = mongo,
     collectionName = "ttparrangements-new-mongo",
-    domainFormat = TTPArrangementMongoFormats.format,
-    indexes = TTPArrangementRepository.indexes(config.getDuration("TTPArrangement.ttl").toSeconds),
+    domainFormat   = TTPArrangementMongoFormats.format,
+    indexes        = TTPArrangementRepository.indexes(config.getDuration("TTPArrangement.ttl").toSeconds),
     replaceIndexes = true
   ) {
 
@@ -98,38 +98,36 @@ class TTPArrangementRepository @Inject() (
       )
       .headOption()
 
-//    collection.find(_id(id), None)(new OWrites[JsObject] {
-//      def writes(o: JsObject): JsObject = o
-//    }, new OWrites[JsObject] {
-//      def writes(o: JsObject): JsObject = o
-//    }).one[JsValue](readPreference)
+    //    collection.find(_id(id), None)(new OWrites[JsObject] {
+    //      def writes(o: JsObject): JsObject = o
+    //    }, new OWrites[JsObject] {
+    //      def writes(o: JsObject): JsObject = o
+    //    }).one[JsValue](readPreference)
   }
 
   def doInsert(ttpArrangement: TTPArrangement): Future[Option[result.InsertOneResult]] = {
-//    logger.debug("Saving ttparrangement record")
+    //    logger.debug("Saving ttparrangement record")
     collection
       .insertOne(ttpArrangement)
       .headOption()
-//      .toFutureOption()
+    //      .toFutureOption()
 
-
-
-//    insert(ttpArrangement)
-//      .collect {
-//        case DefaultWriteResult(true, 1, Seq(), None, _, None) =>
-//          logger.info(s"Arrangement record persisted ID: ${ttpArrangement.id}")
-//          Some(ttpArrangement)
-//        case DefaultWriteResult(false, 1, Seq(), None, _, Some(msg)) =>
-//          logger.error(s"An error occurred saving record: $msg")
-//          None
-//      }
+    //    insert(ttpArrangement)
+    //      .collect {
+    //        case DefaultWriteResult(true, 1, Seq(), None, _, None) =>
+    //          logger.info(s"Arrangement record persisted ID: ${ttpArrangement.id}")
+    //          Some(ttpArrangement)
+    //        case DefaultWriteResult(false, 1, Seq(), None, _, Some(msg)) =>
+    //          logger.error(s"An error occurred saving record: $msg")
+    //          None
+    //      }
   }
 }
 
 object TTPArrangementRepository {
   def indexes(cacheTtlInSeconds: Long): Seq[IndexModel] = Seq (
     IndexModel(
-      keys = Indexes.ascending("expireAtIndex"),
+      keys         = Indexes.ascending("expireAtIndex"),
       indexOptions = IndexOptions().expireAfter(cacheTtlInSeconds, TimeUnit.SECONDS)
     )
   )

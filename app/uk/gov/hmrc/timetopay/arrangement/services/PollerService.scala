@@ -22,12 +22,13 @@ import play.api.Logger
 import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.mongo.workitem.ProcessingStatus.{Failed, PermanentlyFailed, Succeeded}
 import uk.gov.hmrc.play.scheduling.ExclusiveScheduledJob
 import uk.gov.hmrc.timetopay.arrangement.config.{QueueConfig, QueueLogger}
 import uk.gov.hmrc.timetopay.arrangement.connectors.{DesArrangementApiServiceConnector, SubmissionError, SubmissionSuccess}
 import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, TTPArrangementWorkItem}
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementWorkItemRepository
-import uk.gov.hmrc.workitem.{Failed, PermanentlyFailed, WorkItem}
+import uk.gov.hmrc.mongo.workitem.WorkItem
 
 import java.time.{Clock, LocalDateTime}
 import javax.inject.Inject
@@ -52,10 +53,10 @@ class PollerService @Inject() (
   val interval = queueConfig.interval
 
   override def executeInMutex(implicit ec: ExecutionContext): Future[Result] = {
-    ttpArrangementRepositoryWorkItem.find().map{ ls =>
-      val txt = ls.map(x => x.status).groupBy(x => x).map{ x => s"${x._1}: ${x._2.size}" }.mkString(", ")
-      logger.track("Retry poller - WorkItem counts- " + txt)
-    }
+    //    ttpArrangementRepositoryWorkItem.find().map{ ls =>
+    //      val txt = ls.map(x => x.status).groupBy(x => x).map{ x => s"${x._1}: ${x._2.size}" }.mkString(", ")
+    //      logger.track("Retry poller - WorkItem counts- " + txt)
+    //    }
 
     process().map(_ => Result(""))
   }
@@ -102,7 +103,7 @@ class PollerService @Inject() (
 
           auditService.sendSubmissionSucceededEvent(arrangment.taxpayer, arrangment.bankDetails, arrangment.schedule, auditTags)
 
-          ttpArrangementRepositoryWorkItem.complete(wi.id).map(_ => process())
+          ttpArrangementRepositoryWorkItem.complete(wi.id, Succeeded).map(_ => process())
           ()
         case error: SubmissionError =>
           if (finalAttempt) {

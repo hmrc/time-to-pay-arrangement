@@ -34,7 +34,7 @@ class TTPArrangementWorkItemRepository @Inject() (configuration:          Config
                                                   val clock:              Clock,
                                                  )(implicit ec: ExecutionContext)
   extends WorkItemRepository[TTPArrangementWorkItem](
-    collectionName = "TTPArrangementsWorkItem",
+    collectionName = "TTPArrangementsWorkItem-new-mongo",
     mongoComponent = mongo,
     itemFormat     = TTPArrangementWorkItem.format,
     workItemFields = WorkItemFields(
@@ -45,7 +45,8 @@ class TTPArrangementWorkItemRepository @Inject() (configuration:          Config
       id = "_id",
       failureCount = "failureCount",
       item = "item"
-    )
+    ),
+    replaceIndexes = false
   ) {
 
   override def now: Instant = Instant.now()
@@ -72,7 +73,7 @@ class TTPArrangementWorkItemRepository @Inject() (configuration:          Config
       replaceIndexes = configuration.get[Boolean]("mongodb.replaceIndexes")
     )
 
-  def additionalIndexes: Seq[IndexModel] = super.indexes ++ Seq(
+  def additionalIndexes: Seq[IndexModel] = Seq(
     IndexModel(
       keys = Indexes.ascending("receivedAtTime"),
       indexOptions = IndexOptions().expireAfter(ttlInSeconds, TimeUnit.SECONDS)
@@ -88,7 +89,7 @@ class TTPArrangementWorkItemRepository @Inject() (configuration:          Config
 //    ))
 
 
-  def pullOutstanding(implicit ec: ExecutionContext): Future[Option[WorkItem[TTPArrangementWorkItem]]] =
+  def pullOutstanding(): Future[Option[WorkItem[TTPArrangementWorkItem]]] =
     super.pullOutstanding(now.minusMillis(retryIntervalMillis.toInt), now)
 
 //  def failed(id: BSONObjectID)(implicit ec: ExecutionContext): Future[Boolean] = {

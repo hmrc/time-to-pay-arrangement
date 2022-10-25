@@ -16,10 +16,11 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import java.time.{Clock, Duration, LocalDateTime, ZoneId}
+import java.time.{Clock, Duration, Instant, LocalDateTime, ZoneId}
 import java.util.UUID
 import javax.inject.Inject
 import org.joda.time.DateTime
+import org.mongodb.scala.result
 import play.api.Logger
 import play.api.http.Status
 import play.api.libs.json.JsValue
@@ -30,7 +31,7 @@ import uk.gov.hmrc.timetopay.arrangement.config.{QueueConfig, QueueLogger}
 import uk.gov.hmrc.timetopay.arrangement.connectors.{DesArrangementApiServiceConnector, SubmissionError, SubmissionSuccess}
 import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, TTPArrangement, TTPArrangementWorkItem}
 import uk.gov.hmrc.timetopay.arrangement.repository.{TTPArrangementRepository, TTPArrangementWorkItemRepository}
-import uk.gov.hmrc.workitem.WorkItem
+import uk.gov.hmrc.mongo.workitem.WorkItem
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -50,12 +51,12 @@ class TTPArrangementService @Inject() (
 
   val CLIENT_CLOSED_REQUEST = 499 // Client closes the connection while nginx is processing the request.
 
-  def byId(id: String): Future[Option[JsValue]] = ttpArrangementRepository.findByIdLocal(id)
+  def byId(id: String): Future[Option[TTPArrangement]] = ttpArrangementRepository.findByIdLocal(id)
 
   /**
    * Builds and submits the TTPArrangement to Des. Also saves to Mongo
    */
-  def submit(arrangement: TTPArrangement)(implicit r: Request[_]): Future[Option[TTPArrangement]] = {
+  def submit(arrangement: TTPArrangement)(implicit r: Request[_]): Future[Option[result.InsertOneResult]] = {
     logger.trace(arrangement, s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' " +
       s"and PP '${arrangement.paymentPlanReference}'")
 
@@ -99,7 +100,7 @@ class TTPArrangementService @Inject() (
   /**
    * Saves the TTPArrangement to our mongoDB and adds in a Id
    */
-  private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[TTPArrangement]] = {
+  private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[result.InsertOneResult]] = {
     val toSave = arrangementToSave(arrangement, desSubmissionRequest)
 
     Try(ttpArrangementRepository.doInsert(toSave)).getOrElse(Future.successful(None))
@@ -119,7 +120,7 @@ class TTPArrangementService @Inject() (
     val time: LocalDateTime = LocalDateTime.now(clock)
     val availableUntil = time.plus(Duration.ofMillis(queueConfig.availableFor.toMillis))
 
-    val jodaLocalDateTime: DateTime = ttpArrangementRepositoryWorkItem.now
+    val instantNow: Instant = ttpArrangementRepositoryWorkItem.now
 
     logger.trace(utr, "Item to add to workItem")
 
@@ -130,7 +131,7 @@ class TTPArrangementService @Inject() (
         utr,
         crypto.encryptTtpa(arrangement),
         crypto.encryptAuditTags(AuditService.auditTags)
-      ), jodaLocalDateTime
+      ), instantNow
     ).map{ workItem: WorkItem[TTPArrangementWorkItem] =>
         logger.traceWorkItem(utr, workItem, "Pushed to work queue ")
         workItem
