@@ -103,7 +103,7 @@ object TTPArrangementId {
 }
 
 case class TTPArrangement(
-    _id:                   TTPArrangementId,
+    _id:                  TTPArrangementId,
     createdOn:            Option[LocalDateTime],
     paymentPlanReference: String,
     directDebitReference: String,

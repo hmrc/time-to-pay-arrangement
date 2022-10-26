@@ -24,8 +24,7 @@ import play.api.Logging
 import play.api.libs.json.Json
 import reactivemongo.play.json.ImplicitBSONHandlers
 import reactivemongo.play.json.collection.JSONCollection
-import uk.gov.hmrc.mongo.MongoSpecSupport
-
+import uk.gov.hmrc.mongo.test.{MongoSupport => MongoSpecSupport}
 import scala.concurrent.ExecutionContext.global
 import scala.concurrent.{ExecutionContext, Future}
 
