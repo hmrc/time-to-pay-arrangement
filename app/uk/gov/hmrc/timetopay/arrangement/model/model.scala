@@ -103,7 +103,7 @@ object TTPArrangementId {
 }
 
 case class TTPArrangement(
-    _id:                   TTPArrangementId,
+    _id:                  TTPArrangementId,
     createdOn:            Option[LocalDateTime],
     paymentPlanReference: String,
     directDebitReference: String,
@@ -111,7 +111,7 @@ case class TTPArrangement(
     bankDetails:          BankDetails,
     schedule:             PaymentSchedule,
     desArrangement:       Option[DesSubmissionRequest]
-                         ) extends HasId[TTPArrangementId]
+) extends HasId[TTPArrangementId]
 
 object TTPArrangement {
   implicit val ttpArrangementFormat: OFormat[TTPArrangement] = Json.format[TTPArrangement]

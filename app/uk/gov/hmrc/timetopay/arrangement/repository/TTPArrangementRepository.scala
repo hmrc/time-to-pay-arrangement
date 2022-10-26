@@ -105,13 +105,13 @@ class TTPArrangementRepository @Inject() (
     insertOne(ttpArrangement)
       .map {
         case Some(_) => Some(ttpArrangement)
-        case None => None
+        case None    => None
       }
 
     //    logger.debug("Saving ttparrangement record")
-//    collection
-//      .insertOne(ttpArrangement)
-//      .headOption()
+    //    collection
+    //      .insertOne(ttpArrangement)
+    //      .headOption()
     //      .toFutureOption()
 
     //    insert(ttpArrangement)
