@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import java.time.Clock
+import java.time.{Clock, Instant}
 import java.time.Clock.systemUTC
 import java.time.LocalDateTime.now
 import org.joda.time.DateTime
@@ -26,7 +26,7 @@ import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangementWorkItem
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementWorkItemRepository
 import uk.gov.hmrc.timetopay.arrangement.repository.TestDataTtp.{arrangement, auditTags}
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, WireMockResponses}
-import uk.gov.hmrc.workitem.{Failed, PermanentlyFailed, Succeeded}
+import uk.gov.hmrc.mongo.workitem.ProcessingStatus.{Failed, PermanentlyFailed, Succeeded}
 
 class PollerServiceSpec extends ITSpec {
 
@@ -35,41 +35,41 @@ class PollerServiceSpec extends ITSpec {
   private val crypto = fakeApplication.injector.instanceOf[CryptoService]
 
   override def beforeEach(): Unit = {
-    arrangementWorkItemRepo.collection.drop(false).futureValue
+    arrangementWorkItemRepo.collection.drop().toFuture().futureValue
     ()
   }
 
   override def afterEach(): Unit = {
-    arrangementWorkItemRepo.collection.drop(false).futureValue
+    arrangementWorkItemRepo.collection.drop().toFuture().futureValue
     ()
   }
   private val clock: Clock = systemUTC()
-  private val jodaDateTime: DateTime = DateTime.now()
+  private val javaInstantNow: Instant = Instant.now()
   val ttpArrangementWorkItem = TTPArrangementWorkItem(now(clock), now(clock), "", crypto.encryptTtpa(arrangement), crypto.encryptAuditTags(auditTags))
-  protected def numberOfQueuedNotifications: Integer = arrangementWorkItemRepo.count(Json.obj()).futureValue
+  protected def numberOfQueuedNotifications: Integer = arrangementWorkItemRepo.collection.countDocuments().toFuture().futureValue.toInt
 
   "pollerService should set it to PermanentlyFailed failed if availableUntil is passed" in {
-    arrangementWorkItemRepo.pushNew(ttpArrangementWorkItem.copy(availableUntil = now(clock).minusYears(1)), jodaDateTime).futureValue
+    arrangementWorkItemRepo.pushNew(ttpArrangementWorkItem.copy(availableUntil = now(clock).minusYears(1)), javaInstantNow).futureValue
     pollerService.process().futureValue
     eventually {
-      arrangementWorkItemRepo.findAll().futureValue.head.status shouldBe PermanentlyFailed
+      arrangementWorkItemRepo.collection.find().headOption().futureValue.get.status shouldBe PermanentlyFailed
     }
   }
 
   "pollerService should set it to failed if des call fails " in {
-    arrangementWorkItemRepo.pushNew(ttpArrangementWorkItem.copy(availableUntil = now(clock).plusMinutes(10)), jodaDateTime).futureValue
+    arrangementWorkItemRepo.pushNew(ttpArrangementWorkItem.copy(availableUntil = now(clock).plusMinutes(10)), javaInstantNow).futureValue
     pollerService.process().futureValue
     eventually {
-      arrangementWorkItemRepo.findAll().futureValue.head.status shouldBe Failed
+      arrangementWorkItemRepo.collection.find().headOption().futureValue.get.status shouldBe Failed
     }
   }
 
   "pollerService should set it to complete if des call is successful and remove from repo " in {
     WireMockResponses.desArrangementApiSucccess(arrangement.taxpayer.selfAssessment.utr)
-    arrangementWorkItemRepo.pushNew(ttpArrangementWorkItem.copy(availableUntil = now(clock).plusMinutes(10)), jodaDateTime).futureValue
+    arrangementWorkItemRepo.pushNew(ttpArrangementWorkItem.copy(availableUntil = now(clock).plusMinutes(10)), javaInstantNow).futureValue
     pollerService.process().futureValue
     eventually {
-      arrangementWorkItemRepo.findAll().futureValue.size shouldBe 0
+      arrangementWorkItemRepo.collection.countDocuments().toFuture().futureValue.toInt shouldBe 0
     }
   }
 }

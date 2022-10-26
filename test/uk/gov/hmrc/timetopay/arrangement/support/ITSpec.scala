@@ -22,7 +22,9 @@ import java.time.format.DateTimeFormatter
 import java.time.{LocalDateTime, ZoneId, ZonedDateTime}
 import com.google.inject.AbstractModule
 import org.scalatest.time.{Millis, Seconds, Span}
-import org.scalatest.{BeforeAndAfterEach, FreeSpecLike, Matchers}
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.freespec.AnyFreeSpecLike
+import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.play.guice.GuiceOneServerPerTest
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.mvc.Result
@@ -41,13 +43,13 @@ import scala.concurrent.{Await, ExecutionContext, Future}
  */
 
 trait ITSpec
-  extends FreeSpecLike
+  extends AnyFreeSpecLike
   with RichMatchers
   with BeforeAndAfterEach
   with GuiceOneServerPerTest
   with WireMockSupport
   with Matchers
-  with MongoSupport {
+  with TestMongoSupport {
 
   lazy val frozenZonedDateTime: ZonedDateTime = {
     val formatter = DateTimeFormatter.ISO_DATE_TIME

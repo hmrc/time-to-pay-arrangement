@@ -18,7 +18,7 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import org.scalatest.{FreeSpecLike, Matchers}
 import org.scalatestplus.play.guice.GuiceOneServerPerTest
-import uk.gov.hmrc.timetopay.arrangement.model.{BankDetails, DesSubmissionRequest, PaymentSchedule, SelfAssessment, TTPArrangement, Taxpayer}
+import uk.gov.hmrc.timetopay.arrangement.model.{BankDetails, DesSubmissionRequest, PaymentSchedule, SelfAssessment, TTPArrangement, TTPArrangementId, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestData}
 
 import java.time.LocalDate
@@ -36,7 +36,7 @@ class CryptoServiceSpec extends ITSpec with TestData {
   "check encrypted -> decripted match" in {
     val des: DesSubmissionRequest = DesSubmissionRequest(submitArrangementTTPArrangement, submitArrangementLetterAndControl)
     val request: TTPArrangement = TTPArrangement(
-      None, None, "", "",
+      TTPArrangementId(), None, "", "",
       Taxpayer("", List.empty, SelfAssessment("", None, List.empty)),
       bankDetails,
       PaymentSchedule(LocalDate.now(), LocalDate.now(), 0, 0, 0, 0, 0, List.empty),

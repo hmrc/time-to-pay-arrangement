@@ -25,12 +25,12 @@ class TTPArrangementRepositorySpec extends ITSpec {
   private val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
 
   override def beforeEach(): Unit = {
-    arrangementRepo.collection.drop(false).futureValue
+    arrangementRepo.collection.drop().toFuture().futureValue
     ()
   }
 
   override def afterEach(): Unit = {
-    arrangementRepo.collection.drop(false).futureValue
+    arrangementRepo.collection.drop().toFuture().futureValue
     ()
   }
 
@@ -46,7 +46,7 @@ class TTPArrangementRepositorySpec extends ITSpec {
     logger.warn(arrangement.toString)
     arrangementRepo.doInsert(arrangement).futureValue
 
-    val loaded = arrangementRepo.findByIdLocal(arrangement.id.get).futureValue.get
+    val loaded = arrangementRepo.findByIdLocal(arrangement.id.value).futureValue.get
     assert(loaded.toString.contains("desArrangement"))
     assert(loaded.toString.contains("XXX-XXX-XXX"))
   }
@@ -54,7 +54,7 @@ class TTPArrangementRepositorySpec extends ITSpec {
   "should not save any personal data in" in {
     arrangementRepo.doInsert(arrangement).futureValue
 
-    val loaded = arrangementRepo.findByIdLocal(arrangement.id.get).futureValue.get
+    val loaded = arrangementRepo.findByIdLocal(arrangement.id.value).futureValue.get
     assert(!loaded.toString.contains("Customer Name"))
     assert(!loaded.toString.contains("addresses"))
   }
