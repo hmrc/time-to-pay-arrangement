@@ -108,7 +108,7 @@ class TTPArrangementService @Inject() (
 
   def arrangementToSave(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): TTPArrangement = {
     arrangement.copy(
-      _id            = TTPArrangementId(),
+      _id             = TTPArrangementId(),
       createdOn      = Some(LocalDateTime.now()),
       desArrangement = Some(desSubmissionRequest))
   }
