@@ -16,9 +16,11 @@
 
 package uk.gov.hmrc.timetopay.arrangement.model
 
-import java.time.{LocalDate, LocalDateTime}
+import org.bson.types.ObjectId
 
+import java.time.{LocalDate, LocalDateTime}
 import play.api.libs.json._
+import uk.gov.hmrc.timetopay.arrangement.repository.{HasId, Id}
 
 case class PaymentSchedule(
     startDate:            LocalDate,
@@ -92,15 +94,25 @@ object DesDebit {
   implicit val format: OFormat[DesDebit] = Json.format
 }
 
+final case class TTPArrangementId(value: String) extends Id
+
+object TTPArrangementId {
+  implicit val format: Format[TTPArrangementId] = Json.valueFormat
+
+  def apply(): TTPArrangementId = TTPArrangementId(ObjectId.get().toString)
+}
+
 case class TTPArrangement(
-    id:                   Option[String],
+    _id:                   TTPArrangementId,
     createdOn:            Option[LocalDateTime],
     paymentPlanReference: String,
     directDebitReference: String,
     taxpayer:             Taxpayer,
     bankDetails:          BankDetails,
     schedule:             PaymentSchedule,
-    desArrangement:       Option[DesSubmissionRequest])
+    desArrangement:       Option[DesSubmissionRequest]
+                         ) extends HasId[TTPArrangementId]
+
 object TTPArrangement {
   implicit val ttpArrangementFormat: OFormat[TTPArrangement] = Json.format[TTPArrangement]
 }

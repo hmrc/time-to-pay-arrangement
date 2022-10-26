@@ -29,10 +29,11 @@ import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.Inject
-import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangement
+import uk.gov.hmrc.timetopay.arrangement.model.{TTPArrangement, TTPArrangementId}
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.{ExecutionContext, Future}
+import scala.reflect.runtime.universe.Try
 //The below is needed !
 
 object TTPArrangementMongoFormats {
@@ -83,20 +84,15 @@ class TTPArrangementRepository @Inject() (
     mongo:  MongoComponent,
     config: ServicesConfig
 )(implicit ec: ExecutionContext)
-  extends PlayMongoRepository[TTPArrangement](
+  extends Repo[TTPArrangementId, TTPArrangement](
     mongoComponent = mongo,
     collectionName = "ttparrangements-new-mongo",
-    domainFormat   = TTPArrangementMongoFormats.format,
     indexes        = TTPArrangementRepository.indexes(config.getDuration("TTPArrangement.ttl").toSeconds),
     replaceIndexes = true
   ) {
 
   def findByIdLocal(id: String): Future[Option[TTPArrangement]] = {
-    collection
-      .find(
-        filter = Filters.eq("_id", id)
-      )
-      .headOption()
+    findById(TTPArrangementId(id))
 
     //    collection.find(_id(id), None)(new OWrites[JsObject] {
     //      def writes(o: JsObject): JsObject = o
@@ -105,11 +101,17 @@ class TTPArrangementRepository @Inject() (
     //    }).one[JsValue](readPreference)
   }
 
-  def doInsert(ttpArrangement: TTPArrangement): Future[Option[result.InsertOneResult]] = {
+  def doInsert(ttpArrangement: TTPArrangement): Future[Option[TTPArrangement]] = {
+    insertOne(ttpArrangement)
+      .map {
+        case Some(_) => Some(ttpArrangement)
+        case None => None
+      }
+
     //    logger.debug("Saving ttparrangement record")
-    collection
-      .insertOne(ttpArrangement)
-      .headOption()
+//    collection
+//      .insertOne(ttpArrangement)
+//      .headOption()
     //      .toFutureOption()
 
     //    insert(ttpArrangement)
