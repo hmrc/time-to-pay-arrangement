@@ -21,7 +21,6 @@ import com.codahale.metrics.SharedMetricRegistries
 import java.time.format.DateTimeFormatter
 import java.time.{LocalDateTime, ZoneId, ZonedDateTime}
 import com.google.inject.AbstractModule
-import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{BeforeAndAfterEach, FreeSpecLike, Matchers}
 import org.scalatestplus.play.guice.GuiceOneServerPerTest
@@ -44,12 +43,11 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 trait ITSpec
   extends FreeSpecLike
   with RichMatchers
-  with MockitoSugar
   with BeforeAndAfterEach
   with GuiceOneServerPerTest
   with WireMockSupport
   with Matchers
-  with MongoSupport {
+  with TestMongoSupport {
 
   lazy val frozenZonedDateTime: ZonedDateTime = {
     val formatter = DateTimeFormatter.ISO_DATE_TIME

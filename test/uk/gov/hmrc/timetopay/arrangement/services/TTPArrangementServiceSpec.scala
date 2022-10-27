@@ -19,7 +19,7 @@ package uk.gov.hmrc.timetopay.arrangement.services
 import uk.gov.hmrc.timetopay.arrangement.model.{TTPArrangement, TTPArrangementWorkItem}
 import uk.gov.hmrc.timetopay.arrangement.repository.{TTPArrangementRepository, TTPArrangementWorkItemRepository}
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestData, WireMockResponses}
-import uk.gov.hmrc.workitem.WorkItem
+import uk.gov.hmrc.mongo.workitem.WorkItem
 
 class TTPArrangementServiceSpec extends ITSpec with TestData {
 
@@ -31,14 +31,14 @@ class TTPArrangementServiceSpec extends ITSpec with TestData {
   private val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement].copy(taxpayer = taxPayerWithEnglishAddress)
 
   override def beforeEach(): Unit = {
-    arrangementWorkItemRepo.collection.drop(false).futureValue
-    arrangementRepo.collection.drop(false).futureValue
+    arrangementWorkItemRepo.collection.drop().toFuture().futureValue
+    arrangementRepo.collection.drop().toFuture().futureValue
     ()
   }
 
   override def afterEach(): Unit = {
-    arrangementWorkItemRepo.collection.drop(false).futureValue
-    arrangementRepo.collection.drop(false).futureValue
+    arrangementWorkItemRepo.collection.drop().toFuture().futureValue
+    arrangementRepo.collection.drop().toFuture().futureValue
     ()
   }
 
@@ -63,7 +63,7 @@ class TTPArrangementServiceSpec extends ITSpec with TestData {
 
     WireMockResponses.desArrangementApiBadRequestSeverError(arrangement.taxpayer.selfAssessment.utr)
     val response = tTPArrangementService.submit(arrangement).failed.futureValue
-    val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.findAll().futureValue.headOption
+    val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.collection.find().headOption.futureValue
     workItem should not be None
     response.getMessage should include("SERVICE_UNAVAILABLE")
   }
@@ -72,7 +72,7 @@ class TTPArrangementServiceSpec extends ITSpec with TestData {
 
     WireMockResponses.desArrangementApiBadRequestSeverError(arrangement.taxpayer.selfAssessment.utr)
     val response = tTPArrangementService.submit(arrangement).failed.futureValue
-    val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.findAll().futureValue.headOption
+    val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.collection.find().headOption.futureValue
     workItem should not be None
     response.getMessage should include("SERVICE_UNAVAILABLE")
   }
@@ -81,7 +81,7 @@ class TTPArrangementServiceSpec extends ITSpec with TestData {
 
     WireMockResponses.desArrangementApiBadRequestClientError(arrangement.taxpayer.selfAssessment.utr)
     val response = tTPArrangementService.submit(arrangement).failed.futureValue
-    val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.findAll().futureValue.headOption
+    val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.collection.find().headOption.futureValue
     workItem shouldBe None
     response.getMessage should include("DES httpCode: 400")
   }

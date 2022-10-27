@@ -24,12 +24,12 @@ import play.api.Logging
 import play.api.libs.json.Json
 import reactivemongo.play.json.ImplicitBSONHandlers
 import reactivemongo.play.json.collection.JSONCollection
-import uk.gov.hmrc.mongo.MongoSpecSupport
+import uk.gov.hmrc.mongo.test.MongoSupport
 
 import scala.concurrent.ExecutionContext.global
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MongoSupport extends MongoSpecSupport with BeforeAndAfterAll with BeforeAndAfterEach with Logging {
+trait TestMongoSupport extends MongoSupport with BeforeAndAfterAll with BeforeAndAfterEach with Logging {
   self: Suite with ScalaFutures with AppendedClues =>
 
   //longer timeout for dropping database or cleaning collections
@@ -50,7 +50,7 @@ trait MongoSupport extends MongoSpecSupport with BeforeAndAfterAll with BeforeAn
 
   def dropMongoDb()(implicit ec: ExecutionContext = global): Unit = {
     logger.info("dropping database ...")
-    mongo().drop().futureValue(longPatienceConfig, implicitly[Position]) withClue "dropping database failed"
+    mongoDatabase.drop().toFuture().futureValue(longPatienceConfig, implicitly[Position]).withClue("dropping database failed")
   }
 
   def clearAllCollectionsButRetainIndices()(implicit ec: ExecutionContext = global): Unit = {
