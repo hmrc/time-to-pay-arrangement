@@ -105,11 +105,15 @@ class TTPArrangementRepository @Inject() (
     //    }).one[JsValue](readPreference)
   }
 
-  def doInsert(ttpArrangement: TTPArrangement): Future[Option[result.InsertOneResult]] = {
+  def doInsert(ttpArrangement: TTPArrangement): Future[Option[TTPArrangement]] = {
     //    logger.debug("Saving ttparrangement record")
     collection
       .insertOne(ttpArrangement)
-      .headOption()
+      .toFutureOption()
+      .map {
+        case Some(_) => Some(ttpArrangement)
+        case None    => None
+      }
     //      .toFutureOption()
 
     //    insert(ttpArrangement)

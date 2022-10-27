@@ -56,7 +56,7 @@ class TTPArrangementService @Inject() (
   /**
    * Builds and submits the TTPArrangement to Des. Also saves to Mongo
    */
-  def submit(arrangement: TTPArrangement)(implicit r: Request[_]): Future[Option[result.InsertOneResult]] = {
+  def submit(arrangement: TTPArrangement)(implicit r: Request[_]): Future[Option[TTPArrangement]] = {
     logger.trace(arrangement, s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' " +
       s"and PP '${arrangement.paymentPlanReference}'")
 
@@ -100,7 +100,7 @@ class TTPArrangementService @Inject() (
   /**
    * Saves the TTPArrangement to our mongoDB and adds in a Id
    */
-  private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[result.InsertOneResult]] = {
+  private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[TTPArrangement]] = {
     val toSave = arrangementToSave(arrangement, desSubmissionRequest)
 
     Try(ttpArrangementRepository.doInsert(toSave)).getOrElse(Future.successful(None))

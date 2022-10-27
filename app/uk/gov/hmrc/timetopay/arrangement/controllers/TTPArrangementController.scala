@@ -42,7 +42,7 @@ class TTPArrangementController @Inject() (arrangementService: TTPArrangementServ
       withJsonBody[TTPArrangement] {
         arrangement =>
           arrangementService.submit(arrangement).flatMap {
-            x => x.fold(createdNoLocation)(a => createdWithLocation(a.getInsertedId.toString))
+            x => x.fold(createdNoLocation)(a => createdWithLocation(a.id.get))
           }.recover {
             case desApiException: DesApiException =>
               val desFailureMessage: String = s"Submission to DES failed, status code [${desApiException.code}] and response [${desApiException.message}]"
