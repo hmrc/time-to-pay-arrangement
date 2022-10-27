@@ -103,7 +103,7 @@ class PollerService @Inject() (
 
           auditService.sendSubmissionSucceededEvent(arrangment.taxpayer, arrangment.bankDetails, arrangment.schedule, auditTags)
 
-          ttpArrangementRepositoryWorkItem.complete(wi.id, Succeeded).map(_ => process())
+          ttpArrangementRepositoryWorkItem.completeAndDelete(wi.id).map(_ => process())
           ()
         case error: SubmissionError =>
           if (finalAttempt) {

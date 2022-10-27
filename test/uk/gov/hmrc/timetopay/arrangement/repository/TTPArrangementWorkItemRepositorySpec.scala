@@ -18,7 +18,7 @@ package uk.gov.hmrc.timetopay.arrangement.repository
 
 import org.bson.types.ObjectId
 
-import java.time.{Clock, Instant}
+import java.time.{Clock, Duration, Instant}
 import java.time.Clock.systemUTC
 import org.joda.time.DateTime
 import play.api.libs.json.Json
@@ -31,6 +31,7 @@ import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.timetopay.arrangement.services.CryptoService
 import uk.gov.hmrc.mongo.workitem.ProcessingStatus.{Cancelled, Deferred, Duplicate, Failed, Ignored, InProgress, PermanentlyFailed, Succeeded}
 import uk.gov.hmrc.mongo.workitem.WorkItem
+import uk.gov.hmrc.timetopay.arrangement.config.QueueConfig
 
 class TTPArrangementWorkItemRepositorySpec extends ITSpec {
 
@@ -40,7 +41,17 @@ class TTPArrangementWorkItemRepositorySpec extends ITSpec {
 
   private val clock: Clock = systemUTC()
 
-  val ttpArrangementWorkItem = TTPArrangementWorkItem(now(clock), now(clock), "", crypto.encryptTtpa(arrangement), crypto.encryptAuditTags(auditTags))
+  val testTime = now(clock)
+  val testAvailableUntil = testTime.plus(Duration.ofHours(48))
+
+  val ttpArrangementWorkItem = TTPArrangementWorkItem(
+    createdOn = testTime,
+    availableUntil = testAvailableUntil,
+    reference = "",
+    ttpArrangement = crypto.encryptTtpa(arrangement),
+    auditTags = crypto.encryptAuditTags(auditTags)
+  )
+
   "Count should be 0 with empty repo" in {
     collectionSize shouldBe 0
   }
@@ -112,7 +123,7 @@ class TTPArrangementWorkItemRepositorySpec extends ITSpec {
   "complete and delete an in progress request" in {
     val workItem = repo.pushNew(ttpArrangementWorkItem, javaInstantNow).futureValue
     repo.markAs(workItem.id, InProgress).futureValue should be(true)
-    repo.complete(workItem.id, Succeeded).futureValue should be(true)
+    repo.completeAndDelete(workItem.id).futureValue should be(true)
     repo.findById(workItem.id).futureValue shouldBe None
   }
 
