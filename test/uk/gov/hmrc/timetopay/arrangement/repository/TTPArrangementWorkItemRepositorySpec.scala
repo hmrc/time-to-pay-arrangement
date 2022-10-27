@@ -59,7 +59,7 @@ class TTPArrangementWorkItemRepositorySpec extends ITSpec {
   "ensure indexes are created" in {
     repo.collection.drop().toFuture().futureValue
     repo.ensureIndexes.futureValue
-    repo.collection.countDocuments().toFuture().futureValue.toInt shouldBe 5
+    repo.collection.listIndexes().toFuture().futureValue.length shouldBe 5
   }
 
   "be able to push a new request and reload a request" in {

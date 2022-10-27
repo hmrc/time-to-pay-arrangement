@@ -45,8 +45,7 @@ class TTPArrangementWorkItemRepository @Inject() (configuration:          Config
       failureCount = "failureCount",
       updatedAt = "updatedAt",
       status = "status"
-    ),
-    replaceIndexes = true
+    )
   ) {
 
   override def now: Instant = Instant.now()
