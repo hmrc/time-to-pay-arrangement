@@ -25,6 +25,7 @@ import play.api.libs.json.Json
 import reactivemongo.play.json.ImplicitBSONHandlers
 import reactivemongo.play.json.collection.JSONCollection
 import uk.gov.hmrc.mongo.test.MongoSupport
+import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
 import scala.concurrent.ExecutionContext.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,14 +34,15 @@ trait TestMongoSupport extends MongoSupport with BeforeAndAfterAll with BeforeAn
   self: Suite with ScalaFutures with AppendedClues =>
 
   //longer timeout for dropping database or cleaning collections
-  private val longPatienceConfig = PatienceConfig(
+  implicit val longPatienceConfig: PatienceConfig = PatienceConfig(
     timeout  = scaled(Span(6, Seconds)),
     interval = scaled(Span(50, Millis)) //tests aren't run in parallel so why bother with waiting longer
   )
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    clearAllCollectionsButRetainIndices()
+    dropMongoDb()
+    //    clearAllCollectionsButRetainIndices()
   }
 
   override def afterAll(): Unit = {
@@ -48,21 +50,31 @@ trait TestMongoSupport extends MongoSupport with BeforeAndAfterAll with BeforeAn
     dropMongoDb()
   }
 
-  def dropMongoDb()(implicit ec: ExecutionContext = global): Unit = {
+  def dropMongoDb(): Unit = {
     logger.info("dropping database ...")
-    mongoDatabase.drop().toFuture().futureValue(longPatienceConfig, implicitly[Position]).withClue("dropping database failed")
+    mongoDatabase.drop().toFuture().futureValue //.withClue("dropping database failed")
   }
 
-  def clearAllCollectionsButRetainIndices()(implicit ec: ExecutionContext = global): Unit = {
-    import ImplicitBSONHandlers._
-    logger.info("clearing collections ...")
-    val dropF =
-      for {
-        collNames <- mongo().collectionNames
-        collections = collNames.map(name => mongo().collection[JSONCollection](name))
-        _ <- Future.sequence(collections.map(_.delete(ordered = true).one(Json.obj(), None)))
-      } yield ()
-
-    dropF.futureValue(longPatienceConfig, implicitly[Position]) withClue "dropping collections failed"
-  }
+  //  def clearAllCollectionsButRetainIndices()(implicit ec: ExecutionContext = global): Unit = {
+  //    import ImplicitBSONHandlers._
+  //    logger.info("clearing collections ...")
+  //    val dropF =
+  //      for {
+  //        collNames <- mongoDatabase.listCollections()
+  //        collections = collNames.map(name => mongoDatabase.getCollection[JSONCollection](name._1))
+  //        _ <- Future.sequence(collections.map(_.remove
+  ////          delete(ordered = true).one(Json.obj(), None)))
+  //
+  //      } yield ()
+  //
+  //    dropF.futureValue(longPatienceConfig, implicitly[Position]) withClue "dropping collections failed"
+  //  }
+  //
+  //  def clear(): Unit = {
+  //    for {
+  //      collNames <- mongoDatabase.listCollectionNames()
+  //      collections <- collNames.map(name => mongoDatabase.getCollection(name.toString))
+  //      _ <- collections.deleteMany()
+  //    }
+  //  }
 }
