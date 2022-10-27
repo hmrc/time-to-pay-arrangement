@@ -52,7 +52,7 @@ trait TestMongoSupport extends MongoSupport with BeforeAndAfterAll with BeforeAn
 
   def dropMongoDb(): Unit = {
     logger.info("dropping database ...")
-    mongoDatabase.drop().toFuture().futureValue //.withClue("dropping database failed")
+    dropDatabase().withClue("dropping database failed")
   }
 
   //  def clearAllCollectionsButRetainIndices()(implicit ec: ExecutionContext = global): Unit = {
