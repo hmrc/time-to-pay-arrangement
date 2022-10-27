@@ -40,13 +40,13 @@ class TTPArrangementWorkItemRepository @Inject() (configuration:          Config
     workItemFields = WorkItemFields(
       id = "_id",
       item = "item",
-      availableAt = "receivedAt",
+      availableAt = "availableAt",
       receivedAt = "receivedAt",
       failureCount = "failureCount",
       updatedAt = "updatedAt",
       status = "status"
     ),
-    replaceIndexes = false
+    replaceIndexes = true
   ) {
 
   override def now: Instant = Instant.now()
