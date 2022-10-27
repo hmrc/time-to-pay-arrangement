@@ -47,6 +47,7 @@ class TTPArrangementRepositorySpec extends ITSpec {
     arrangementRepo.doInsert(arrangement).futureValue
 
     val loaded = arrangementRepo.findByIdLocal(arrangement.id.get).futureValue.get
+
     assert(loaded.toString.contains("desArrangement"))
     assert(loaded.toString.contains("XXX-XXX-XXX"))
   }

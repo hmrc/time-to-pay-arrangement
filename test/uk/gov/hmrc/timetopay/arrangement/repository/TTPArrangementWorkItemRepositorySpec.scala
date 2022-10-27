@@ -18,38 +18,35 @@ package uk.gov.hmrc.timetopay.arrangement.repository
 
 import org.bson.types.ObjectId
 
-import java.time.{Clock, Duration, Instant}
+import java.time.{Clock, Duration, Instant, LocalDateTime}
 import java.time.Clock.systemUTC
-import org.joda.time.DateTime
-import play.api.libs.json.Json
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangementWorkItem
-import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestMongoSupport}
+import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
 import uk.gov.hmrc.timetopay.arrangement.repository.TestDataTtp.{arrangement, auditTags}
 
 import java.time.LocalDateTime.now
-import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.timetopay.arrangement.services.CryptoService
 import uk.gov.hmrc.mongo.workitem.ProcessingStatus.{Cancelled, Deferred, Duplicate, Failed, Ignored, InProgress, PermanentlyFailed, Succeeded}
 import uk.gov.hmrc.mongo.workitem.WorkItem
-import uk.gov.hmrc.timetopay.arrangement.config.QueueConfig
 
 class TTPArrangementWorkItemRepositorySpec extends ITSpec {
 
-  private lazy val repo = fakeApplication.injector.instanceOf[TTPArrangementWorkItemRepository]
-  private val crypto = fakeApplication.injector.instanceOf[CryptoService]
+  private lazy val repo = fakeApplication().injector.instanceOf[TTPArrangementWorkItemRepository]
+
+  private val crypto = fakeApplication().injector.instanceOf[CryptoService]
   private val javaInstantNow: Instant = Instant.now()
 
   private val clock: Clock = systemUTC()
 
-  val testTime = now(clock)
-  val testAvailableUntil = testTime.plus(Duration.ofHours(48))
+  val testTime: LocalDateTime = now(clock)
+  val testAvailableUntil: LocalDateTime = testTime.plus(Duration.ofHours(48))
 
-  val ttpArrangementWorkItem = TTPArrangementWorkItem(
-    createdOn = testTime,
+  val ttpArrangementWorkItem: TTPArrangementWorkItem = TTPArrangementWorkItem(
+    createdOn      = testTime,
     availableUntil = testAvailableUntil,
-    reference = "",
+    reference      = "",
     ttpArrangement = crypto.encryptTtpa(arrangement),
-    auditTags = crypto.encryptAuditTags(auditTags)
+    auditTags      = crypto.encryptAuditTags(auditTags)
   )
 
   "Count should be 0 with empty repo" in {
