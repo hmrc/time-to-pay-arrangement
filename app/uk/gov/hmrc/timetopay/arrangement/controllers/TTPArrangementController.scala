@@ -57,7 +57,9 @@ class TTPArrangementController @Inject() (arrangementService: TTPArrangementServ
 
   private def createdNoLocation = Future.successful[Result](Created)
 
-  private def createdWithLocation(id: String)(implicit reqHead: RequestHeader) = Future.successful[Result](Created.withHeaders(LOCATION -> s"$protocol://${reqHead.host}/ttparrangements/$id"))
+  private def createdWithLocation(id: String)(implicit reqHead: RequestHeader) = {
+    Future.successful[Result](Created.withHeaders(LOCATION -> s"$protocol://${reqHead.host}/ttparrangements/$id"))
+  }
 
   def protocol(implicit reqHead: RequestHeader): String = if (reqHead.secure) "https" else "http"
 
