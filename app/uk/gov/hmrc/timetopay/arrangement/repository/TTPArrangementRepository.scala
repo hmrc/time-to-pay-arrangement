@@ -17,10 +17,9 @@
 package uk.gov.hmrc.timetopay.arrangement.repository
 
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes}
-import org.mongodb.scala.result
+import org.mongodb.scala.{ReadPreference, result}
 import play.api.libs.json._
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
-import reactivemongo.api.ReadPreference
 import reactivemongo.api.commands.DefaultWriteResult
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.BSONDocument
@@ -95,7 +94,7 @@ class TTPArrangementRepository @Inject() (
   ) {
 
   def findByIdLocal(id: String): Future[Option[TTPArrangement]] = {
-    collection
+    collection.withReadPreference(ReadPreference.primaryPreferred)
       .find(
         filter = Filters.eq("_id", id)
       )
