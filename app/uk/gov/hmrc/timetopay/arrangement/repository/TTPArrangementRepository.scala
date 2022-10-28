@@ -19,7 +19,7 @@ package uk.gov.hmrc.timetopay.arrangement.repository
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes}
 import org.mongodb.scala.{ReadPreference, result}
 import play.api.libs.json._
-import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
+import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 import reactivemongo.api.commands.DefaultWriteResult
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.BSONDocument
@@ -79,7 +79,9 @@ object TTPArrangementMongoFormats {
   implicit val newFormat: Format[TTPArrangement] = Format[TTPArrangement](Json.reads[TTPArrangement], customWriterTTPArrangementMongo)
 
   val id = "_id"
+
 }
+
 
 class TTPArrangementRepository @Inject() (
     mongo:  MongoComponent,
@@ -89,16 +91,20 @@ class TTPArrangementRepository @Inject() (
     mongoComponent = mongo,
     collectionName = "ttparrangements-new-mongo",
     domainFormat   = TTPArrangementMongoFormats.format,
+    extraCodecs = Seq(Codecs.playFormatCodec(Json.format[JsValue])),
     indexes        = TTPArrangementRepository.indexes(config.getDuration("TTPArrangement.ttl").toSeconds),
     replaceIndexes = true
   ) {
 
-  def findByIdLocal(id: String): Future[Option[TTPArrangement]] = {
-    collection.withReadPreference(ReadPreference.primaryPreferred)
-      .find(
+  def findByIdLocal(
+                     id: String,
+                     readPreference: ReadPreference = ReadPreference.primaryPreferred
+                   ): Future[Option[JsValue]] = {
+    collection.withReadPreference(readPreference)
+      .find[JsValue](
         filter = Filters.eq("_id", id)
-      )
-      .headOption()
+      ).headOption()
+
   }
 
   def doInsert(ttpArrangement: TTPArrangement): Future[Option[TTPArrangement]] = {

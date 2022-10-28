@@ -51,7 +51,7 @@ class TTPArrangementService @Inject() (
 
   val CLIENT_CLOSED_REQUEST = 499 // Client closes the connection while nginx is processing the request.
 
-  def byId(id: String): Future[Option[TTPArrangement]] = ttpArrangementRepository.findByIdLocal(id)
+  def byId(id: String): Future[Option[JsValue]] = ttpArrangementRepository.findByIdLocal(id)
 
   /**
    * Builds and submits the TTPArrangement to Des. Also saves to Mongo
