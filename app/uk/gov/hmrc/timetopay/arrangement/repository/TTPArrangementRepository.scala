@@ -20,9 +20,6 @@ import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes}
 import org.mongodb.scala.{ReadPreference, result}
 import play.api.libs.json._
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
-import reactivemongo.api.commands.DefaultWriteResult
-import reactivemongo.api.indexes.{Index, IndexType}
-import reactivemongo.bson.BSONDocument
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -82,7 +79,6 @@ object TTPArrangementMongoFormats {
 
 }
 
-
 class TTPArrangementRepository @Inject() (
     mongo:  MongoComponent,
     config: ServicesConfig
@@ -91,24 +87,23 @@ class TTPArrangementRepository @Inject() (
     mongoComponent = mongo,
     collectionName = "ttparrangements-new-mongo",
     domainFormat   = TTPArrangementMongoFormats.format,
-    extraCodecs = Seq(Codecs.playFormatCodec(Json.format[JsValue])),
+    //    extraCodecs = Seq(Codecs.playFormatCodec(Json.format[JsValue])),
     indexes        = TTPArrangementRepository.indexes(config.getDuration("TTPArrangement.ttl").toSeconds),
     replaceIndexes = true
   ) {
 
   def findByIdLocal(
-                     id: String,
-                     readPreference: ReadPreference = ReadPreference.primaryPreferred
-                   ): Future[Option[JsValue]] = {
+      id:             String,
+      readPreference: ReadPreference = ReadPreference.primaryPreferred
+  ): Future[Option[JsValue]] = {
     collection.withReadPreference(readPreference)
       .find[JsValue](
         filter = Filters.eq("_id", id)
-      ).headOption()
-
+      )
+      .headOption()
   }
 
   def doInsert(ttpArrangement: TTPArrangement): Future[Option[TTPArrangement]] = {
-    //    logger.debug("Saving ttparrangement record")
     collection
       .insertOne(ttpArrangement)
       .toFutureOption()
@@ -116,17 +111,6 @@ class TTPArrangementRepository @Inject() (
         case Some(_) => Some(ttpArrangement)
         case None    => None
       }
-    //      .toFutureOption()
-
-    //    insert(ttpArrangement)
-    //      .collect {
-    //        case DefaultWriteResult(true, 1, Seq(), None, _, None) =>
-    //          logger.info(s"Arrangement record persisted ID: ${ttpArrangement.id}")
-    //          Some(ttpArrangement)
-    //        case DefaultWriteResult(false, 1, Seq(), None, _, Some(msg)) =>
-    //          logger.error(s"An error occurred saving record: $msg")
-    //          None
-    //      }
   }
 }
 
