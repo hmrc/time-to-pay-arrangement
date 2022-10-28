@@ -17,7 +17,7 @@
 package uk.gov.hmrc.timetopay.arrangement.repository
 
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes}
-import org.mongodb.scala.{ReadPreference, result}
+import org.mongodb.scala.ReadPreference
 import play.api.libs.json._
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 import uk.gov.hmrc.mongo.MongoComponent

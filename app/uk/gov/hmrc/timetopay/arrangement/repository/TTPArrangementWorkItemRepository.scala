@@ -55,16 +55,6 @@ class TTPArrangementWorkItemRepository @Inject() (configuration:          Config
   override lazy val inProgressRetryAfter: Duration = Duration.ofMillis(retryIntervalMillis)
   private lazy val ttlInSeconds = queueConfig.ttl.toSeconds
 
-//  override lazy val workItemFields: WorkItemFieldNames =
-//    new WorkItemFieldNames {
-//      val receivedAt = "receivedAt"
-//      val updatedAt = "updatedAt"
-//      val availableAt = "receivedAt"
-//      val status = "status"
-//      val id = "_id"
-//      val failureCount = "failureCount"
-//    }
-
   override def ensureIndexes: Future[Seq[String]] =
     MongoUtils.ensureIndexes(
       collection,
@@ -78,15 +68,6 @@ class TTPArrangementWorkItemRepository @Inject() (configuration:          Config
       indexOptions = IndexOptions().expireAfter(ttlInSeconds, TimeUnit.SECONDS)
     )
   )
-
-
-//  override def indexes: Seq[Index] = super.indexes ++ Seq(
-//    Index(
-//      key     = Seq(workItemFields.receivedAt -> IndexType.Ascending),
-//      name    = Some("receivedAtTime"),
-//      options = BSONDocument("expireAfterSeconds" -> ttlInSeconds)
-//    ))
-
 
   def pullOutstanding(): Future[Option[WorkItem[TTPArrangementWorkItem]]] =
     super.pullOutstanding(now.minusMillis(retryIntervalMillis.toInt), now)

@@ -16,17 +16,13 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import java.time.{Clock, Duration, Instant, LocalDateTime, ZoneId}
+import java.time.{Clock, Duration, Instant, LocalDateTime}
 import java.util.UUID
 import javax.inject.Inject
-import org.joda.time.DateTime
-import org.mongodb.scala.result
-import play.api.Logger
-import play.api.http.Status
+
 import play.api.libs.json.JsValue
 import play.api.mvc.Request
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
+
 import uk.gov.hmrc.timetopay.arrangement.config.{QueueConfig, QueueLogger}
 import uk.gov.hmrc.timetopay.arrangement.connectors.{DesArrangementApiServiceConnector, SubmissionError, SubmissionSuccess}
 import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, TTPArrangement, TTPArrangementWorkItem}
