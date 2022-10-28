@@ -76,6 +76,9 @@ object TTPArrangementMongoFormats {
   implicit val format: Format[TTPArrangement] = ReactiveMongoFormats.mongoEntity({
     Format(Json.reads[TTPArrangement], customWriterTTPArrangementMongo)
   })
+
+  implicit val newFormat: Format[TTPArrangement] = Format[TTPArrangement](Json.reads[TTPArrangement], customWriterTTPArrangementMongo)
+
   val id = "_id"
 }
 
@@ -97,12 +100,6 @@ class TTPArrangementRepository @Inject() (
         filter = Filters.eq("_id", id)
       )
       .headOption()
-
-    //    collection.find(_id(id), None)(new OWrites[JsObject] {
-    //      def writes(o: JsObject): JsObject = o
-    //    }, new OWrites[JsObject] {
-    //      def writes(o: JsObject): JsObject = o
-    //    }).one[JsValue](readPreference)
   }
 
   def doInsert(ttpArrangement: TTPArrangement): Future[Option[TTPArrangement]] = {

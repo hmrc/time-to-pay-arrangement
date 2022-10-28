@@ -45,11 +45,11 @@ class TTPArrangementWorkItemRepositorySpec extends ITSpec {
   val testAvailableUntil = testTime.plus(Duration.ofHours(48))
 
   val ttpArrangementWorkItem = TTPArrangementWorkItem(
-    createdOn = testTime,
+    createdOn      = testTime,
     availableUntil = testAvailableUntil,
-    reference = "",
+    reference      = "",
     ttpArrangement = crypto.encryptTtpa(arrangement),
-    auditTags = crypto.encryptAuditTags(auditTags)
+    auditTags      = crypto.encryptAuditTags(auditTags)
   )
 
   "Count should be 0 with empty repo" in {
