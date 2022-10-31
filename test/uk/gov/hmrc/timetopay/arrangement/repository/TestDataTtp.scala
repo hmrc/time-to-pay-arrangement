@@ -148,7 +148,7 @@ object TestDataTtp {
        |  "directDebitReference": "1234567890",
        |  "taxpayer": {
        |    "selfAssessment": {
-       |      "utr": "1234567890",
+       |      "utr": "1234567890"
        |    }
        |  },
        |  "bankDetails": {
