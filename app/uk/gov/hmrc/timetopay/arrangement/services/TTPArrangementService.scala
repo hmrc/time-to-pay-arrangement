@@ -23,7 +23,7 @@ import play.api.libs.json.JsValue
 import play.api.mvc.Request
 import uk.gov.hmrc.timetopay.arrangement.config.{QueueConfig, QueueLogger}
 import uk.gov.hmrc.timetopay.arrangement.connectors.{DesArrangementApiServiceConnector, SubmissionError, SubmissionSuccess}
-import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, LetterAndControl, SelfAssessment, TTPAnonymisedArrangement, TTPArrangement, TTPArrangementWorkItem, Taxpayer}
+import uk.gov.hmrc.timetopay.arrangement.model.{AnonymisedDesSubmissionRequest, AnonymisedSelfAssessment, AnonymisedTaxpayer, DesSubmissionRequest, LetterAndControl, SelfAssessment, TTPAnonymisedArrangement, TTPArrangement, TTPArrangementWorkItem, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.repository.{TTPArrangementRepository, TTPArrangementWorkItemRepository}
 import uk.gov.hmrc.mongo.workitem.WorkItem
 
@@ -130,6 +130,31 @@ class TTPArrangementService @Inject() (
         logger.traceWorkItem(utr, workItem, "Pushed to work queue ")
         workItem
       }
+  }
+
+  def anonymiseArrangement(ttpArrangement: TTPArrangement): TTPAnonymisedArrangement = {
+    TTPAnonymisedArrangement(
+      id = ttpArrangement.id,
+      createdOn = ttpArrangement.createdOn,
+      paymentPlanReference = ttpArrangement.paymentPlanReference,
+      directDebitReference = ttpArrangement.directDebitReference,
+      taxpayer = AnonymisedTaxpayer(
+        selfAssessment = AnonymisedSelfAssessment(
+          utr = ttpArrangement.taxpayer.selfAssessment.utr
+        )
+      ),
+      bankDetails = ttpArrangement.bankDetails,
+      schedule = ttpArrangement.schedule,
+      desArrangement = ttpArrangement.desArrangement match {
+        case None => None
+        case Some(desSubmissionRequest: DesSubmissionRequest) =>
+          Some(
+            AnonymisedDesSubmissionRequest(
+              ttpArrangement = desSubmissionRequest.ttpArrangement
+            )
+          )
+      }
+    )
   }
 
   def padAnonymisedArrangement(anonymisedArrangement: TTPAnonymisedArrangement): TTPArrangement = {

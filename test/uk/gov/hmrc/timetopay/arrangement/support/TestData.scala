@@ -17,8 +17,8 @@
 package uk.gov.hmrc.timetopay.arrangement.support
 
 import java.time.{LocalDate, LocalDateTime}
-import play.api.libs.json.Json
-import uk.gov.hmrc.timetopay.arrangement.model.{Address, AnonymisedDesSubmissionRequest, AnonymisedSelfAssessment, AnonymisedTaxpayer, BankDetails, CommunicationPreferences, DesDebit, DesTTPArrangement, Instalment, LetterAndControl, PaymentSchedule, SelfAssessment, TTPAnonymisedArrangement, Taxpayer}
+import play.api.libs.json.{JsValue, Json}
+import uk.gov.hmrc.timetopay.arrangement.model.{Address, AnonymisedDesSubmissionRequest, AnonymisedSelfAssessment, AnonymisedTaxpayer, BankDetails, CommunicationPreferences, DesDebit, DesSubmissionRequest, DesTTPArrangement, Instalment, LetterAndControl, PaymentSchedule, SelfAssessment, TTPAnonymisedArrangement, TTPArrangement, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.model.modelFormat._
 
 trait TestData {
@@ -90,7 +90,7 @@ trait TestData {
        |  }
        |}""".stripMargin)
 
-  val ttparrangementResponse = Json.parse(
+  val ttparrangementResponse: JsValue = Json.parse(
     s"""
        |{
        |  "id" : "XXX-XXX-XXX",
@@ -342,10 +342,66 @@ trait TestData {
     accountName = "Mr John Campbell"
   )
 
+  val desTTPArrangement: DesTTPArrangement = DesTTPArrangement(
+    startDate = LocalDate.parse("2016-08-09"),
+    endDate = LocalDate.parse("2016-09-16"),
+    firstPaymentDate = LocalDate.parse("2016-08-09"),
+    firstPaymentAmount = "1248.95",
+    regularPaymentAmount = "1248.95",
+    reviewDate = LocalDate.parse("2016-08-09"),
+    initials = "DOM",
+    enforcementAction = "Distraint",
+    debitDetails = List(
+      DesDebit(
+        debitType = "IN2",
+        dueDate = LocalDate.parse("2004-07-31")
+      )
+    ),
+    saNote = "SA Note Text Here"
+  )
+
+  val letterAndControl: LetterAndControl = LetterAndControl(
+    customerName = "Customer Name",
+    addressLine1 = "Plaza 2",
+    addressLine2 = Some("Ironmasters Way"),
+    addressLine3 = Some("Telford"),
+    addressLine4 = Some("Shropshire"),
+    addressLine5 = Some("UK"),
+    postCode = Some("TF3 4NA"),
+    totalAll = "50000",
+    clmPymtString = "Initial payment of 50 then 3 payments of 1248.95 and final payment of 1248.95",
+    officeName1 = "office name 1",
+    officeName2 = "office name 2",
+    officePostcode = "TF2 8JU",
+    officePhone = "1234567",
+    officeFax = "12345678",
+    exceptionType = Some("2"),
+    exceptionReason = Some("Customer requires Large Format printing")
+  )
+
+  val desSubmissionRequest: DesSubmissionRequest = DesSubmissionRequest(
+    ttpArrangement = desTTPArrangement,
+    letterAndControl = letterAndControl
+  )
+
+  val createdOn = Some(LocalDateTime.now())
+
+
+  val ttpArrangement: TTPArrangement = TTPArrangement(
+    id = Some("XXX-XXX-XXX"),
+    createdOn = createdOn,
+    paymentPlanReference = "1234567890",
+    directDebitReference = "1234567890",
+    taxpayer = Taxpayers.taxPayerWithEnglishAddress,
+    bankDetails = bankDetails,
+    schedule = schedule,
+    desArrangement = Some(desSubmissionRequest)
+  )
+
   object AnonymisedData {
     val anonymisedTaxpayer: AnonymisedTaxpayer = AnonymisedTaxpayer(
       selfAssessment = AnonymisedSelfAssessment(
-        utr =       "1234567890"
+        utr =       "XXX"
       )
     )
 
@@ -373,7 +429,7 @@ trait TestData {
 
     val ttpAnonymisedArrangement: TTPAnonymisedArrangement = TTPAnonymisedArrangement(
       id = Some("XXX-XXX-XXX"),
-      createdOn = Some(LocalDateTime.now()),
+      createdOn = createdOn,
       paymentPlanReference = "1234567890",
       directDebitReference = "1234567890",
       taxpayer = anonymisedTaxpayer,
