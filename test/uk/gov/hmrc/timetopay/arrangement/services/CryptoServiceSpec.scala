@@ -27,12 +27,6 @@ class CryptoServiceSpec extends ITSpec with TestData {
 
   val cryptoService = fakeApplication.injector.instanceOf[CryptoService]
 
-  lazy val bankDetails: BankDetails = BankDetails(
-    sortCode      = "12-34-56",
-    accountNumber = "12345678",
-    accountName   = "Mr John Campbell"
-  )
-
   "check encrypted -> decripted match" in {
     val des: DesSubmissionRequest = DesSubmissionRequest(submitArrangementTTPArrangement, submitArrangementLetterAndControl)
     val request: TTPArrangement = TTPArrangement(

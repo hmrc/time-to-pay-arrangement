@@ -184,3 +184,38 @@ object modelFormat {
   implicit val desSubmissionRequestFormat: OFormat[DesSubmissionRequest] = Json.format[DesSubmissionRequest]
 
 }
+
+case class TTPAnonymisedArrangement(
+                                     id:                   Option[String],
+                                     createdOn:            Option[LocalDateTime],
+                                     paymentPlanReference: String,
+                                     directDebitReference: String,
+                                     taxpayer:             AnonymisedTaxpayer,
+                                     bankDetails:          BankDetails,
+                                     schedule:             PaymentSchedule,
+                                     desArrangement:       Option[AnonymisedDesSubmissionRequest])
+
+object TTPAnonymisedArrangement {
+  implicit val TTPAnonymisedArrangementFormat: OFormat[TTPAnonymisedArrangement] = Json.format[TTPAnonymisedArrangement]
+}
+
+case class AnonymisedTaxpayer(
+                               selfAssessment: AnonymisedSelfAssessment)
+
+object AnonymisedTaxpayer {
+  implicit val format: OFormat[AnonymisedTaxpayer] = Json.format
+}
+
+case class AnonymisedSelfAssessment(
+                                     utr:                      String
+                                   )
+
+object AnonymisedSelfAssessment {
+  implicit val format: OFormat[AnonymisedSelfAssessment] = Json.format
+}
+
+case class AnonymisedDesSubmissionRequest(ttpArrangement: DesTTPArrangement)
+
+object AnonymisedDesSubmissionRequest {
+  implicit val format: OFormat[AnonymisedDesSubmissionRequest] = Json.format
+}

@@ -95,9 +95,9 @@ class TTPArrangementRepository @Inject() (
   def findByIdLocal(
       id:             String,
       readPreference: ReadPreference = ReadPreference.primaryPreferred
-  ): Future[Option[JsValue]] = {
+  ): Future[Option[TTPArrangement]] = {
     collection.withReadPreference(readPreference)
-      .find[JsValue](
+      .find(
         filter = Filters.eq("_id", id)
       )
       .headOption()

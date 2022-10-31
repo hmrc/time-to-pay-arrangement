@@ -16,10 +16,9 @@
 
 package uk.gov.hmrc.timetopay.arrangement.support
 
-import java.time.LocalDate
-
+import java.time.{LocalDate, LocalDateTime}
 import play.api.libs.json.Json
-import uk.gov.hmrc.timetopay.arrangement.model.{Address, CommunicationPreferences, DesTTPArrangement, Instalment, LetterAndControl, PaymentSchedule, SelfAssessment, Taxpayer}
+import uk.gov.hmrc.timetopay.arrangement.model.{Address, AnonymisedDesSubmissionRequest, AnonymisedSelfAssessment, AnonymisedTaxpayer, BankDetails, CommunicationPreferences, DesDebit, DesTTPArrangement, Instalment, LetterAndControl, PaymentSchedule, SelfAssessment, TTPAnonymisedArrangement, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.model.modelFormat._
 
 trait TestData {
@@ -337,4 +336,50 @@ trait TestData {
 
   }
 
+  val bankDetails: BankDetails = BankDetails(
+    sortCode = "12-34-56",
+    accountNumber = "12345678",
+    accountName = "Mr John Campbell"
+  )
+
+  object AnonymisedData {
+    val anonymisedTaxpayer: AnonymisedTaxpayer = AnonymisedTaxpayer(
+      selfAssessment = AnonymisedSelfAssessment(
+        utr =       "1234567890"
+      )
+    )
+
+    val anonymisedDesSubmissionRequest: AnonymisedDesSubmissionRequest = AnonymisedDesSubmissionRequest(
+      ttpArrangement = DesTTPArrangement(
+        startDate = LocalDate.parse("2016-08-09"),
+        endDate = LocalDate.parse("2016-09-16"),
+        firstPaymentDate = LocalDate.parse("2016-08-09"),
+        firstPaymentAmount = "1248.95",
+        regularPaymentAmount = "1248.95",
+        regularPaymentFrequency = "Monthly",
+        reviewDate = LocalDate.parse("2016-08-09"),
+        initials = "DOM",
+        enforcementAction = "Distraint",
+        directDebit = true,
+        debitDetails = List(
+          DesDebit(
+          debitType = "IN2",
+          dueDate = LocalDate.parse("2004-07-31")
+          )
+        ),
+        saNote = "SA Note Text Here"
+      )
+    )
+
+    val ttpAnonymisedArrangement: TTPAnonymisedArrangement = TTPAnonymisedArrangement(
+      id = Some("XXX-XXX-XXX"),
+      createdOn = Some(LocalDateTime.now()),
+      paymentPlanReference = "1234567890",
+      directDebitReference = "1234567890",
+      taxpayer = anonymisedTaxpayer,
+      bankDetails = bankDetails,
+      schedule = schedule,
+      desArrangement = Some(anonymisedDesSubmissionRequest)
+    )
+  }
 }
