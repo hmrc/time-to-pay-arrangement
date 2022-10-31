@@ -384,8 +384,7 @@ trait TestData {
     letterAndControl = letterAndControl
   )
 
-  val createdOn = Some(LocalDateTime.now())
-
+  val createdOn: Option[LocalDateTime] = Some(LocalDateTime.now())
 
   val ttpArrangement: TTPArrangement = TTPArrangement(
     id = Some("XXX-XXX-XXX"),
@@ -412,11 +411,9 @@ trait TestData {
         firstPaymentDate = LocalDate.parse("2016-08-09"),
         firstPaymentAmount = "1248.95",
         regularPaymentAmount = "1248.95",
-        regularPaymentFrequency = "Monthly",
         reviewDate = LocalDate.parse("2016-08-09"),
         initials = "DOM",
         enforcementAction = "Distraint",
-        directDebit = true,
         debitDetails = List(
           DesDebit(
           debitType = "IN2",
@@ -436,6 +433,35 @@ trait TestData {
       bankDetails = bankDetails,
       schedule = schedule,
       desArrangement = Some(anonymisedDesSubmissionRequest)
+    )
+
+    val paddedTtpAnonymisedArrangement: TTPArrangement = TTPArrangement(
+      id = Some("XXX-XXX-XXX"),
+      createdOn = createdOn,
+      paymentPlanReference = "1234567890",
+      directDebitReference = "1234567890",
+      taxpayer = Taxpayer(
+        customerName = "",
+        addresses = List(),
+        selfAssessment = SelfAssessment(
+          utr = "XXX",
+          communicationPreferences = None,
+          debits = List()
+        )
+      ),
+      bankDetails = bankDetails,
+      schedule = schedule,
+      desArrangement = Some(
+        DesSubmissionRequest(
+          ttpArrangement = desTTPArrangement,
+          letterAndControl = LetterAndControl(
+            customerName = "",
+            salutation = "",
+            totalAll = "",
+            clmPymtString = ""
+          )
+        )
+      )
     )
   }
 }

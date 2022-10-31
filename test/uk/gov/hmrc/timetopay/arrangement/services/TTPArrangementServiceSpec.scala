@@ -86,22 +86,11 @@ class TTPArrangementServiceSpec extends ITSpec with TestData {
     response.getMessage should include("DES httpCode: 400")
   }
 
-  "TTPArrangementService.padAnonymisedArrangement returns a TTPArrangement from a TTPAnonymisedArrangement with empty strings for personal details" in {
-    val returnValue = tTPArrangementService.padAnonymisedArrangement(AnonymisedData.ttpAnonymisedArrangement)
-
-    returnValue.taxpayer.customerName should equal("")
-    returnValue.taxpayer.addresses should equal(List())
-    returnValue.taxpayer.selfAssessment.communicationPreferences should equal(None)
-    returnValue.taxpayer.selfAssessment.debits should equal(List())
-
-    returnValue.desArrangement.get.letterAndControl.customerName should equal("")
-    returnValue.desArrangement.get.letterAndControl.salutation should equal("")
-    returnValue.desArrangement.get.letterAndControl.addressLine1 should equal("")
-    returnValue.desArrangement.get.letterAndControl.totalAll should equal("")
-    returnValue.desArrangement.get.letterAndControl.clmPymtString should equal("")
-  }
-
   "TTSPArrangementService.anonymiseArrangement returns a TTPAnonymiseArrangement from a TTPArrangement with personal details pruned out" in {
     tTPArrangementService.anonymiseArrangement(ttpArrangement) should equal(AnonymisedData.ttpAnonymisedArrangement)
+  }
+
+  "TTPArrangementService.padAnonymisedArrangement returns a TTPArrangement from a TTPAnonymisedArrangement with empty strings for personal details" in {
+    tTPArrangementService.padAnonymisedArrangement(AnonymisedData.ttpAnonymisedArrangement) should equal(AnonymisedData.paddedTtpAnonymisedArrangement)
   }
 }
