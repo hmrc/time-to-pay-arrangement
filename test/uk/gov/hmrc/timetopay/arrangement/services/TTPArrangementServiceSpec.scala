@@ -55,8 +55,6 @@ class TTPArrangementServiceSpec extends ITSpec with TestData {
     desSubmissionRequest.ttpArrangement.firstPaymentAmount shouldBe "1248.95"
     desSubmissionRequest.ttpArrangement.enforcementAction shouldBe "Distraint"
     desSubmissionRequest.ttpArrangement.regularPaymentAmount shouldBe "1248.95"
-    desSubmissionRequest.letterAndControl.clmPymtString shouldBe "Initial payment of £50.00 then 3 payments of £1,248.95 and final payment of £1,248.95"
-
   }
 
   "TTPArrangementService should return failed future for DES Bad request in the 500's range and save to the work item db in" in {

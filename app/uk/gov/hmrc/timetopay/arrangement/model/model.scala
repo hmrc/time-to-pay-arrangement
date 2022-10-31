@@ -186,29 +186,29 @@ object modelFormat {
 }
 
 case class TTPAnonymisedArrangement(
-                                     id:                   Option[String],
-                                     createdOn:            Option[LocalDateTime],
-                                     paymentPlanReference: String,
-                                     directDebitReference: String,
-                                     taxpayer:             AnonymisedTaxpayer,
-                                     bankDetails:          BankDetails,
-                                     schedule:             PaymentSchedule,
-                                     desArrangement:       Option[AnonymisedDesSubmissionRequest])
+    id:                   Option[String],
+    createdOn:            Option[LocalDateTime],
+    paymentPlanReference: String,
+    directDebitReference: String,
+    taxpayer:             AnonymisedTaxpayer,
+    bankDetails:          BankDetails,
+    schedule:             PaymentSchedule,
+    desArrangement:       Option[AnonymisedDesSubmissionRequest])
 
 object TTPAnonymisedArrangement {
-  implicit val TTPAnonymisedArrangementFormat: OFormat[TTPAnonymisedArrangement] = Json.format[TTPAnonymisedArrangement]
+  implicit val format: OFormat[TTPAnonymisedArrangement] = Json.format[TTPAnonymisedArrangement]
 }
 
 case class AnonymisedTaxpayer(
-                               selfAssessment: AnonymisedSelfAssessment)
+    selfAssessment: AnonymisedSelfAssessment)
 
 object AnonymisedTaxpayer {
   implicit val format: OFormat[AnonymisedTaxpayer] = Json.format
 }
 
 case class AnonymisedSelfAssessment(
-                                     utr:                      String
-                                   )
+    utr: String
+)
 
 object AnonymisedSelfAssessment {
   implicit val format: OFormat[AnonymisedSelfAssessment] = Json.format

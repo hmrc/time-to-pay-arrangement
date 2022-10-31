@@ -45,12 +45,12 @@ class TTPArrangementService @Inject() (
 
   val CLIENT_CLOSED_REQUEST = 499 // Client closes the connection while nginx is processing the request.
 
-  def byId(id: String): Future[Option[TTPArrangement]] = ttpArrangementRepository.findByIdLocal(id)
+  def byId(id: String): Future[Option[TTPAnonymisedArrangement]] = ttpArrangementRepository.findByIdLocal(id)
 
   /**
    * Builds and submits the TTPArrangement to Des. Also saves to Mongo
    */
-  def submit(arrangement: TTPArrangement)(implicit r: Request[_]): Future[Option[TTPArrangement]] = {
+  def submit(arrangement: TTPArrangement)(implicit r: Request[_]): Future[Option[TTPAnonymisedArrangement]] = {
     logger.trace(arrangement, s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' " +
       s"and PP '${arrangement.paymentPlanReference}'")
 
@@ -94,10 +94,12 @@ class TTPArrangementService @Inject() (
   /**
    * Saves the TTPArrangement to our mongoDB and adds in a Id
    */
-  private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[TTPArrangement]] = {
+  private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[TTPAnonymisedArrangement]] = {
     val toSave = arrangementToSave(arrangement, desSubmissionRequest)
 
-    Try(ttpArrangementRepository.doInsert(toSave)).getOrElse(Future.successful(None))
+    val toSaveAnonymised = anonymiseArrangement(toSave)
+
+    Try(ttpArrangementRepository.doInsert(toSaveAnonymised)).getOrElse(Future.successful(None))
   }
 
   def arrangementToSave(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): TTPArrangement = {
@@ -134,18 +136,18 @@ class TTPArrangementService @Inject() (
 
   def anonymiseArrangement(ttpArrangement: TTPArrangement): TTPAnonymisedArrangement = {
     TTPAnonymisedArrangement(
-      id = ttpArrangement.id,
-      createdOn = ttpArrangement.createdOn,
+      id                   = ttpArrangement.id,
+      createdOn            = ttpArrangement.createdOn,
       paymentPlanReference = ttpArrangement.paymentPlanReference,
       directDebitReference = ttpArrangement.directDebitReference,
-      taxpayer = AnonymisedTaxpayer(
+      taxpayer             = AnonymisedTaxpayer(
         selfAssessment = AnonymisedSelfAssessment(
           utr = ttpArrangement.taxpayer.selfAssessment.utr
         )
       ),
-      bankDetails = ttpArrangement.bankDetails,
-      schedule = ttpArrangement.schedule,
-      desArrangement = ttpArrangement.desArrangement match {
+      bankDetails          = ttpArrangement.bankDetails,
+      schedule             = ttpArrangement.schedule,
+      desArrangement       = ttpArrangement.desArrangement match {
         case None => None
         case Some(desSubmissionRequest: DesSubmissionRequest) =>
           Some(
@@ -159,31 +161,31 @@ class TTPArrangementService @Inject() (
 
   def padAnonymisedArrangement(anonymisedArrangement: TTPAnonymisedArrangement): TTPArrangement = {
     TTPArrangement(
-      id = anonymisedArrangement.id,
-      createdOn = anonymisedArrangement.createdOn,
+      id                   = anonymisedArrangement.id,
+      createdOn            = anonymisedArrangement.createdOn,
       paymentPlanReference = anonymisedArrangement.paymentPlanReference,
       directDebitReference = anonymisedArrangement.directDebitReference,
-      taxpayer = Taxpayer(
-        customerName = "",
-        addresses = List(),
+      taxpayer             = Taxpayer(
+        customerName   = "",
+        addresses      = List(),
         selfAssessment = SelfAssessment(
-          utr = anonymisedArrangement.taxpayer.selfAssessment.utr,
+          utr                      = anonymisedArrangement.taxpayer.selfAssessment.utr,
           communicationPreferences = None,
-          debits = List()
+          debits                   = List()
         )
       ),
-      bankDetails = anonymisedArrangement.bankDetails,
-      schedule = anonymisedArrangement.schedule,
-      desArrangement = anonymisedArrangement.desArrangement match {
+      bankDetails          = anonymisedArrangement.bankDetails,
+      schedule             = anonymisedArrangement.schedule,
+      desArrangement       = anonymisedArrangement.desArrangement match {
         case None => None
         case Some(anonymisedDesSubmissionRequest) =>
           Some(
             DesSubmissionRequest(
-              ttpArrangement = anonymisedDesSubmissionRequest.ttpArrangement,
+              ttpArrangement   = anonymisedDesSubmissionRequest.ttpArrangement,
               letterAndControl = LetterAndControl(
-                customerName = "",
-                salutation = "",
-                totalAll = "",
+                customerName  = "",
+                salutation    = "",
+                totalAll      = "",
                 clmPymtString = ""
               )
             )

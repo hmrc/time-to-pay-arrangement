@@ -337,127 +337,127 @@ trait TestData {
   }
 
   val bankDetails: BankDetails = BankDetails(
-    sortCode = "12-34-56",
+    sortCode      = "12-34-56",
     accountNumber = "12345678",
-    accountName = "Mr John Campbell"
+    accountName   = "Mr John Campbell"
   )
 
   val desTTPArrangement: DesTTPArrangement = DesTTPArrangement(
-    startDate = LocalDate.parse("2016-08-09"),
-    endDate = LocalDate.parse("2016-09-16"),
-    firstPaymentDate = LocalDate.parse("2016-08-09"),
-    firstPaymentAmount = "1248.95",
+    startDate            = LocalDate.parse("2016-08-09"),
+    endDate              = LocalDate.parse("2016-09-16"),
+    firstPaymentDate     = LocalDate.parse("2016-08-09"),
+    firstPaymentAmount   = "1248.95",
     regularPaymentAmount = "1248.95",
-    reviewDate = LocalDate.parse("2016-08-09"),
-    initials = "DOM",
-    enforcementAction = "Distraint",
-    debitDetails = List(
+    reviewDate           = LocalDate.parse("2016-08-09"),
+    initials             = "DOM",
+    enforcementAction    = "Distraint",
+    debitDetails         = List(
       DesDebit(
         debitType = "IN2",
-        dueDate = LocalDate.parse("2004-07-31")
+        dueDate   = LocalDate.parse("2004-07-31")
       )
     ),
-    saNote = "SA Note Text Here"
+    saNote               = "SA Note Text Here"
   )
 
   val letterAndControl: LetterAndControl = LetterAndControl(
-    customerName = "Customer Name",
-    addressLine1 = "Plaza 2",
-    addressLine2 = Some("Ironmasters Way"),
-    addressLine3 = Some("Telford"),
-    addressLine4 = Some("Shropshire"),
-    addressLine5 = Some("UK"),
-    postCode = Some("TF3 4NA"),
-    totalAll = "50000",
-    clmPymtString = "Initial payment of 50 then 3 payments of 1248.95 and final payment of 1248.95",
-    officeName1 = "office name 1",
-    officeName2 = "office name 2",
-    officePostcode = "TF2 8JU",
-    officePhone = "1234567",
-    officeFax = "12345678",
-    exceptionType = Some("2"),
+    customerName    = "Customer Name",
+    addressLine1    = "Plaza 2",
+    addressLine2    = Some("Ironmasters Way"),
+    addressLine3    = Some("Telford"),
+    addressLine4    = Some("Shropshire"),
+    addressLine5    = Some("UK"),
+    postCode        = Some("TF3 4NA"),
+    totalAll        = "50000",
+    clmPymtString   = "Initial payment of 50 then 3 payments of 1248.95 and final payment of 1248.95",
+    officeName1     = "office name 1",
+    officeName2     = "office name 2",
+    officePostcode  = "TF2 8JU",
+    officePhone     = "1234567",
+    officeFax       = "12345678",
+    exceptionType   = Some("2"),
     exceptionReason = Some("Customer requires Large Format printing")
   )
 
   val desSubmissionRequest: DesSubmissionRequest = DesSubmissionRequest(
-    ttpArrangement = desTTPArrangement,
+    ttpArrangement   = desTTPArrangement,
     letterAndControl = letterAndControl
   )
 
   val createdOn: Option[LocalDateTime] = Some(LocalDateTime.now())
 
   val ttpArrangement: TTPArrangement = TTPArrangement(
-    id = Some("XXX-XXX-XXX"),
-    createdOn = createdOn,
+    id                   = Some("XXX-XXX-XXX"),
+    createdOn            = createdOn,
     paymentPlanReference = "1234567890",
     directDebitReference = "1234567890",
-    taxpayer = Taxpayers.taxPayerWithEnglishAddress,
-    bankDetails = bankDetails,
-    schedule = schedule,
-    desArrangement = Some(desSubmissionRequest)
+    taxpayer             = Taxpayers.taxPayerWithEnglishAddress,
+    bankDetails          = bankDetails,
+    schedule             = schedule,
+    desArrangement       = Some(desSubmissionRequest)
   )
 
   object AnonymisedData {
     val anonymisedTaxpayer: AnonymisedTaxpayer = AnonymisedTaxpayer(
       selfAssessment = AnonymisedSelfAssessment(
-        utr =       "XXX"
+        utr = "XXX"
       )
     )
 
     val anonymisedDesSubmissionRequest: AnonymisedDesSubmissionRequest = AnonymisedDesSubmissionRequest(
       ttpArrangement = DesTTPArrangement(
-        startDate = LocalDate.parse("2016-08-09"),
-        endDate = LocalDate.parse("2016-09-16"),
-        firstPaymentDate = LocalDate.parse("2016-08-09"),
-        firstPaymentAmount = "1248.95",
+        startDate            = LocalDate.parse("2016-08-09"),
+        endDate              = LocalDate.parse("2016-09-16"),
+        firstPaymentDate     = LocalDate.parse("2016-08-09"),
+        firstPaymentAmount   = "1248.95",
         regularPaymentAmount = "1248.95",
-        reviewDate = LocalDate.parse("2016-08-09"),
-        initials = "DOM",
-        enforcementAction = "Distraint",
-        debitDetails = List(
+        reviewDate           = LocalDate.parse("2016-08-09"),
+        initials             = "DOM",
+        enforcementAction    = "Distraint",
+        debitDetails         = List(
           DesDebit(
-          debitType = "IN2",
-          dueDate = LocalDate.parse("2004-07-31")
+            debitType = "IN2",
+            dueDate   = LocalDate.parse("2004-07-31")
           )
         ),
-        saNote = "SA Note Text Here"
+        saNote               = "SA Note Text Here"
       )
     )
 
     val ttpAnonymisedArrangement: TTPAnonymisedArrangement = TTPAnonymisedArrangement(
-      id = Some("XXX-XXX-XXX"),
-      createdOn = createdOn,
+      id                   = Some("XXX-XXX-XXX"),
+      createdOn            = createdOn,
       paymentPlanReference = "1234567890",
       directDebitReference = "1234567890",
-      taxpayer = anonymisedTaxpayer,
-      bankDetails = bankDetails,
-      schedule = schedule,
-      desArrangement = Some(anonymisedDesSubmissionRequest)
+      taxpayer             = anonymisedTaxpayer,
+      bankDetails          = bankDetails,
+      schedule             = schedule,
+      desArrangement       = Some(anonymisedDesSubmissionRequest)
     )
 
     val paddedTtpAnonymisedArrangement: TTPArrangement = TTPArrangement(
-      id = Some("XXX-XXX-XXX"),
-      createdOn = createdOn,
+      id                   = Some("XXX-XXX-XXX"),
+      createdOn            = createdOn,
       paymentPlanReference = "1234567890",
       directDebitReference = "1234567890",
-      taxpayer = Taxpayer(
-        customerName = "",
-        addresses = List(),
+      taxpayer             = Taxpayer(
+        customerName   = "",
+        addresses      = List(),
         selfAssessment = SelfAssessment(
-          utr = "XXX",
+          utr                      = "XXX",
           communicationPreferences = None,
-          debits = List()
+          debits                   = List()
         )
       ),
-      bankDetails = bankDetails,
-      schedule = schedule,
-      desArrangement = Some(
+      bankDetails          = bankDetails,
+      schedule             = schedule,
+      desArrangement       = Some(
         DesSubmissionRequest(
-          ttpArrangement = desTTPArrangement,
+          ttpArrangement   = desTTPArrangement,
           letterAndControl = LetterAndControl(
-            customerName = "",
-            salutation = "",
-            totalAll = "",
+            customerName  = "",
+            salutation    = "",
+            totalAll      = "",
             clmPymtString = ""
           )
         )
