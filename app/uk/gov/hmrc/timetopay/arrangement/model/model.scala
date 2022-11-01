@@ -186,21 +186,21 @@ object modelFormat {
 
 }
 
-case class TTPAnonymisedArrangement(
-    _id:                  String,
-    createdOn:            LocalDateTime,
-    paymentPlanReference: String,
-    directDebitReference: String,
-    taxpayer:             AnonymisedTaxpayer,
-    bankDetails:          BankDetails,
-    schedule:             PaymentSchedule,
-    desArrangement:       Option[AnonymisedDesSubmissionRequest])
+case class TTPArrangementAnon(
+                               _id:                  String,
+                               createdOn:            LocalDateTime,
+                               paymentPlanReference: String,
+                               directDebitReference: String,
+                               taxpayer:             TaxpayerAnon,
+                               bankDetails:          BankDetails,
+                               schedule:             PaymentSchedule,
+                               desArrangement:       Option[AnonymisedDesSubmissionRequest])
 
-object TTPAnonymisedArrangement {
-  implicit val format: OFormat[TTPAnonymisedArrangement] = Json.format[TTPAnonymisedArrangement]
+object TTPArrangementAnon {
+  implicit val format: OFormat[TTPArrangementAnon] = Json.format[TTPArrangementAnon]
 
-  implicit def anonymiseArrangement(ttpArrangement: TTPArrangement): TTPAnonymisedArrangement = {
-    TTPAnonymisedArrangement(
+  implicit def makeArrangementAnonymous(ttpArrangement: TTPArrangement): TTPArrangementAnon = {
+    TTPArrangementAnon(
       _id                  = ttpArrangement.id.getOrElse(throw new RuntimeException("Found None")),
       createdOn            = ttpArrangement.createdOn.getOrElse(throw new RuntimeException("Found None")),
       paymentPlanReference = ttpArrangement.paymentPlanReference,
@@ -221,27 +221,27 @@ object TTPAnonymisedArrangement {
   }
 }
 
-case class AnonymisedTaxpayer(
-    selfAssessment: AnonymisedSelfAssessment)
+case class TaxpayerAnon(
+    selfAssessment: SelfAssessmentAnon)
 
-object AnonymisedTaxpayer {
-  implicit val format: OFormat[AnonymisedTaxpayer] = Json.format
+object TaxpayerAnon {
+  implicit val format: OFormat[TaxpayerAnon] = Json.format
 
-  implicit def anonymisedTaxpayer(taxpayer: Taxpayer): AnonymisedTaxpayer = {
-    AnonymisedTaxpayer(
-      selfAssessment = AnonymisedSelfAssessment(
-        utr = taxpayer.selfAssessment.utr
-      )
-    )
+  implicit def makeTaxpayerAnonymous(taxpayer: Taxpayer): TaxpayerAnon = {
+    TaxpayerAnon(taxpayer.selfAssessment)
   }
 }
 
-case class AnonymisedSelfAssessment(
+case class SelfAssessmentAnon(
     utr: String
 )
 
-object AnonymisedSelfAssessment {
-  implicit val format: OFormat[AnonymisedSelfAssessment] = Json.format
+object SelfAssessmentAnon {
+  implicit val format: OFormat[SelfAssessmentAnon] = Json.format
+
+  implicit def makeSelfAssessmentAnonymous(selfAssessment: SelfAssessment): SelfAssessmentAnon = {
+    SelfAssessmentAnon(utr = selfAssessment.utr)
+  }
 }
 
 case class AnonymisedDesSubmissionRequest(ttpArrangement: DesTTPArrangement)

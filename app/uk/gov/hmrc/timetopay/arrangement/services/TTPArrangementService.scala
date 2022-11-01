@@ -23,7 +23,7 @@ import play.api.libs.json.JsValue
 import play.api.mvc.Request
 import uk.gov.hmrc.timetopay.arrangement.config.{QueueConfig, QueueLogger}
 import uk.gov.hmrc.timetopay.arrangement.connectors.{DesArrangementApiServiceConnector, SubmissionError, SubmissionSuccess}
-import uk.gov.hmrc.timetopay.arrangement.model.{AnonymisedDesSubmissionRequest, AnonymisedSelfAssessment, AnonymisedTaxpayer, DesSubmissionRequest, LetterAndControl, SelfAssessment, TTPAnonymisedArrangement, TTPArrangement, TTPArrangementWorkItem, Taxpayer}
+import uk.gov.hmrc.timetopay.arrangement.model.{AnonymisedDesSubmissionRequest, SelfAssessmentAnon, TaxpayerAnon, DesSubmissionRequest, LetterAndControl, SelfAssessment, TTPArrangementAnon, TTPArrangement, TTPArrangementWorkItem, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.repository.{TTPArrangementRepository, TTPArrangementWorkItemRepository}
 import uk.gov.hmrc.mongo.workitem.WorkItem
 
@@ -45,12 +45,12 @@ class TTPArrangementService @Inject() (
 
   val CLIENT_CLOSED_REQUEST = 499 // Client closes the connection while nginx is processing the request.
 
-  def byId(id: String): Future[Option[TTPAnonymisedArrangement]] = ttpArrangementRepository.findByIdLocal(id)
+  def byId(id: String): Future[Option[TTPArrangementAnon]] = ttpArrangementRepository.findByIdLocal(id)
 
   /**
    * Builds and submits the TTPArrangement to Des. Also saves to Mongo
    */
-  def submit(arrangement: TTPArrangement)(implicit r: Request[_]): Future[Option[TTPAnonymisedArrangement]] = {
+  def submit(arrangement: TTPArrangement)(implicit r: Request[_]): Future[Option[TTPArrangementAnon]] = {
     logger.trace(arrangement, s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' " +
       s"and PP '${arrangement.paymentPlanReference}'")
 
@@ -94,7 +94,7 @@ class TTPArrangementService @Inject() (
   /**
    * Saves the TTPArrangement to our mongoDB and adds in a Id
    */
-  private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[TTPAnonymisedArrangement]] = {
+  private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[TTPArrangementAnon]] = {
     val toSave = arrangementToSave(arrangement, desSubmissionRequest)
 
     Try(ttpArrangementRepository.doInsert(toSave)).getOrElse(Future.successful(None))
@@ -132,14 +132,14 @@ class TTPArrangementService @Inject() (
       }
   }
 
-  def anonymiseArrangement(ttpArrangement: TTPArrangement): TTPAnonymisedArrangement = {
-    TTPAnonymisedArrangement(
+  def anonymiseArrangement(ttpArrangement: TTPArrangement): TTPArrangementAnon = {
+    TTPArrangementAnon(
       _id                  = ttpArrangement.id.getOrElse(throw new RuntimeException("Found None")),
       createdOn            = ttpArrangement.createdOn.getOrElse(throw new RuntimeException("Found None")),
       paymentPlanReference = ttpArrangement.paymentPlanReference,
       directDebitReference = ttpArrangement.directDebitReference,
-      taxpayer             = AnonymisedTaxpayer(
-        selfAssessment = AnonymisedSelfAssessment(
+      taxpayer             = TaxpayerAnon(
+        selfAssessment = SelfAssessmentAnon(
           utr = ttpArrangement.taxpayer.selfAssessment.utr
         )
       ),
@@ -157,7 +157,7 @@ class TTPArrangementService @Inject() (
     )
   }
 
-  def padAnonymisedArrangement(anonymisedArrangement: TTPAnonymisedArrangement): TTPArrangement = {
+  def padAnonymisedArrangement(anonymisedArrangement: TTPArrangementAnon): TTPArrangement = {
     TTPArrangement(
       id                   = Some(anonymisedArrangement._id),
       createdOn            = Some(anonymisedArrangement.createdOn),
