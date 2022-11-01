@@ -18,7 +18,9 @@ package uk.gov.hmrc.timetopay.arrangement.model
 
 import java.time.{LocalDate, LocalDateTime}
 import play.api.libs.json._
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
+import java.util.UUID
 import scala.language.implicitConversions
 
 case class PaymentSchedule(
@@ -197,12 +199,14 @@ case class AnonymousTTPArrangement(
     desArrangement:       Option[AnonymousDesSubmissionRequest])
 
 object AnonymousTTPArrangement {
+  implicit val localDatTimeFormat: Format[LocalDateTime] = MongoJavatimeFormats.localDateTimeFormat
+
   implicit val format: OFormat[AnonymousTTPArrangement] = Json.format[AnonymousTTPArrangement]
 
   implicit def makeArrangementAnonymous(ttpArrangement: TTPArrangement): AnonymousTTPArrangement = {
     AnonymousTTPArrangement(
-      _id                  = ttpArrangement.id.getOrElse(throw new RuntimeException("Found None")),
-      createdOn            = ttpArrangement.createdOn.getOrElse(throw new RuntimeException("Found None")),
+      _id                  = UUID.randomUUID().toString,
+      createdOn            = LocalDateTime.now(),
       paymentPlanReference = ttpArrangement.paymentPlanReference,
       directDebitReference = ttpArrangement.directDebitReference,
       taxpayer             = ttpArrangement.taxpayer,

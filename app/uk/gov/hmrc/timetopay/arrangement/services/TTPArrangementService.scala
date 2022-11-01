@@ -73,7 +73,7 @@ class TTPArrangementService @Inject() (
             logger.trace(arrangement, "des failed: adding to queue ")
             sendToTTPArrangementWorkRepo(
               utr,
-              arrangementToSave(arrangement, request)).flatMap { _ =>
+              affixDesArrangement(arrangement, request)).flatMap { _ =>
                 returnedError
               }
           } else {
@@ -95,16 +95,13 @@ class TTPArrangementService @Inject() (
    * Saves the TTPArrangement to our mongoDB and adds in a Id
    */
   private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[AnonymousTTPArrangement]] = {
-    val toSave = arrangementToSave(arrangement, desSubmissionRequest)
+    val toSave = affixDesArrangement(arrangement, desSubmissionRequest)
 
     Try(ttpArrangementRepository.doInsert(toSave)).getOrElse(Future.successful(None))
   }
 
-  def arrangementToSave(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): TTPArrangement = {
-    arrangement.copy(
-      id             = Some(UUID.randomUUID().toString),
-      createdOn      = Some(LocalDateTime.now()),
-      desArrangement = Some(desSubmissionRequest))
+  def affixDesArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): TTPArrangement = {
+    arrangement.copy(desArrangement = Some(desSubmissionRequest))
   }
 
   private def sendToTTPArrangementWorkRepo(
@@ -130,31 +127,6 @@ class TTPArrangementService @Inject() (
         logger.traceWorkItem(utr, workItem, "Pushed to work queue ")
         workItem
       }
-  }
-
-  def anonymiseArrangement(ttpArrangement: TTPArrangement): AnonymousTTPArrangement = {
-    AnonymousTTPArrangement(
-      _id                  = ttpArrangement.id.getOrElse(throw new RuntimeException("Found None")),
-      createdOn            = ttpArrangement.createdOn.getOrElse(throw new RuntimeException("Found None")),
-      paymentPlanReference = ttpArrangement.paymentPlanReference,
-      directDebitReference = ttpArrangement.directDebitReference,
-      taxpayer             = AnonymousTaxpayer(
-        selfAssessment = AnonymousSelfAssessment(
-          utr = ttpArrangement.taxpayer.selfAssessment.utr
-        )
-      ),
-      bankDetails          = ttpArrangement.bankDetails,
-      schedule             = ttpArrangement.schedule,
-      desArrangement       = ttpArrangement.desArrangement match {
-        case None => None
-        case Some(desSubmissionRequest: DesSubmissionRequest) =>
-          Some(
-            AnonymousDesSubmissionRequest(
-              ttpArrangement = desSubmissionRequest.ttpArrangement
-            )
-          )
-      }
-    )
   }
 
   def padAnonymisedArrangement(anonymisedArrangement: AnonymousTTPArrangement): TTPArrangement = {
