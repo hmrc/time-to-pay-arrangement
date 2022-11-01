@@ -280,7 +280,7 @@ object TTPArrangementResponse {
           Some(
             DesSubmissionRequestResponse(
               ttpArrangement   = anonymousDesSubmissionRequest.ttpArrangement,
-              letterAndControl = None
+              letterAndControl = Json.obj()
             )
           )
       }
@@ -288,7 +288,7 @@ object TTPArrangementResponse {
   }
 }
 
-case class DesSubmissionRequestResponse(ttpArrangement: DesTTPArrangement, letterAndControl: Option[LetterAndControl])
+case class DesSubmissionRequestResponse(ttpArrangement: DesTTPArrangement, letterAndControl: JsObject)
 
 object DesSubmissionRequestResponse {
   implicit val format: OFormat[DesSubmissionRequestResponse] = Json.format
