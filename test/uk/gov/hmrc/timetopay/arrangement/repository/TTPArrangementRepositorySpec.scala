@@ -18,7 +18,7 @@ package uk.gov.hmrc.timetopay.arrangement.repository
 
 import play.api.Logger
 import play.api.libs.json.Json
-import uk.gov.hmrc.timetopay.arrangement.model.{AnonymisedDesSubmissionRequest, TTPArrangement}
+import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequestAnon, TTPArrangement}
 import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
 import uk.gov.hmrc.timetopay.arrangement.repository.TestDataTtp.{anonymisedArrangement, arrangement}
 class TTPArrangementRepositorySpec extends ITSpec {
@@ -46,7 +46,7 @@ class TTPArrangementRepositorySpec extends ITSpec {
     logger.warn(arrangement.toString)
     arrangementRepo.doInsert(anonymisedArrangement).futureValue
 
-    val loaded = arrangementRepo.findByIdLocal(anonymisedArrangement._id).futureValue.get
+    val loaded = arrangementRepo.findById(anonymisedArrangement._id).futureValue.get
     println("HERE" + loaded.toString)
     assert(loaded.desArrangement.get.ttpArrangement.firstPaymentAmount.equals(1248.95.toString))
     assert(loaded._id.equals("XXX-XXX-XXX"))
@@ -55,7 +55,7 @@ class TTPArrangementRepositorySpec extends ITSpec {
   "should not save any personal data in" in {
     arrangementRepo.doInsert(anonymisedArrangement).futureValue
 
-    val loaded = arrangementRepo.findByIdLocal(anonymisedArrangement._id).futureValue.get
+    val loaded = arrangementRepo.findById(anonymisedArrangement._id).futureValue.get
     assert(!loaded.toString.contains("Customer Name"))
     assert(!loaded.toString.contains("addresses"))
   }

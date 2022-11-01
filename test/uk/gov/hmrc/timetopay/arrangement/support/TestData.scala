@@ -18,7 +18,7 @@ package uk.gov.hmrc.timetopay.arrangement.support
 
 import java.time.{LocalDate, LocalDateTime}
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.timetopay.arrangement.model.{Address, AnonymisedDesSubmissionRequest, SelfAssessmentAnon, TaxpayerAnon, BankDetails, CommunicationPreferences, DesDebit, DesSubmissionRequest, DesTTPArrangement, Instalment, LetterAndControl, PaymentSchedule, SelfAssessment, TTPArrangementAnon, TTPArrangement, Taxpayer}
+import uk.gov.hmrc.timetopay.arrangement.model.{Address, DesSubmissionRequestAnon, SelfAssessmentAnon, TaxpayerAnon, BankDetails, CommunicationPreferences, DesDebit, DesSubmissionRequest, DesTTPArrangement, Instalment, LetterAndControl, PaymentSchedule, SelfAssessment, TTPArrangementAnon, TTPArrangement, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.model.modelFormat._
 
 trait TestData {
@@ -404,7 +404,7 @@ trait TestData {
       )
     )
 
-    val anonymisedDesSubmissionRequest: AnonymisedDesSubmissionRequest = AnonymisedDesSubmissionRequest(
+    val anonymisedDesSubmissionRequest: DesSubmissionRequestAnon = DesSubmissionRequestAnon(
       ttpArrangement = DesTTPArrangement(
         startDate            = LocalDate.parse("2016-08-09"),
         endDate              = LocalDate.parse("2016-09-16"),

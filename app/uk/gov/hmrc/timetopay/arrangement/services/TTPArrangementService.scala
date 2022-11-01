@@ -23,7 +23,7 @@ import play.api.libs.json.JsValue
 import play.api.mvc.Request
 import uk.gov.hmrc.timetopay.arrangement.config.{QueueConfig, QueueLogger}
 import uk.gov.hmrc.timetopay.arrangement.connectors.{DesArrangementApiServiceConnector, SubmissionError, SubmissionSuccess}
-import uk.gov.hmrc.timetopay.arrangement.model.{AnonymisedDesSubmissionRequest, SelfAssessmentAnon, TaxpayerAnon, DesSubmissionRequest, LetterAndControl, SelfAssessment, TTPArrangementAnon, TTPArrangement, TTPArrangementWorkItem, Taxpayer}
+import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequestAnon, SelfAssessmentAnon, TaxpayerAnon, DesSubmissionRequest, LetterAndControl, SelfAssessment, TTPArrangementAnon, TTPArrangement, TTPArrangementWorkItem, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.repository.{TTPArrangementRepository, TTPArrangementWorkItemRepository}
 import uk.gov.hmrc.mongo.workitem.WorkItem
 
@@ -45,7 +45,7 @@ class TTPArrangementService @Inject() (
 
   val CLIENT_CLOSED_REQUEST = 499 // Client closes the connection while nginx is processing the request.
 
-  def byId(id: String): Future[Option[TTPArrangementAnon]] = ttpArrangementRepository.findByIdLocal(id)
+  def byId(id: String): Future[Option[TTPArrangementAnon]] = ttpArrangementRepository.findById(id)
 
   /**
    * Builds and submits the TTPArrangement to Des. Also saves to Mongo
@@ -149,7 +149,7 @@ class TTPArrangementService @Inject() (
         case None => None
         case Some(desSubmissionRequest: DesSubmissionRequest) =>
           Some(
-            AnonymisedDesSubmissionRequest(
+            DesSubmissionRequestAnon(
               ttpArrangement = desSubmissionRequest.ttpArrangement
             )
           )

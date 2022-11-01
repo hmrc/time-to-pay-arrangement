@@ -187,14 +187,14 @@ object modelFormat {
 }
 
 case class TTPArrangementAnon(
-                               _id:                  String,
-                               createdOn:            LocalDateTime,
-                               paymentPlanReference: String,
-                               directDebitReference: String,
-                               taxpayer:             TaxpayerAnon,
-                               bankDetails:          BankDetails,
-                               schedule:             PaymentSchedule,
-                               desArrangement:       Option[AnonymisedDesSubmissionRequest])
+    _id:                  String,
+    createdOn:            LocalDateTime,
+    paymentPlanReference: String,
+    directDebitReference: String,
+    taxpayer:             TaxpayerAnon,
+    bankDetails:          BankDetails,
+    schedule:             PaymentSchedule,
+    desArrangement:       Option[DesSubmissionRequestAnon])
 
 object TTPArrangementAnon {
   implicit val format: OFormat[TTPArrangementAnon] = Json.format[TTPArrangementAnon]
@@ -211,11 +211,7 @@ object TTPArrangementAnon {
       desArrangement       = ttpArrangement.desArrangement match {
         case None => None
         case Some(desSubmissionRequest: DesSubmissionRequest) =>
-          Some(
-            AnonymisedDesSubmissionRequest(
-              ttpArrangement = desSubmissionRequest.ttpArrangement
-            )
-          )
+          Some(desSubmissionRequest)
       }
     )
   }
@@ -244,8 +240,12 @@ object SelfAssessmentAnon {
   }
 }
 
-case class AnonymisedDesSubmissionRequest(ttpArrangement: DesTTPArrangement)
+case class DesSubmissionRequestAnon(ttpArrangement: DesTTPArrangement)
 
-object AnonymisedDesSubmissionRequest {
-  implicit val format: OFormat[AnonymisedDesSubmissionRequest] = Json.format
+object DesSubmissionRequestAnon {
+  implicit val format: OFormat[DesSubmissionRequestAnon] = Json.format
+
+  implicit def makeDesSubmissionRequestAnonymous(desSubmissionRequest: DesSubmissionRequest): DesSubmissionRequestAnon = {
+    DesSubmissionRequestAnon(ttpArrangement = desSubmissionRequest.ttpArrangement)
+  }
 }
