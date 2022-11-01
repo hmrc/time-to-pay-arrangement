@@ -18,7 +18,7 @@ package uk.gov.hmrc.timetopay.arrangement.support
 
 import java.time.{LocalDate, LocalDateTime}
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.timetopay.arrangement.model.{Address, DesSubmissionRequestAnon, SelfAssessmentAnon, TaxpayerAnon, BankDetails, CommunicationPreferences, DesDebit, DesSubmissionRequest, DesTTPArrangement, Instalment, LetterAndControl, PaymentSchedule, SelfAssessment, TTPArrangementAnon, TTPArrangement, Taxpayer}
+import uk.gov.hmrc.timetopay.arrangement.model.{Address, AnonymousDesSubmissionRequest, AnonymousSelfAssessment, AnonymousTaxpayer, BankDetails, CommunicationPreferences, DesDebit, DesSubmissionRequest, DesTTPArrangement, Instalment, LetterAndControl, PaymentSchedule, SelfAssessment, AnonymousTTPArrangement, TTPArrangement, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.model.modelFormat._
 
 trait TestData {
@@ -398,13 +398,13 @@ trait TestData {
   )
 
   object AnonymisedData {
-    val anonymisedTaxpayer: TaxpayerAnon = TaxpayerAnon(
-      selfAssessment = SelfAssessmentAnon(
+    val anonymisedTaxpayer: AnonymousTaxpayer = AnonymousTaxpayer(
+      selfAssessment = AnonymousSelfAssessment(
         utr = "XXX"
       )
     )
 
-    val anonymisedDesSubmissionRequest: DesSubmissionRequestAnon = DesSubmissionRequestAnon(
+    val anonymisedDesSubmissionRequest: AnonymousDesSubmissionRequest = AnonymousDesSubmissionRequest(
       ttpArrangement = DesTTPArrangement(
         startDate            = LocalDate.parse("2016-08-09"),
         endDate              = LocalDate.parse("2016-09-16"),
@@ -424,7 +424,7 @@ trait TestData {
       )
     )
 
-    val ttpAnonymisedArrangement: TTPArrangementAnon = TTPArrangementAnon(
+    val ttpAnonymisedArrangement: AnonymousTTPArrangement = AnonymousTTPArrangement(
       _id                  = "XXX-XXX-XXX",
       createdOn            = createdOn,
       paymentPlanReference = "1234567890",

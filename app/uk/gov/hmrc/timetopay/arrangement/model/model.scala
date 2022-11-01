@@ -186,21 +186,21 @@ object modelFormat {
 
 }
 
-case class TTPArrangementAnon(
-    _id:                  String,
-    createdOn:            LocalDateTime,
-    paymentPlanReference: String,
-    directDebitReference: String,
-    taxpayer:             TaxpayerAnon,
-    bankDetails:          BankDetails,
-    schedule:             PaymentSchedule,
-    desArrangement:       Option[DesSubmissionRequestAnon])
+case class AnonymousTTPArrangement(
+                               _id:                  String,
+                               createdOn:            LocalDateTime,
+                               paymentPlanReference: String,
+                               directDebitReference: String,
+                               taxpayer:             AnonymousTaxpayer,
+                               bankDetails:          BankDetails,
+                               schedule:             PaymentSchedule,
+                               desArrangement:       Option[AnonymousDesSubmissionRequest])
 
-object TTPArrangementAnon {
-  implicit val format: OFormat[TTPArrangementAnon] = Json.format[TTPArrangementAnon]
+object AnonymousTTPArrangement {
+  implicit val format: OFormat[AnonymousTTPArrangement] = Json.format[AnonymousTTPArrangement]
 
-  implicit def makeArrangementAnonymous(ttpArrangement: TTPArrangement): TTPArrangementAnon = {
-    TTPArrangementAnon(
+  implicit def makeArrangementAnonymous(ttpArrangement: TTPArrangement): AnonymousTTPArrangement = {
+    AnonymousTTPArrangement(
       _id                  = ttpArrangement.id.getOrElse(throw new RuntimeException("Found None")),
       createdOn            = ttpArrangement.createdOn.getOrElse(throw new RuntimeException("Found None")),
       paymentPlanReference = ttpArrangement.paymentPlanReference,
@@ -217,35 +217,35 @@ object TTPArrangementAnon {
   }
 }
 
-case class TaxpayerAnon(
-    selfAssessment: SelfAssessmentAnon)
+case class AnonymousTaxpayer(
+    selfAssessment: AnonymousSelfAssessment)
 
-object TaxpayerAnon {
-  implicit val format: OFormat[TaxpayerAnon] = Json.format
+object AnonymousTaxpayer {
+  implicit val format: OFormat[AnonymousTaxpayer] = Json.format
 
-  implicit def makeTaxpayerAnonymous(taxpayer: Taxpayer): TaxpayerAnon = {
-    TaxpayerAnon(taxpayer.selfAssessment)
+  implicit def makeTaxpayerAnonymous(taxpayer: Taxpayer): AnonymousTaxpayer = {
+    AnonymousTaxpayer(taxpayer.selfAssessment)
   }
 }
 
-case class SelfAssessmentAnon(
+case class AnonymousSelfAssessment(
     utr: String
 )
 
-object SelfAssessmentAnon {
-  implicit val format: OFormat[SelfAssessmentAnon] = Json.format
+object AnonymousSelfAssessment {
+  implicit val format: OFormat[AnonymousSelfAssessment] = Json.format
 
-  implicit def makeSelfAssessmentAnonymous(selfAssessment: SelfAssessment): SelfAssessmentAnon = {
-    SelfAssessmentAnon(utr = selfAssessment.utr)
+  implicit def makeSelfAssessmentAnonymous(selfAssessment: SelfAssessment): AnonymousSelfAssessment = {
+    AnonymousSelfAssessment(utr = selfAssessment.utr)
   }
 }
 
-case class DesSubmissionRequestAnon(ttpArrangement: DesTTPArrangement)
+case class AnonymousDesSubmissionRequest(ttpArrangement: DesTTPArrangement)
 
-object DesSubmissionRequestAnon {
-  implicit val format: OFormat[DesSubmissionRequestAnon] = Json.format
+object AnonymousDesSubmissionRequest {
+  implicit val format: OFormat[AnonymousDesSubmissionRequest] = Json.format
 
-  implicit def makeDesSubmissionRequestAnonymous(desSubmissionRequest: DesSubmissionRequest): DesSubmissionRequestAnon = {
-    DesSubmissionRequestAnon(ttpArrangement = desSubmissionRequest.ttpArrangement)
+  implicit def makeDesSubmissionRequestAnonymous(desSubmissionRequest: DesSubmissionRequest): AnonymousDesSubmissionRequest = {
+    AnonymousDesSubmissionRequest(ttpArrangement = desSubmissionRequest.ttpArrangement)
   }
 }

@@ -17,7 +17,7 @@
 package uk.gov.hmrc.timetopay.arrangement.repository
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.timetopay.arrangement.model.{TTPArrangementAnon, TTPArrangement}
+import uk.gov.hmrc.timetopay.arrangement.model.{AnonymousTTPArrangement, TTPArrangement}
 
 object TestDataTtp {
 
@@ -139,7 +139,7 @@ object TestDataTtp {
        |  }
        |}""".stripMargin).as[TTPArrangement]
 
-  val anonymisedArrangement: TTPArrangementAnon = Json.parse(
+  val anonymisedArrangement: AnonymousTTPArrangement = Json.parse(
     s"""
        |{
        |  "_id" : "XXX-XXX-XXX",
@@ -204,6 +204,6 @@ object TestDataTtp {
        |      "saNote": "SA Note Text Here"
        |    }
        |  }
-       |}""".stripMargin).as[TTPArrangementAnon]
+       |}""".stripMargin).as[AnonymousTTPArrangement]
 
 }

@@ -21,7 +21,7 @@ import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import javax.inject.Inject
-import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangementAnon
+import uk.gov.hmrc.timetopay.arrangement.model.AnonymousTTPArrangement
 import java.util.concurrent.TimeUnit
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -29,15 +29,15 @@ class TTPArrangementRepository @Inject() (
     mongo:  MongoComponent,
     config: ServicesConfig
 )(implicit ec: ExecutionContext)
-  extends PlayMongoRepository[TTPArrangementAnon](
+  extends PlayMongoRepository[AnonymousTTPArrangement](
     mongoComponent = mongo,
     collectionName = "ttparrangements-new-mongo",
-    domainFormat   = TTPArrangementAnon.format,
+    domainFormat   = AnonymousTTPArrangement.format,
     indexes        = TTPArrangementRepository.indexes(config.getDuration("TTPArrangement.ttl").toSeconds),
     replaceIndexes = true
   ) {
 
-  def findById(id: String): Future[Option[TTPArrangementAnon]] = {
+  def findById(id: String): Future[Option[AnonymousTTPArrangement]] = {
     collection
       .find(
         filter = Filters.eq("_id", id)
@@ -45,7 +45,7 @@ class TTPArrangementRepository @Inject() (
       .headOption()
   }
 
-  def doInsert(ttpArrangement: TTPArrangementAnon): Future[Option[TTPArrangementAnon]] = {
+  def doInsert(ttpArrangement: AnonymousTTPArrangement): Future[Option[AnonymousTTPArrangement]] = {
     collection
       .insertOne(ttpArrangement)
       .toFutureOption()

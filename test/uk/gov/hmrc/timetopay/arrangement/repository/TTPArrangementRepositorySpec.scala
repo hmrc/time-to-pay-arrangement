@@ -18,7 +18,7 @@ package uk.gov.hmrc.timetopay.arrangement.repository
 
 import play.api.Logger
 import play.api.libs.json.Json
-import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequestAnon, TTPArrangement}
+import uk.gov.hmrc.timetopay.arrangement.model.{AnonymousDesSubmissionRequest, TTPArrangement}
 import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
 import uk.gov.hmrc.timetopay.arrangement.repository.TestDataTtp.{anonymisedArrangement, arrangement}
 class TTPArrangementRepositorySpec extends ITSpec {
