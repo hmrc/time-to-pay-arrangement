@@ -64,7 +64,7 @@ class TTPArrangementWorkItemRepository @Inject() (configuration:          Config
 
   def additionalIndexes: Seq[IndexModel] = Seq(
     IndexModel(
-      keys = Indexes.ascending("receivedAtTime"),
+      keys = Indexes.ascending("receivedAt"),
       indexOptions = IndexOptions().expireAfter(ttlInSeconds, TimeUnit.SECONDS)
     )
   )
@@ -72,8 +72,6 @@ class TTPArrangementWorkItemRepository @Inject() (configuration:          Config
   def pullOutstanding(): Future[Option[WorkItem[TTPArrangementWorkItem]]] =
     super.pullOutstanding(now.minusMillis(retryIntervalMillis.toInt), now)
 
-//  def failed(id: BSONObjectID)(implicit ec: ExecutionContext): Future[Boolean] = {
-//    markAs(id, Failed, Some(now.plusMillis(retryIntervalMillis.toInt)))
-//  }
-
+  def findAll(): Future[Seq[WorkItem[TTPArrangementWorkItem]]] =
+    collection.find().toFuture()
 }

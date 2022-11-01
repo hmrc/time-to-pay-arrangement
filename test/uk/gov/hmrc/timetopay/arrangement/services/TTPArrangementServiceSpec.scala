@@ -84,11 +84,4 @@ class TTPArrangementServiceSpec extends ITSpec with TestData {
     response.getMessage should include("DES httpCode: 400")
   }
 
-  //  "TTSPArrangementService.anonymiseArrangement returns a TTPAnonymiseArrangement from a TTPArrangement with personal details pruned out" in {
-  //    tTPArrangementService.anonymiseArrangement(ttpArrangement) should equal(AnonymisedData.ttpAnonymisedArrangement)
-  //  }
-
-  "TTPArrangementService.padAnonymisedArrangement returns a TTPArrangement from a TTPAnonymisedArrangement with empty strings for personal details" in {
-    tTPArrangementService.padAnonymisedArrangement(AnonymisedData.ttpAnonymisedArrangement) should equal(AnonymisedData.paddedTtpAnonymisedArrangement)
-  }
 }

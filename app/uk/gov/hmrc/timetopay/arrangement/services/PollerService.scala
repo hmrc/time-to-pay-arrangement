@@ -53,10 +53,10 @@ class PollerService @Inject() (
   val interval = queueConfig.interval
 
   override def executeInMutex(implicit ec: ExecutionContext): Future[Result] = {
-    //    ttpArrangementRepositoryWorkItem.find().map{ ls =>
-    //      val txt = ls.map(x => x.status).groupBy(x => x).map{ x => s"${x._1}: ${x._2.size}" }.mkString(", ")
-    //      logger.track("Retry poller - WorkItem counts- " + txt)
-    //    }
+    ttpArrangementRepositoryWorkItem.findAll().map{ ls =>
+      val txt = ls.map(x => x.status).groupBy(x => x).map{ x => s"${x._1}: ${x._2.size}" }.mkString(", ")
+      logger.track("Retry poller - WorkItem counts- " + txt)
+    }
 
     process().map(_ => Result(""))
   }

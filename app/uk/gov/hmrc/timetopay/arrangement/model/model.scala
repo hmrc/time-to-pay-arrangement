@@ -19,7 +19,6 @@ package uk.gov.hmrc.timetopay.arrangement.model
 import java.time.{LocalDate, LocalDateTime}
 import play.api.libs.json._
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
-
 import java.util.UUID
 import scala.language.implicitConversions
 
@@ -228,7 +227,7 @@ object AnonymousTaxpayer {
   implicit val format: OFormat[AnonymousTaxpayer] = Json.format
 
   implicit def makeTaxpayerAnonymous(taxpayer: Taxpayer): AnonymousTaxpayer = {
-    AnonymousTaxpayer(taxpayer.selfAssessment)
+    AnonymousTaxpayer(selfAssessment = taxpayer.selfAssessment)
   }
 }
 
