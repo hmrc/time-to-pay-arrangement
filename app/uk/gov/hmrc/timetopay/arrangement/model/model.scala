@@ -186,8 +186,8 @@ object modelFormat {
 }
 
 case class TTPAnonymisedArrangement(
-    id:                   Option[String],
-    createdOn:            Option[LocalDateTime],
+    _id:                  String,
+    createdOn:            LocalDateTime,
     paymentPlanReference: String,
     directDebitReference: String,
     taxpayer:             AnonymisedTaxpayer,

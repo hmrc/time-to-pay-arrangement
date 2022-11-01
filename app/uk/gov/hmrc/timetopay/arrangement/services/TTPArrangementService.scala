@@ -136,8 +136,8 @@ class TTPArrangementService @Inject() (
 
   def anonymiseArrangement(ttpArrangement: TTPArrangement): TTPAnonymisedArrangement = {
     TTPAnonymisedArrangement(
-      id                   = ttpArrangement.id,
-      createdOn            = ttpArrangement.createdOn,
+      _id                  = ttpArrangement.id.getOrElse(throw new RuntimeException("Found None")),
+      createdOn            = ttpArrangement.createdOn.getOrElse(throw new RuntimeException("Found None")),
       paymentPlanReference = ttpArrangement.paymentPlanReference,
       directDebitReference = ttpArrangement.directDebitReference,
       taxpayer             = AnonymisedTaxpayer(
@@ -161,8 +161,8 @@ class TTPArrangementService @Inject() (
 
   def padAnonymisedArrangement(anonymisedArrangement: TTPAnonymisedArrangement): TTPArrangement = {
     TTPArrangement(
-      id                   = anonymisedArrangement.id,
-      createdOn            = anonymisedArrangement.createdOn,
+      id                   = Some(anonymisedArrangement._id),
+      createdOn            = Some(anonymisedArrangement.createdOn),
       paymentPlanReference = anonymisedArrangement.paymentPlanReference,
       directDebitReference = anonymisedArrangement.directDebitReference,
       taxpayer             = Taxpayer(

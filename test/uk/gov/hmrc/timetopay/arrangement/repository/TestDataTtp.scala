@@ -142,7 +142,7 @@ object TestDataTtp {
   val anonymisedArrangement: TTPAnonymisedArrangement = Json.parse(
     s"""
        |{
-       |  "id" : "XXX-XXX-XXX",
+       |  "_id" : "XXX-XXX-XXX",
        |  "createdOn" : "2016-11-07T18:15:57.581",
        |  "paymentPlanReference": "1234567890",
        |  "directDebitReference": "1234567890",

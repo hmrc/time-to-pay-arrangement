@@ -384,11 +384,11 @@ trait TestData {
     letterAndControl = letterAndControl
   )
 
-  val createdOn: Option[LocalDateTime] = Some(LocalDateTime.now())
+  val createdOn: LocalDateTime = LocalDateTime.now()
 
   val ttpArrangement: TTPArrangement = TTPArrangement(
     id                   = Some("XXX-XXX-XXX"),
-    createdOn            = createdOn,
+    createdOn            = Some(createdOn),
     paymentPlanReference = "1234567890",
     directDebitReference = "1234567890",
     taxpayer             = Taxpayers.taxPayerWithEnglishAddress,
@@ -425,7 +425,7 @@ trait TestData {
     )
 
     val ttpAnonymisedArrangement: TTPAnonymisedArrangement = TTPAnonymisedArrangement(
-      id                   = Some("XXX-XXX-XXX"),
+      _id                  = "XXX-XXX-XXX",
       createdOn            = createdOn,
       paymentPlanReference = "1234567890",
       directDebitReference = "1234567890",
@@ -437,7 +437,7 @@ trait TestData {
 
     val paddedTtpAnonymisedArrangement: TTPArrangement = TTPArrangement(
       id                   = Some("XXX-XXX-XXX"),
-      createdOn            = createdOn,
+      createdOn            = Some(createdOn),
       paymentPlanReference = "1234567890",
       directDebitReference = "1234567890",
       taxpayer             = Taxpayer(
