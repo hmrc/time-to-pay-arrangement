@@ -280,7 +280,7 @@ object TTPArrangementResponse {
           Some(
             DesSubmissionRequestResponse(
               ttpArrangement   = anonymousDesSubmissionRequest.ttpArrangement,
-              letterAndControl = ???
+              letterAndControl = None
             )
           )
       }

@@ -55,26 +55,4 @@ trait TestMongoSupport extends MongoSupport with BeforeAndAfterAll with BeforeAn
     dropDatabase().withClue("dropping database failed")
   }
 
-  //  def clearAllCollectionsButRetainIndices()(implicit ec: ExecutionContext = global): Unit = {
-  //    import ImplicitBSONHandlers._
-  //    logger.info("clearing collections ...")
-  //    val dropF =
-  //      for {
-  //        collNames <- mongoDatabase.listCollections()
-  //        collections = collNames.map(name => mongoDatabase.getCollection[JSONCollection](name._1))
-  //        _ <- Future.sequence(collections.map(_.remove
-  ////          delete(ordered = true).one(Json.obj(), None)))
-  //
-  //      } yield ()
-  //
-  //    dropF.futureValue(longPatienceConfig, implicitly[Position]) withClue "dropping collections failed"
-  //  }
-  //
-  //  def clear(): Unit = {
-  //    for {
-  //      collNames <- mongoDatabase.listCollectionNames()
-  //      collections <- collNames.map(name => mongoDatabase.getCollection(name.toString))
-  //      _ <- collections.deleteMany()
-  //    }
-  //  }
 }
