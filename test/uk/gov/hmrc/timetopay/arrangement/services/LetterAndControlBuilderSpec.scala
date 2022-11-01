@@ -28,9 +28,9 @@ class LetterAndControlBuilderSpec extends ITSpec with TestData {
   import Taxpayers._
 
   lazy val bankDetails: BankDetails = BankDetails(
-    sortCode = "12-34-56",
+    sortCode      = "12-34-56",
     accountNumber = "12345678",
-    accountName = "Mr John Campbell"
+    accountName   = "Mr John Campbell"
   )
 
   private val taxPayerData = Table(

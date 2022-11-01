@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.timetopay.arrangement.repository
 
-
 import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
 import uk.gov.hmrc.timetopay.arrangement.repository.TestDataTtp.{anonymisedArrangement, arrangement}
 

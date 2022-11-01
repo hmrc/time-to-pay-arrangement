@@ -16,13 +16,11 @@
 
 package uk.gov.hmrc.timetopay.arrangement.support
 
-
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{AppendedClues, BeforeAndAfterAll, BeforeAndAfterEach, Suite}
 import play.api.Logging
 import uk.gov.hmrc.mongo.test.MongoSupport
-
 
 trait TestMongoSupport extends MongoSupport with BeforeAndAfterAll with BeforeAndAfterEach with Logging {
   self: Suite with ScalaFutures with AppendedClues =>

@@ -20,18 +20,15 @@ import org.bson.types.ObjectId
 
 import java.time.{Clock, Duration, Instant}
 import java.time.Clock.systemUTC
-import org.joda.time.DateTime
-import play.api.libs.json.Json
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangementWorkItem
-import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestMongoSupport}
+import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
 import uk.gov.hmrc.timetopay.arrangement.repository.TestDataTtp.{arrangement, auditTags}
 
 import java.time.LocalDateTime.now
-import reactivemongo.bson.BSONObjectID
+
 import uk.gov.hmrc.timetopay.arrangement.services.CryptoService
 import uk.gov.hmrc.mongo.workitem.ProcessingStatus.{Cancelled, Deferred, Duplicate, Failed, Ignored, InProgress, PermanentlyFailed, Succeeded}
 import uk.gov.hmrc.mongo.workitem.WorkItem
-import uk.gov.hmrc.timetopay.arrangement.config.QueueConfig
 
 class TTPArrangementWorkItemRepositorySpec extends ITSpec {
 
