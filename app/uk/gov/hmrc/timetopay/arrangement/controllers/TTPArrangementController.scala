@@ -22,7 +22,7 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
 import play.api.mvc._
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangement
+import uk.gov.hmrc.timetopay.arrangement.model.{TTPArrangement, TTPArrangementResponse}
 import uk.gov.hmrc.timetopay.arrangement.services.{DesApiException, TTPArrangementService}
 
 import scala.concurrent.Future._
@@ -69,7 +69,9 @@ class TTPArrangementController @Inject() (arrangementService: TTPArrangementServ
 
       logger.debug(s"Requested arrangement $id")
       arrangementService.byId(id).flatMap {
-        _.fold(successful(NotFound(s"arrangement with $id does not exist")))(r => successful(Ok(toJson(r))))
+        _.fold(
+          successful(NotFound(s"arrangement with $id does not exist"))
+        )(r => successful(Ok(toJson(TTPArrangementResponse.buildTTPArrangementResponse(r)))))
       }
   }
 }

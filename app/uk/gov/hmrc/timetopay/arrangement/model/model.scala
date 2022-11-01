@@ -196,7 +196,7 @@ case class AnonymousTTPArrangement(
     desArrangement:       Option[AnonymousDesSubmissionRequest])
 
 object AnonymousTTPArrangement {
-  implicit val localDatTimeFormat: Format[LocalDateTime] = MongoJavatimeFormats.localDateTimeFormat
+  implicit val localDateTimeFormat: Format[LocalDateTime] = MongoJavatimeFormats.localDateTimeFormat
 
   implicit val format: OFormat[AnonymousTTPArrangement] = Json.format[AnonymousTTPArrangement]
 
@@ -249,4 +249,47 @@ object AnonymousDesSubmissionRequest {
   implicit def makeDesSubmissionRequestAnonymous(desSubmissionRequest: DesSubmissionRequest): AnonymousDesSubmissionRequest = {
     AnonymousDesSubmissionRequest(ttpArrangement = desSubmissionRequest.ttpArrangement)
   }
+}
+
+case class TTPArrangementResponse(
+    _id:                  String,
+    createdOn:            String,
+    paymentPlanReference: String,
+    directDebitReference: String,
+    taxpayer:             AnonymousTaxpayer,
+    bankDetails:          BankDetails,
+    schedule:             PaymentSchedule,
+    desArrangement:       Option[DesSubmissionRequestResponse]
+)
+
+object TTPArrangementResponse {
+  implicit val format: OFormat[TTPArrangementResponse] = Json.format[TTPArrangementResponse]
+
+  implicit def buildTTPArrangementResponse(anonymousTTPArrangement: AnonymousTTPArrangement): TTPArrangementResponse = {
+    TTPArrangementResponse(
+      _id                  = anonymousTTPArrangement._id,
+      createdOn            = anonymousTTPArrangement.createdOn.toString,
+      paymentPlanReference = anonymousTTPArrangement.paymentPlanReference,
+      directDebitReference = anonymousTTPArrangement.directDebitReference,
+      taxpayer             = anonymousTTPArrangement.taxpayer,
+      bankDetails          = anonymousTTPArrangement.bankDetails,
+      schedule             = anonymousTTPArrangement.schedule,
+      desArrangement       = anonymousTTPArrangement.desArrangement match {
+        case None => None
+        case Some(anonymousDesSubmissionRequest: AnonymousDesSubmissionRequest) =>
+          Some(
+            DesSubmissionRequestResponse(
+              ttpArrangement   = anonymousDesSubmissionRequest.ttpArrangement,
+              letterAndControl = ???
+            )
+          )
+      }
+    )
+  }
+}
+
+case class DesSubmissionRequestResponse(ttpArrangement: DesTTPArrangement, letterAndControl: Option[LetterAndControl])
+
+object DesSubmissionRequestResponse {
+  implicit val format: OFormat[DesSubmissionRequestResponse] = Json.format
 }
