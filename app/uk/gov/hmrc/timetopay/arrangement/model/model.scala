@@ -187,14 +187,14 @@ object modelFormat {
 }
 
 case class AnonymousTTPArrangement(
-                               _id:                  String,
-                               createdOn:            LocalDateTime,
-                               paymentPlanReference: String,
-                               directDebitReference: String,
-                               taxpayer:             AnonymousTaxpayer,
-                               bankDetails:          BankDetails,
-                               schedule:             PaymentSchedule,
-                               desArrangement:       Option[AnonymousDesSubmissionRequest])
+    _id:                  String,
+    createdOn:            LocalDateTime,
+    paymentPlanReference: String,
+    directDebitReference: String,
+    taxpayer:             AnonymousTaxpayer,
+    bankDetails:          BankDetails,
+    schedule:             PaymentSchedule,
+    desArrangement:       Option[AnonymousDesSubmissionRequest])
 
 object AnonymousTTPArrangement {
   implicit val format: OFormat[AnonymousTTPArrangement] = Json.format[AnonymousTTPArrangement]
