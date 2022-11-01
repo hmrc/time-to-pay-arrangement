@@ -10,7 +10,7 @@ object AppDependencies {
     "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.12.0",
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28" % hmrcMongoVersion,
     "com.beachape" %% "enumeratum" % "1.5.13",
-    "uk.gov.hmrc"  %% "play-scheduling-play-27"   % "7.10.0",
+    "uk.gov.hmrc"  %% "play-scheduling-play-28"   % "8.1.0",
     "uk.gov.hmrc"  %% "crypto"     % "6.0.0",
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-work-item-repo-play-28" % hmrcMongoVersion
   )
