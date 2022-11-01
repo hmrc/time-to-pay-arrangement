@@ -140,10 +140,14 @@ object TestDataTtp {
        |}""".stripMargin).as[TTPArrangement]
 
   val anonymisedArrangement: AnonymousTTPArrangement = Json.parse(
-    s"""
+    """
        |{
        |  "_id" : "XXX-XXX-XXX",
-       |  "createdOn" : "2016-11-07T18:15:57.581",
+       |  "createdOn" : {
+       |    "$date" : {
+       |      "$numberLong" : "1667304404080"
+       |    }
+       |  },
        |  "paymentPlanReference": "1234567890",
        |  "directDebitReference": "1234567890",
        |  "taxpayer": {

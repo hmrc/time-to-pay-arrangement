@@ -32,10 +32,10 @@ class CryptoServiceSpec extends ITSpec with TestData {
     val request: TTPArrangement = TTPArrangement(
       paymentPlanReference = "",
       directDebitReference = "",
-      taxpayer = Taxpayer("", List.empty, SelfAssessment("", None, List.empty)),
-      bankDetails = bankDetails,
-      schedule = PaymentSchedule(LocalDate.now(), LocalDate.now(), 0, 0, 0, 0, 0, List.empty),
-      desArrangement = Some(des)
+      taxpayer             = Taxpayer("", List.empty, SelfAssessment("", None, List.empty)),
+      bankDetails          = bankDetails,
+      schedule             = PaymentSchedule(LocalDate.now(), LocalDate.now(), 0, 0, 0, 0, 0, List.empty),
+      desArrangement       = Some(des)
     )
 
     val encrypted = cryptoService.encryptTtpa(request)

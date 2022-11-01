@@ -54,10 +54,10 @@ class LetterAndControlBuilderSpec extends ITSpec with TestData {
         TTPArrangement(
           paymentPlanReference = "XXX",
           directDebitReference = "XXX",
-          taxpayer = taxpayer,
-          bankDetails = bankDetails,
-          schedule = schedule,
-          desArrangement = None))
+          taxpayer             = taxpayer,
+          bankDetails          = bankDetails,
+          schedule             = schedule,
+          desArrangement       = None))
 
       result.customerName shouldBe taxpayer.customerName
       result.salutation shouldBe s"Dear ${taxpayer.customerName}"
@@ -83,10 +83,10 @@ class LetterAndControlBuilderSpec extends ITSpec with TestData {
       TTPArrangement(
         paymentPlanReference = "XXX",
         directDebitReference = "XXX",
-        taxpayer = taxpayer,
-        bankDetails = bankDetails,
-        schedule = scheduleWithInstalments,
-        desArrangement = None
+        taxpayer             = taxpayer,
+        bankDetails          = bankDetails,
+        schedule             = scheduleWithInstalments,
+        desArrangement       = None
       )
     )
     result.clmPymtString shouldBe "9 payments of £10.00 and final payment of £10.98"
@@ -103,10 +103,10 @@ class LetterAndControlBuilderSpec extends ITSpec with TestData {
       TTPArrangement(
         paymentPlanReference = "XXX",
         directDebitReference = "XXX",
-        taxpayer = taxpayer,
-        bankDetails = bankDetails,
-        schedule = scheduleWithInstalments,
-        desArrangement = None
+        taxpayer             = taxpayer,
+        bankDetails          = bankDetails,
+        schedule             = scheduleWithInstalments,
+        desArrangement       = None
       )
     )
     result.clmPymtString shouldBe "Initial payment of £5,000,000.00 then 2 payments of £100,000,000.00 and final payment of £100,000,000.00"
@@ -120,10 +120,10 @@ class LetterAndControlBuilderSpec extends ITSpec with TestData {
       TTPArrangement(
         paymentPlanReference = "XXX",
         directDebitReference = "XXX",
-        taxpayer = taxpayer,
-        bankDetails = bankDetails,
-        schedule = scheduleWithInstalments,
-        desArrangement = None
+        taxpayer             = taxpayer,
+        bankDetails          = bankDetails,
+        schedule             = scheduleWithInstalments,
+        desArrangement       = None
       )
     )
     result.clmPymtString shouldBe "Initial payment of £5,000,000.00 then 1 payments of £100,000,000.00 and final payment of £100,000,000.00"
