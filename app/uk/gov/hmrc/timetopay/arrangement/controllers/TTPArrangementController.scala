@@ -30,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class TTPArrangementController @Inject() (arrangementService: TTPArrangementService, cc: ControllerComponents)(implicit ec: ExecutionContext)
   extends BackendController(cc) {
-  val logger = Logger(getClass)
+  val logger: Logger = Logger(getClass)
 
   /**
    * Turns the json into our representation of a TTPArrangement

@@ -17,7 +17,6 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
 import org.scalatest.prop.TableDrivenPropertyChecks._
-import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestData}
 
 import java.time.LocalDate.now

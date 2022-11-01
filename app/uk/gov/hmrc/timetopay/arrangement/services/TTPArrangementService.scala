@@ -17,13 +17,11 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
 import java.time.{Clock, Duration, Instant, LocalDateTime}
-import java.util.UUID
 import javax.inject.Inject
-import play.api.libs.json.JsValue
 import play.api.mvc.Request
 import uk.gov.hmrc.timetopay.arrangement.config.{QueueConfig, QueueLogger}
 import uk.gov.hmrc.timetopay.arrangement.connectors.{DesArrangementApiServiceConnector, SubmissionError, SubmissionSuccess}
-import uk.gov.hmrc.timetopay.arrangement.model.{AnonymousDesSubmissionRequest, AnonymousSelfAssessment, AnonymousTaxpayer, DesSubmissionRequest, LetterAndControl, SelfAssessment, AnonymousTTPArrangement, TTPArrangement, TTPArrangementWorkItem, Taxpayer}
+import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, AnonymousTTPArrangement, TTPArrangement, TTPArrangementWorkItem}
 import uk.gov.hmrc.timetopay.arrangement.repository.{TTPArrangementRepository, TTPArrangementWorkItemRepository}
 import uk.gov.hmrc.mongo.workitem.WorkItem
 
@@ -41,7 +39,7 @@ class TTPArrangementService @Inject() (
     letterAndControlBuilder:          LetterAndControlBuilder,
     crypto:                           CryptoService,
     queueConfig:                      QueueConfig) {
-  val logger = QueueLogger(getClass)
+  val logger: QueueLogger = QueueLogger(getClass)
 
   val CLIENT_CLOSED_REQUEST = 499 // Client closes the connection while nginx is processing the request.
 
@@ -128,42 +126,6 @@ class TTPArrangementService @Inject() (
         workItem
       }
   }
-
-  //  def padAnonymisedArrangement(anonymisedArrangement: AnonymousTTPArrangement): TTPArrangement = {
-  //    TTPArrangement(
-  //      id                   = Some(anonymisedArrangement._id),
-  //      createdOn            = Some(anonymisedArrangement.createdOn),
-  //      paymentPlanReference = anonymisedArrangement.paymentPlanReference,
-  //      directDebitReference = anonymisedArrangement.directDebitReference,
-  //      taxpayer             = Taxpayer(
-  //        customerName   = "",
-  //        addresses      = List(),
-  //        selfAssessment = SelfAssessment(
-  //          utr                      = anonymisedArrangement.taxpayer.selfAssessment.utr,
-  //          communicationPreferences = None,
-  //          debits                   = List()
-  //        )
-  //      ),
-  //      bankDetails          = anonymisedArrangement.bankDetails,
-  //      schedule             = anonymisedArrangement.schedule,
-  //      desArrangement       = anonymisedArrangement.desArrangement match {
-  //        case None => None
-  //        case Some(anonymisedDesSubmissionRequest) =>
-  //          Some(
-  //            DesSubmissionRequest(
-  //              ttpArrangement   = anonymisedDesSubmissionRequest.ttpArrangement,
-  //              letterAndControl = LetterAndControl(
-  //                customerName  = "",
-  //                salutation    = "",
-  //                totalAll      = "",
-  //                clmPymtString = ""
-  //              )
-  //            )
-  //          )
-  //      }
-  //    )
-  //  }
-
 }
 
 case class DesApiException(code: Int, message: String) extends RuntimeException(s"DES httpCode: $code, reason: $message") {}

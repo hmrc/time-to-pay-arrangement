@@ -16,13 +16,12 @@
 
 package uk.gov.hmrc.timetopay.arrangement.repository
 
-import play.api.Logger
-import play.api.libs.json.Json
-import uk.gov.hmrc.timetopay.arrangement.model.{AnonymousDesSubmissionRequest, TTPArrangement}
+
 import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
 import uk.gov.hmrc.timetopay.arrangement.repository.TestDataTtp.{anonymisedArrangement, arrangement}
+
 class TTPArrangementRepositorySpec extends ITSpec {
-  private val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
+  private val arrangementRepo = fakeApplication().injector.instanceOf[TTPArrangementRepository]
 
   override def beforeEach(): Unit = {
     arrangementRepo.collection.drop().toFuture().futureValue
@@ -47,7 +46,6 @@ class TTPArrangementRepositorySpec extends ITSpec {
     arrangementRepo.doInsert(anonymisedArrangement).futureValue
 
     val loaded = arrangementRepo.findById(anonymisedArrangement._id).futureValue.get
-    println("HERE" + loaded.toString)
     assert(loaded.desArrangement.get.ttpArrangement.firstPaymentAmount.equals(1248.95.toString))
     assert(loaded._id.equals("XXX-XXX-XXX"))
   }

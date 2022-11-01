@@ -25,8 +25,8 @@ class TTPArrangementServiceSpec extends ITSpec with TestData {
 
   import Taxpayers._
 
-  private val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
-  private val arrangementWorkItemRepo = fakeApplication.injector.instanceOf[TTPArrangementWorkItemRepository]
+  private val arrangementRepo = fakeApplication().injector.instanceOf[TTPArrangementRepository]
+  private val arrangementWorkItemRepo = fakeApplication().injector.instanceOf[TTPArrangementWorkItemRepository]
   private val tTPArrangementService = fakeApplication().injector.instanceOf[TTPArrangementService]
   private val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement].copy(taxpayer = taxPayerWithEnglishAddress)
 

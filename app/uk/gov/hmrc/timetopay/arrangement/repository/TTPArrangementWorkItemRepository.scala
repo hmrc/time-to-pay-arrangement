@@ -30,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class TTPArrangementWorkItemRepository @Inject() (configuration:          Configuration,
                                                   queueConfig:            QueueConfig,
-                                                  mongo: MongoComponent,
+                                                  mongo:                  MongoComponent,
                                                   val clock:              Clock,
                                                  )(implicit ec: ExecutionContext)
   extends WorkItemRepository[TTPArrangementWorkItem](
@@ -38,13 +38,13 @@ class TTPArrangementWorkItemRepository @Inject() (configuration:          Config
     mongoComponent = mongo,
     itemFormat     = TTPArrangementWorkItem.format,
     workItemFields = WorkItemFields(
-      id = "_id",
-      item = "item",
-      availableAt = "availableAt",
-      receivedAt = "receivedAt",
-      failureCount = "failureCount",
-      updatedAt = "updatedAt",
-      status = "status"
+                                id            = "_id",
+                                item          = "item",
+                                availableAt   = "availableAt",
+                                receivedAt    = "receivedAt",
+                                failureCount  = "failureCount",
+                                updatedAt     = "updatedAt",
+                                status        = "status"
     )
   ) {
 

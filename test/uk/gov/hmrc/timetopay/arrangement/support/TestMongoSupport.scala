@@ -16,19 +16,13 @@
 
 package uk.gov.hmrc.timetopay.arrangement.support
 
-import org.scalactic.source.Position
+
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{AppendedClues, BeforeAndAfterAll, BeforeAndAfterEach, Suite}
 import play.api.Logging
-import play.api.libs.json.Json
-import reactivemongo.play.json.ImplicitBSONHandlers
-import reactivemongo.play.json.collection.JSONCollection
 import uk.gov.hmrc.mongo.test.MongoSupport
-import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
-import scala.concurrent.ExecutionContext.global
-import scala.concurrent.{ExecutionContext, Future}
 
 trait TestMongoSupport extends MongoSupport with BeforeAndAfterAll with BeforeAndAfterEach with Logging {
   self: Suite with ScalaFutures with AppendedClues =>
@@ -42,7 +36,6 @@ trait TestMongoSupport extends MongoSupport with BeforeAndAfterAll with BeforeAn
   override def beforeEach(): Unit = {
     super.beforeEach()
     dropMongoDb()
-    //    clearAllCollectionsButRetainIndices()
   }
 
   override def afterAll(): Unit = {
