@@ -17,8 +17,9 @@
 package uk.gov.hmrc.timetopay.arrangement.model
 
 import java.time.{LocalDate, LocalDateTime}
-
 import play.api.libs.json._
+
+import scala.language.implicitConversions
 
 case class PaymentSchedule(
     startDate:            LocalDate,
@@ -197,6 +198,27 @@ case class TTPAnonymisedArrangement(
 
 object TTPAnonymisedArrangement {
   implicit val format: OFormat[TTPAnonymisedArrangement] = Json.format[TTPAnonymisedArrangement]
+
+  implicit def anonymiseArrangement(ttpArrangement: TTPArrangement): TTPAnonymisedArrangement = {
+    TTPAnonymisedArrangement(
+      _id                  = ttpArrangement.id.getOrElse(throw new RuntimeException("Found None")),
+      createdOn            = ttpArrangement.createdOn.getOrElse(throw new RuntimeException("Found None")),
+      paymentPlanReference = ttpArrangement.paymentPlanReference,
+      directDebitReference = ttpArrangement.directDebitReference,
+      taxpayer             = ttpArrangement.taxpayer,
+      bankDetails          = ttpArrangement.bankDetails,
+      schedule             = ttpArrangement.schedule,
+      desArrangement       = ttpArrangement.desArrangement match {
+        case None => None
+        case Some(desSubmissionRequest: DesSubmissionRequest) =>
+          Some(
+            AnonymisedDesSubmissionRequest(
+              ttpArrangement = desSubmissionRequest.ttpArrangement
+            )
+          )
+      }
+    )
+  }
 }
 
 case class AnonymisedTaxpayer(
@@ -204,6 +226,14 @@ case class AnonymisedTaxpayer(
 
 object AnonymisedTaxpayer {
   implicit val format: OFormat[AnonymisedTaxpayer] = Json.format
+
+  implicit def anonymisedTaxpayer(taxpayer: Taxpayer): AnonymisedTaxpayer = {
+    AnonymisedTaxpayer(
+      selfAssessment = AnonymisedSelfAssessment(
+        utr = taxpayer.selfAssessment.utr
+      )
+    )
+  }
 }
 
 case class AnonymisedSelfAssessment(

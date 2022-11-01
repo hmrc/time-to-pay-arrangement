@@ -97,9 +97,7 @@ class TTPArrangementService @Inject() (
   private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[TTPAnonymisedArrangement]] = {
     val toSave = arrangementToSave(arrangement, desSubmissionRequest)
 
-    val toSaveAnonymised = anonymiseArrangement(toSave)
-
-    Try(ttpArrangementRepository.doInsert(toSaveAnonymised)).getOrElse(Future.successful(None))
+    Try(ttpArrangementRepository.doInsert(toSave)).getOrElse(Future.successful(None))
   }
 
   def arrangementToSave(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): TTPArrangement = {
