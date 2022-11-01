@@ -59,7 +59,7 @@ class TTPArrangementRepository @Inject() (
 object TTPArrangementRepository {
   def indexes(cacheTtlInSeconds: Long): Seq[IndexModel] = Seq (
     IndexModel(
-      keys         = Indexes.ascending("expireAtIndex"),
+      keys         = Indexes.ascending("createdOn"),
       indexOptions = IndexOptions().expireAfter(cacheTtlInSeconds, TimeUnit.SECONDS)
     )
   )
