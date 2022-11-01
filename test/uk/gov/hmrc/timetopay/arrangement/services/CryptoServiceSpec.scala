@@ -30,11 +30,12 @@ class CryptoServiceSpec extends ITSpec with TestData {
   "check encrypted -> decripted match" in {
     val des: DesSubmissionRequest = DesSubmissionRequest(submitArrangementTTPArrangement, submitArrangementLetterAndControl)
     val request: TTPArrangement = TTPArrangement(
-      None, None, "", "",
-      Taxpayer("", List.empty, SelfAssessment("", None, List.empty)),
-      bankDetails,
-      PaymentSchedule(LocalDate.now(), LocalDate.now(), 0, 0, 0, 0, 0, List.empty),
-      Some(des)
+      paymentPlanReference = "",
+      directDebitReference = "",
+      taxpayer = Taxpayer("", List.empty, SelfAssessment("", None, List.empty)),
+      bankDetails = bankDetails,
+      schedule = PaymentSchedule(LocalDate.now(), LocalDate.now(), 0, 0, 0, 0, 0, List.empty),
+      desArrangement = Some(des)
     )
 
     val encrypted = cryptoService.encryptTtpa(request)

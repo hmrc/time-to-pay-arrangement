@@ -95,8 +95,6 @@ object DesDebit {
 }
 
 case class TTPArrangement(
-    id:                   Option[String],
-    createdOn:            Option[LocalDateTime],
     paymentPlanReference: String,
     directDebitReference: String,
     taxpayer:             Taxpayer,

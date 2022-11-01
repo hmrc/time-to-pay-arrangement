@@ -129,40 +129,40 @@ class TTPArrangementService @Inject() (
       }
   }
 
-  def padAnonymisedArrangement(anonymisedArrangement: AnonymousTTPArrangement): TTPArrangement = {
-    TTPArrangement(
-      id                   = Some(anonymisedArrangement._id),
-      createdOn            = Some(anonymisedArrangement.createdOn),
-      paymentPlanReference = anonymisedArrangement.paymentPlanReference,
-      directDebitReference = anonymisedArrangement.directDebitReference,
-      taxpayer             = Taxpayer(
-        customerName   = "",
-        addresses      = List(),
-        selfAssessment = SelfAssessment(
-          utr                      = anonymisedArrangement.taxpayer.selfAssessment.utr,
-          communicationPreferences = None,
-          debits                   = List()
-        )
-      ),
-      bankDetails          = anonymisedArrangement.bankDetails,
-      schedule             = anonymisedArrangement.schedule,
-      desArrangement       = anonymisedArrangement.desArrangement match {
-        case None => None
-        case Some(anonymisedDesSubmissionRequest) =>
-          Some(
-            DesSubmissionRequest(
-              ttpArrangement   = anonymisedDesSubmissionRequest.ttpArrangement,
-              letterAndControl = LetterAndControl(
-                customerName  = "",
-                salutation    = "",
-                totalAll      = "",
-                clmPymtString = ""
-              )
-            )
-          )
-      }
-    )
-  }
+//  def padAnonymisedArrangement(anonymisedArrangement: AnonymousTTPArrangement): TTPArrangement = {
+//    TTPArrangement(
+//      id                   = Some(anonymisedArrangement._id),
+//      createdOn            = Some(anonymisedArrangement.createdOn),
+//      paymentPlanReference = anonymisedArrangement.paymentPlanReference,
+//      directDebitReference = anonymisedArrangement.directDebitReference,
+//      taxpayer             = Taxpayer(
+//        customerName   = "",
+//        addresses      = List(),
+//        selfAssessment = SelfAssessment(
+//          utr                      = anonymisedArrangement.taxpayer.selfAssessment.utr,
+//          communicationPreferences = None,
+//          debits                   = List()
+//        )
+//      ),
+//      bankDetails          = anonymisedArrangement.bankDetails,
+//      schedule             = anonymisedArrangement.schedule,
+//      desArrangement       = anonymisedArrangement.desArrangement match {
+//        case None => None
+//        case Some(anonymisedDesSubmissionRequest) =>
+//          Some(
+//            DesSubmissionRequest(
+//              ttpArrangement   = anonymisedDesSubmissionRequest.ttpArrangement,
+//              letterAndControl = LetterAndControl(
+//                customerName  = "",
+//                salutation    = "",
+//                totalAll      = "",
+//                clmPymtString = ""
+//              )
+//            )
+//          )
+//      }
+//    )
+//  }
 
 }
 

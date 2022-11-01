@@ -387,8 +387,6 @@ trait TestData {
   val createdOn: LocalDateTime = LocalDateTime.now()
 
   val ttpArrangement: TTPArrangement = TTPArrangement(
-    id                   = Some("XXX-XXX-XXX"),
-    createdOn            = Some(createdOn),
     paymentPlanReference = "1234567890",
     directDebitReference = "1234567890",
     taxpayer             = Taxpayers.taxPayerWithEnglishAddress,
@@ -433,35 +431,6 @@ trait TestData {
       bankDetails          = bankDetails,
       schedule             = schedule,
       desArrangement       = Some(anonymisedDesSubmissionRequest)
-    )
-
-    val paddedTtpAnonymisedArrangement: TTPArrangement = TTPArrangement(
-      id                   = Some("XXX-XXX-XXX"),
-      createdOn            = Some(createdOn),
-      paymentPlanReference = "1234567890",
-      directDebitReference = "1234567890",
-      taxpayer             = Taxpayer(
-        customerName   = "",
-        addresses      = List(),
-        selfAssessment = SelfAssessment(
-          utr                      = "XXX",
-          communicationPreferences = None,
-          debits                   = List()
-        )
-      ),
-      bankDetails          = bankDetails,
-      schedule             = schedule,
-      desArrangement       = Some(
-        DesSubmissionRequest(
-          ttpArrangement   = desTTPArrangement,
-          letterAndControl = LetterAndControl(
-            customerName  = "",
-            salutation    = "",
-            totalAll      = "",
-            clmPymtString = ""
-          )
-        )
-      )
     )
   }
 }

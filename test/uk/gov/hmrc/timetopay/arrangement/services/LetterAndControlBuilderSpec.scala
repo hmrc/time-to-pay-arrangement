@@ -50,7 +50,14 @@ class LetterAndControlBuilderSpec extends ITSpec with TestData {
   forAll(taxPayerData) { (taxpayer, exceptionCode, exceptionReason, message) =>
     s"LetterAndControlService should return (exceptionCode = $exceptionCode and exceptionReason = $exceptionReason) for $message" in {
 
-      val result = letterAndControlBuilder.create(TTPArrangement(None, None, "XXX", "XXX", taxpayer, bankDetails, schedule, None))
+      val result = letterAndControlBuilder.create(
+        TTPArrangement(
+          paymentPlanReference = "XXX",
+          directDebitReference = "XXX",
+          taxpayer = taxpayer,
+          bankDetails = bankDetails,
+          schedule = schedule,
+          desArrangement = None))
 
       result.customerName shouldBe taxpayer.customerName
       result.salutation shouldBe s"Dear ${taxpayer.customerName}"
@@ -72,7 +79,16 @@ class LetterAndControlBuilderSpec extends ITSpec with TestData {
         Instalment(now(), 10.0),
         Instalment(now(), 10.0),
         Instalment(now(), 10.98)))
-    val result = letterAndControlBuilder.create(TTPArrangement(None, None, "XXX", "XXX", taxpayer, bankDetails, scheduleWithInstalments, None))
+    val result = letterAndControlBuilder.create(
+      TTPArrangement(
+        paymentPlanReference = "XXX",
+        directDebitReference = "XXX",
+        taxpayer = taxpayer,
+        bankDetails = bankDetails,
+        schedule = scheduleWithInstalments,
+        desArrangement = None
+      )
+    )
     result.clmPymtString shouldBe "9 payments of £10.00 and final payment of £10.98"
     result.totalAll shouldBe "100.98"
   }
@@ -83,7 +99,16 @@ class LetterAndControlBuilderSpec extends ITSpec with TestData {
         Instalment(now(), 100000000.00),
         Instalment(now(), 100000000.00),
         Instalment(now(), 100000000.00)))
-    val result = letterAndControlBuilder.create(TTPArrangement(None, None, "XXX", "XXX", taxpayer, bankDetails, scheduleWithInstalments, None))
+    val result = letterAndControlBuilder.create(
+      TTPArrangement(
+        paymentPlanReference = "XXX",
+        directDebitReference = "XXX",
+        taxpayer = taxpayer,
+        bankDetails = bankDetails,
+        schedule = scheduleWithInstalments,
+        desArrangement = None
+      )
+    )
     result.clmPymtString shouldBe "Initial payment of £5,000,000.00 then 2 payments of £100,000,000.00 and final payment of £100,000,000.00"
   }
 
@@ -91,7 +116,16 @@ class LetterAndControlBuilderSpec extends ITSpec with TestData {
     val scheduleWithInstalments =
       PaymentSchedule(now(), now(), 5000000.0, BigDecimal("15000000.00"), 100, 0.00, 100.98, List(Instalment(now(), 100000000.00), Instalment(now(), 100000000.00)))
 
-    val result = letterAndControlBuilder.create(TTPArrangement(None, None, "XXX", "XXX", taxpayer, bankDetails, scheduleWithInstalments, None))
+    val result = letterAndControlBuilder.create(
+      TTPArrangement(
+        paymentPlanReference = "XXX",
+        directDebitReference = "XXX",
+        taxpayer = taxpayer,
+        bankDetails = bankDetails,
+        schedule = scheduleWithInstalments,
+        desArrangement = None
+      )
+    )
     result.clmPymtString shouldBe "Initial payment of £5,000,000.00 then 1 payments of £100,000,000.00 and final payment of £100,000,000.00"
   }
 
