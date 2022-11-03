@@ -70,7 +70,7 @@ class TTPArrangementController @Inject() (arrangementService: TTPArrangementServ
       arrangementService.byId(id).flatMap {
         _.fold(
           successful(NotFound(s"arrangement with $id does not exist"))
-        )(r => successful(Ok(toJson(TTPArrangementResponse.apply(r)))))
+        )(r => successful(Ok(toJson(TTPArrangementResponse(r)))))
       }
   }
 }

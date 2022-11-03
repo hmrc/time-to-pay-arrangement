@@ -206,13 +206,13 @@ object AnonymousTTPArrangement {
       createdOn            = LocalDateTime.now(),
       paymentPlanReference = ttpArrangement.paymentPlanReference,
       directDebitReference = ttpArrangement.directDebitReference,
-      taxpayer             = AnonymousTaxpayer.apply(ttpArrangement.taxpayer),
+      taxpayer             = AnonymousTaxpayer(ttpArrangement.taxpayer),
       bankDetails          = ttpArrangement.bankDetails,
       schedule             = ttpArrangement.schedule,
       desArrangement       = ttpArrangement.desArrangement match {
         case None => None
         case Some(desSubmissionRequest: DesSubmissionRequest) =>
-          Some(AnonymousDesSubmissionRequest.apply(desSubmissionRequest))
+          Some(AnonymousDesSubmissionRequest(desSubmissionRequest))
       }
     )
   }
@@ -225,7 +225,7 @@ object AnonymousTaxpayer {
   implicit val format: OFormat[AnonymousTaxpayer] = Json.format
 
   def apply(taxpayer: Taxpayer): AnonymousTaxpayer = {
-    AnonymousTaxpayer(selfAssessment = AnonymousSelfAssessment.apply(taxpayer.selfAssessment))
+    AnonymousTaxpayer(selfAssessment = AnonymousSelfAssessment(taxpayer.selfAssessment))
   }
 }
 
