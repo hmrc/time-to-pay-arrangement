@@ -200,19 +200,19 @@ object AnonymousTTPArrangement {
 
   implicit val format: OFormat[AnonymousTTPArrangement] = Json.format[AnonymousTTPArrangement]
 
-  implicit def makeArrangementAnonymous(ttpArrangement: TTPArrangement): AnonymousTTPArrangement = {
+  def apply(ttpArrangement: TTPArrangement): AnonymousTTPArrangement = {
     AnonymousTTPArrangement(
       _id                  = UUID.randomUUID().toString,
       createdOn            = LocalDateTime.now(),
       paymentPlanReference = ttpArrangement.paymentPlanReference,
       directDebitReference = ttpArrangement.directDebitReference,
-      taxpayer             = ttpArrangement.taxpayer,
+      taxpayer             = AnonymousTaxpayer.apply(ttpArrangement.taxpayer),
       bankDetails          = ttpArrangement.bankDetails,
       schedule             = ttpArrangement.schedule,
       desArrangement       = ttpArrangement.desArrangement match {
         case None => None
         case Some(desSubmissionRequest: DesSubmissionRequest) =>
-          Some(desSubmissionRequest)
+          Some(AnonymousDesSubmissionRequest.apply(desSubmissionRequest))
       }
     )
   }
@@ -224,8 +224,8 @@ case class AnonymousTaxpayer(
 object AnonymousTaxpayer {
   implicit val format: OFormat[AnonymousTaxpayer] = Json.format
 
-  implicit def makeTaxpayerAnonymous(taxpayer: Taxpayer): AnonymousTaxpayer = {
-    AnonymousTaxpayer(selfAssessment = taxpayer.selfAssessment)
+  def apply(taxpayer: Taxpayer): AnonymousTaxpayer = {
+    AnonymousTaxpayer(selfAssessment = AnonymousSelfAssessment.apply(taxpayer.selfAssessment))
   }
 }
 
@@ -236,7 +236,7 @@ case class AnonymousSelfAssessment(
 object AnonymousSelfAssessment {
   implicit val format: OFormat[AnonymousSelfAssessment] = Json.format
 
-  implicit def makeSelfAssessmentAnonymous(selfAssessment: SelfAssessment): AnonymousSelfAssessment = {
+  def apply(selfAssessment: SelfAssessment): AnonymousSelfAssessment = {
     AnonymousSelfAssessment(utr = selfAssessment.utr)
   }
 }
@@ -246,7 +246,7 @@ case class AnonymousDesSubmissionRequest(ttpArrangement: DesTTPArrangement)
 object AnonymousDesSubmissionRequest {
   implicit val format: OFormat[AnonymousDesSubmissionRequest] = Json.format
 
-  implicit def makeDesSubmissionRequestAnonymous(desSubmissionRequest: DesSubmissionRequest): AnonymousDesSubmissionRequest = {
+  def apply(desSubmissionRequest: DesSubmissionRequest): AnonymousDesSubmissionRequest = {
     AnonymousDesSubmissionRequest(ttpArrangement = desSubmissionRequest.ttpArrangement)
   }
 }
@@ -263,9 +263,9 @@ case class TTPArrangementResponse(
 )
 
 object TTPArrangementResponse {
-  implicit val format: OFormat[TTPArrangementResponse] = Json.format[TTPArrangementResponse]
+  implicit val writes: Writes[TTPArrangementResponse] = Json.writes[TTPArrangementResponse]
 
-  implicit def buildTTPArrangementResponse(anonymousTTPArrangement: AnonymousTTPArrangement): TTPArrangementResponse = {
+  def apply(anonymousTTPArrangement: AnonymousTTPArrangement): TTPArrangementResponse = {
     TTPArrangementResponse(
       _id                  = anonymousTTPArrangement._id,
       createdOn            = anonymousTTPArrangement.createdOn.toString,
@@ -277,19 +277,20 @@ object TTPArrangementResponse {
       desArrangement       = anonymousTTPArrangement.desArrangement match {
         case None => None
         case Some(anonymousDesSubmissionRequest: AnonymousDesSubmissionRequest) =>
-          Some(
-            DesSubmissionRequestResponse(
-              ttpArrangement   = anonymousDesSubmissionRequest.ttpArrangement,
-              letterAndControl = Json.obj()
-            )
-          )
+          Some(DesSubmissionRequestResponse(ttpArrangement = anonymousDesSubmissionRequest.ttpArrangement))
       }
     )
   }
 }
 
-case class DesSubmissionRequestResponse(ttpArrangement: DesTTPArrangement, letterAndControl: JsObject)
+case class DesSubmissionRequestResponse(ttpArrangement: DesTTPArrangement)
 
 object DesSubmissionRequestResponse {
-  implicit val format: OFormat[DesSubmissionRequestResponse] = Json.format
+  implicit val writes: Writes[DesSubmissionRequestResponse] = {
+    (o: DesSubmissionRequestResponse) =>
+      Json.obj(
+        "ttpArrangement" -> Json.toJson(o.ttpArrangement),
+        "letterAndControl" -> Json.obj()
+      )
+  }
 }

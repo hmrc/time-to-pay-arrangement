@@ -17,7 +17,7 @@
 package uk.gov.hmrc.timetopay.arrangement.controllers
 
 import javax.inject.Inject
-import play.api.Logger
+import play.api.{Logger, Logging}
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
 import play.api.mvc._
@@ -29,8 +29,7 @@ import scala.concurrent.Future._
 import scala.concurrent.{ExecutionContext, Future}
 
 class TTPArrangementController @Inject() (arrangementService: TTPArrangementService, cc: ControllerComponents)(implicit ec: ExecutionContext)
-  extends BackendController(cc) {
-  val logger: Logger = Logger(getClass)
+  extends BackendController(cc) with Logging {
 
   /**
    * Turns the json into our representation of a TTPArrangement
@@ -71,7 +70,7 @@ class TTPArrangementController @Inject() (arrangementService: TTPArrangementServ
       arrangementService.byId(id).flatMap {
         _.fold(
           successful(NotFound(s"arrangement with $id does not exist"))
-        )(r => successful(Ok(toJson(TTPArrangementResponse.buildTTPArrangementResponse(r)))))
+        )(r => successful(Ok(toJson(TTPArrangementResponse.apply(r)))))
       }
   }
 }

@@ -34,7 +34,7 @@ class TTPArrangementWorkItemRepository @Inject() (configuration:          Config
                                                   val clock:              Clock,
                                                  )(implicit ec: ExecutionContext)
   extends WorkItemRepository[TTPArrangementWorkItem](
-    collectionName = "TTPArrangementsWorkItem-new-mongo",
+    collectionName = "TTPArrangementsWorkItem",
     mongoComponent = mongo,
     itemFormat     = TTPArrangementWorkItem.format,
     workItemFields = WorkItemFields(
@@ -59,7 +59,7 @@ class TTPArrangementWorkItemRepository @Inject() (configuration:          Config
     MongoUtils.ensureIndexes(
       collection,
       indexes ++ additionalIndexes,
-      replaceIndexes = configuration.get[Boolean]("mongodb.replaceIndexes")
+      replaceIndexes = true
     )
 
   def additionalIndexes: Seq[IndexModel] = Seq(

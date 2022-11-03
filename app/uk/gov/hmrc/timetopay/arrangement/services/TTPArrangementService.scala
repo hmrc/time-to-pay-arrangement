@@ -21,7 +21,7 @@ import javax.inject.Inject
 import play.api.mvc.Request
 import uk.gov.hmrc.timetopay.arrangement.config.{QueueConfig, QueueLogger}
 import uk.gov.hmrc.timetopay.arrangement.connectors.{DesArrangementApiServiceConnector, SubmissionError, SubmissionSuccess}
-import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, AnonymousTTPArrangement, TTPArrangement, TTPArrangementWorkItem}
+import uk.gov.hmrc.timetopay.arrangement.model.{AnonymousTTPArrangement, DesSubmissionRequest, TTPArrangement, TTPArrangementWorkItem}
 import uk.gov.hmrc.timetopay.arrangement.repository.{TTPArrangementRepository, TTPArrangementWorkItemRepository}
 import uk.gov.hmrc.mongo.workitem.WorkItem
 
@@ -93,7 +93,8 @@ class TTPArrangementService @Inject() (
    * Saves the TTPArrangement to our mongoDB and adds in a Id
    */
   private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[AnonymousTTPArrangement]] = {
-    val toSave = affixDesArrangement(arrangement, desSubmissionRequest)
+    val arrangementWithDesSubmissionRequest = affixDesArrangement(arrangement, desSubmissionRequest)
+    val toSave = AnonymousTTPArrangement.apply(arrangementWithDesSubmissionRequest)
 
     Try(ttpArrangementRepository.doInsert(toSave)).getOrElse(Future.successful(None))
   }
