@@ -28,12 +28,12 @@ class TTPArrangementControllerSpec extends ITSpec with TestData {
   private val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
 
   override def beforeEach(): Unit = {
-    arrangementRepo.collection.drop(false).futureValue
+    arrangementRepo.collection.drop().toFuture().futureValue
     ()
   }
 
   override def afterEach(): Unit = {
-    arrangementRepo.collection.drop(false).futureValue
+    arrangementRepo.collection.drop().toFuture().futureValue
     ()
   }
 

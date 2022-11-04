@@ -17,8 +17,7 @@
 package uk.gov.hmrc.timetopay.arrangement.support
 
 import java.time.LocalDate
-
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.timetopay.arrangement.model.{Address, CommunicationPreferences, DesTTPArrangement, Instalment, LetterAndControl, PaymentSchedule, SelfAssessment, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.model.modelFormat._
 
@@ -91,7 +90,7 @@ trait TestData {
        |  }
        |}""".stripMargin)
 
-  val ttparrangementResponse = Json.parse(
+  val ttparrangementResponse: JsValue = Json.parse(
     s"""
        |{
        |  "id" : "XXX-XXX-XXX",
@@ -336,5 +335,4 @@ trait TestData {
     val taxPayerWithMultipleJurisdictions = Taxpayer("CustomerName", List(welshAddress, scottishAddress), selfAssessment)
 
   }
-
 }

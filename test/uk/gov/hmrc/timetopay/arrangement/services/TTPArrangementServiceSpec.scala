@@ -19,26 +19,26 @@ package uk.gov.hmrc.timetopay.arrangement.services
 import uk.gov.hmrc.timetopay.arrangement.model.{TTPArrangement, TTPArrangementWorkItem}
 import uk.gov.hmrc.timetopay.arrangement.repository.{TTPArrangementRepository, TTPArrangementWorkItemRepository}
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestData, WireMockResponses}
-import uk.gov.hmrc.workitem.WorkItem
+import uk.gov.hmrc.mongo.workitem.WorkItem
 
 class TTPArrangementServiceSpec extends ITSpec with TestData {
 
   import Taxpayers._
 
-  private val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
-  private val arrangementWorkItemRepo = fakeApplication.injector.instanceOf[TTPArrangementWorkItemRepository]
+  private val arrangementRepo = fakeApplication().injector.instanceOf[TTPArrangementRepository]
+  private val arrangementWorkItemRepo = fakeApplication().injector.instanceOf[TTPArrangementWorkItemRepository]
   private val tTPArrangementService = fakeApplication().injector.instanceOf[TTPArrangementService]
   private val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement].copy(taxpayer = taxPayerWithEnglishAddress)
 
   override def beforeEach(): Unit = {
-    arrangementWorkItemRepo.collection.drop(false).futureValue
-    arrangementRepo.collection.drop(false).futureValue
+    arrangementWorkItemRepo.collection.drop().toFuture().futureValue
+    arrangementRepo.collection.drop().toFuture().futureValue
     ()
   }
 
   override def afterEach(): Unit = {
-    arrangementWorkItemRepo.collection.drop(false).futureValue
-    arrangementRepo.collection.drop(false).futureValue
+    arrangementWorkItemRepo.collection.drop().toFuture().futureValue
+    arrangementRepo.collection.drop().toFuture().futureValue
     ()
   }
 
@@ -55,15 +55,13 @@ class TTPArrangementServiceSpec extends ITSpec with TestData {
     desSubmissionRequest.ttpArrangement.firstPaymentAmount shouldBe "1248.95"
     desSubmissionRequest.ttpArrangement.enforcementAction shouldBe "Distraint"
     desSubmissionRequest.ttpArrangement.regularPaymentAmount shouldBe "1248.95"
-    desSubmissionRequest.letterAndControl.clmPymtString shouldBe "Initial payment of £50.00 then 3 payments of £1,248.95 and final payment of £1,248.95"
-
   }
 
   "TTPArrangementService should return failed future for DES Bad request in the 500's range and save to the work item db in" in {
 
     WireMockResponses.desArrangementApiBadRequestSeverError(arrangement.taxpayer.selfAssessment.utr)
     val response = tTPArrangementService.submit(arrangement).failed.futureValue
-    val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.findAll().futureValue.headOption
+    val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.collection.find().headOption.futureValue
     workItem should not be None
     response.getMessage should include("SERVICE_UNAVAILABLE")
   }
@@ -72,7 +70,7 @@ class TTPArrangementServiceSpec extends ITSpec with TestData {
 
     WireMockResponses.desArrangementApiBadRequestSeverError(arrangement.taxpayer.selfAssessment.utr)
     val response = tTPArrangementService.submit(arrangement).failed.futureValue
-    val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.findAll().futureValue.headOption
+    val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.collection.find().headOption.futureValue
     workItem should not be None
     response.getMessage should include("SERVICE_UNAVAILABLE")
   }
@@ -81,8 +79,9 @@ class TTPArrangementServiceSpec extends ITSpec with TestData {
 
     WireMockResponses.desArrangementApiBadRequestClientError(arrangement.taxpayer.selfAssessment.utr)
     val response = tTPArrangementService.submit(arrangement).failed.futureValue
-    val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.findAll().futureValue.headOption
+    val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.collection.find().headOption.futureValue
     workItem shouldBe None
     response.getMessage should include("DES httpCode: 400")
   }
+
 }

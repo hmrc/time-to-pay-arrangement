@@ -16,8 +16,6 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import org.scalatest.{FreeSpecLike, Matchers}
-import org.scalatestplus.play.guice.GuiceOneServerPerTest
 import uk.gov.hmrc.timetopay.arrangement.model.{BankDetails, DesSubmissionRequest, PaymentSchedule, SelfAssessment, TTPArrangement, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestData}
 
@@ -25,7 +23,7 @@ import java.time.LocalDate
 
 class CryptoServiceSpec extends ITSpec with TestData {
 
-  val cryptoService = fakeApplication.injector.instanceOf[CryptoService]
+  val cryptoService: CryptoService = fakeApplication().injector.instanceOf[CryptoService]
 
   lazy val bankDetails: BankDetails = BankDetails(
     sortCode      = "12-34-56",
@@ -36,11 +34,12 @@ class CryptoServiceSpec extends ITSpec with TestData {
   "check encrypted -> decripted match" in {
     val des: DesSubmissionRequest = DesSubmissionRequest(submitArrangementTTPArrangement, submitArrangementLetterAndControl)
     val request: TTPArrangement = TTPArrangement(
-      None, None, "", "",
-      Taxpayer("", List.empty, SelfAssessment("", None, List.empty)),
-      bankDetails,
-      PaymentSchedule(LocalDate.now(), LocalDate.now(), 0, 0, 0, 0, 0, List.empty),
-      Some(des)
+      paymentPlanReference = "",
+      directDebitReference = "",
+      taxpayer             = Taxpayer("", List.empty, SelfAssessment("", None, List.empty)),
+      bankDetails          = bankDetails,
+      schedule             = PaymentSchedule(LocalDate.now(), LocalDate.now(), 0, 0, 0, 0, 0, List.empty),
+      desArrangement       = Some(des)
     )
 
     val encrypted = cryptoService.encryptTtpa(request)

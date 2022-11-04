@@ -17,7 +17,7 @@
 package uk.gov.hmrc.timetopay.arrangement.services
 
 import play.api.libs.json.{JsObject, Json}
-import play.api.mvc.{Request, RequestHeader}
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
@@ -96,7 +96,7 @@ class AuditService @Inject() (auditConnector: AuditConnector)(implicit ec: Execu
       "initialPaymentAmount" -> schedule.initialPayment,
       "installments" -> Json.toJson(schedule.instalments.sortBy(_.paymentDate.toEpochDay)),
       "numberOfInstallments" -> schedule.instalments.length,
-      "installmentLengthCalendarMonths" -> (ChronoUnit.MONTHS.between(schedule.startDate, schedule.endDate)),
+      "installmentLengthCalendarMonths" -> ChronoUnit.MONTHS.between(schedule.startDate, schedule.endDate),
       "totalPaymentWithoutInterest" -> schedule.amountToPay,
       "totalInterestCharged" -> schedule.totalInterestCharged,
       "totalPayable" -> schedule.totalPayable)

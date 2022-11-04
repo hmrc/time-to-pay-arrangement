@@ -17,20 +17,19 @@
 package uk.gov.hmrc.timetopay.arrangement.controllers
 
 import javax.inject.Inject
-import play.api.Logger
+import play.api.{Logger, Logging}
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
 import play.api.mvc._
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangement
+import uk.gov.hmrc.timetopay.arrangement.model.{TTPArrangement, TTPArrangementResponse}
 import uk.gov.hmrc.timetopay.arrangement.services.{DesApiException, TTPArrangementService}
 
 import scala.concurrent.Future._
 import scala.concurrent.{ExecutionContext, Future}
 
 class TTPArrangementController @Inject() (arrangementService: TTPArrangementService, cc: ControllerComponents)(implicit ec: ExecutionContext)
-  extends BackendController(cc) {
-  val logger = Logger(getClass)
+  extends BackendController(cc) with Logging {
 
   /**
    * Turns the json into our representation of a TTPArrangement
@@ -42,7 +41,7 @@ class TTPArrangementController @Inject() (arrangementService: TTPArrangementServ
       withJsonBody[TTPArrangement] {
         arrangement =>
           arrangementService.submit(arrangement).flatMap {
-            x => x.fold(createdNoLocation)(a => createdWithLocation(a.id.get))
+            x => x.fold(createdNoLocation)(a => createdWithLocation(a._id))
           }.recover {
             case desApiException: DesApiException =>
               val desFailureMessage: String = s"Submission to DES failed, status code [${desApiException.code}] and response [${desApiException.message}]"
@@ -57,7 +56,9 @@ class TTPArrangementController @Inject() (arrangementService: TTPArrangementServ
 
   private def createdNoLocation = Future.successful[Result](Created)
 
-  private def createdWithLocation(id: String)(implicit reqHead: RequestHeader) = Future.successful[Result](Created.withHeaders(LOCATION -> s"$protocol://${reqHead.host}/ttparrangements/$id"))
+  private def createdWithLocation(id: String)(implicit reqHead: RequestHeader) = {
+    Future.successful[Result](Created.withHeaders(LOCATION -> s"$protocol://${reqHead.host}/ttparrangements/$id"))
+  }
 
   def protocol(implicit reqHead: RequestHeader): String = if (reqHead.secure) "https" else "http"
 
@@ -67,7 +68,9 @@ class TTPArrangementController @Inject() (arrangementService: TTPArrangementServ
 
       logger.debug(s"Requested arrangement $id")
       arrangementService.byId(id).flatMap {
-        _.fold(successful(NotFound(s"arrangement with $id does not exist")))(r => successful(Ok(toJson(r))))
+        _.fold(
+          successful(NotFound(s"arrangement with $id does not exist"))
+        )(r => successful(Ok(toJson(TTPArrangementResponse(r)))))
       }
   }
 }

@@ -17,8 +17,10 @@
 package uk.gov.hmrc.timetopay.arrangement.model
 
 import java.time.{LocalDate, LocalDateTime}
-
 import play.api.libs.json._
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import java.util.UUID
+import scala.language.implicitConversions
 
 case class PaymentSchedule(
     startDate:            LocalDate,
@@ -93,8 +95,6 @@ object DesDebit {
 }
 
 case class TTPArrangement(
-    id:                   Option[String],
-    createdOn:            Option[LocalDateTime],
     paymentPlanReference: String,
     directDebitReference: String,
     taxpayer:             Taxpayer,
@@ -183,4 +183,114 @@ object modelFormat {
   implicit val letterAndControlFormat: OFormat[LetterAndControl] = Json.format[LetterAndControl]
   implicit val desSubmissionRequestFormat: OFormat[DesSubmissionRequest] = Json.format[DesSubmissionRequest]
 
+}
+
+case class AnonymousTTPArrangement(
+    _id:                  String,
+    createdOn:            LocalDateTime,
+    paymentPlanReference: String,
+    directDebitReference: String,
+    taxpayer:             AnonymousTaxpayer,
+    bankDetails:          BankDetails,
+    schedule:             PaymentSchedule,
+    desArrangement:       Option[AnonymousDesSubmissionRequest])
+
+object AnonymousTTPArrangement {
+  implicit val localDateTimeFormat: Format[LocalDateTime] = MongoJavatimeFormats.localDateTimeFormat
+
+  implicit val format: OFormat[AnonymousTTPArrangement] = Json.format[AnonymousTTPArrangement]
+
+  def apply(ttpArrangement: TTPArrangement): AnonymousTTPArrangement = {
+    AnonymousTTPArrangement(
+      _id                  = UUID.randomUUID().toString,
+      createdOn            = LocalDateTime.now(),
+      paymentPlanReference = ttpArrangement.paymentPlanReference,
+      directDebitReference = ttpArrangement.directDebitReference,
+      taxpayer             = AnonymousTaxpayer(ttpArrangement.taxpayer),
+      bankDetails          = ttpArrangement.bankDetails,
+      schedule             = ttpArrangement.schedule,
+      desArrangement       = ttpArrangement.desArrangement match {
+        case None => None
+        case Some(desSubmissionRequest: DesSubmissionRequest) =>
+          Some(AnonymousDesSubmissionRequest(desSubmissionRequest))
+      }
+    )
+  }
+}
+
+case class AnonymousTaxpayer(
+    selfAssessment: AnonymousSelfAssessment)
+
+object AnonymousTaxpayer {
+  implicit val format: OFormat[AnonymousTaxpayer] = Json.format
+
+  def apply(taxpayer: Taxpayer): AnonymousTaxpayer = {
+    AnonymousTaxpayer(selfAssessment = AnonymousSelfAssessment(taxpayer.selfAssessment))
+  }
+}
+
+case class AnonymousSelfAssessment(
+    utr: String
+)
+
+object AnonymousSelfAssessment {
+  implicit val format: OFormat[AnonymousSelfAssessment] = Json.format
+
+  def apply(selfAssessment: SelfAssessment): AnonymousSelfAssessment = {
+    AnonymousSelfAssessment(utr = selfAssessment.utr)
+  }
+}
+
+case class AnonymousDesSubmissionRequest(ttpArrangement: DesTTPArrangement)
+
+object AnonymousDesSubmissionRequest {
+  implicit val format: OFormat[AnonymousDesSubmissionRequest] = Json.format
+
+  def apply(desSubmissionRequest: DesSubmissionRequest): AnonymousDesSubmissionRequest = {
+    AnonymousDesSubmissionRequest(ttpArrangement = desSubmissionRequest.ttpArrangement)
+  }
+}
+
+case class TTPArrangementResponse(
+    _id:                  String,
+    createdOn:            String,
+    paymentPlanReference: String,
+    directDebitReference: String,
+    taxpayer:             AnonymousTaxpayer,
+    bankDetails:          BankDetails,
+    schedule:             PaymentSchedule,
+    desArrangement:       Option[DesSubmissionRequestResponse]
+)
+
+object TTPArrangementResponse {
+  implicit val writes: Writes[TTPArrangementResponse] = Json.writes[TTPArrangementResponse]
+
+  def apply(anonymousTTPArrangement: AnonymousTTPArrangement): TTPArrangementResponse = {
+    TTPArrangementResponse(
+      _id                  = anonymousTTPArrangement._id,
+      createdOn            = anonymousTTPArrangement.createdOn.toString,
+      paymentPlanReference = anonymousTTPArrangement.paymentPlanReference,
+      directDebitReference = anonymousTTPArrangement.directDebitReference,
+      taxpayer             = anonymousTTPArrangement.taxpayer,
+      bankDetails          = anonymousTTPArrangement.bankDetails,
+      schedule             = anonymousTTPArrangement.schedule,
+      desArrangement       = anonymousTTPArrangement.desArrangement match {
+        case None => None
+        case Some(anonymousDesSubmissionRequest: AnonymousDesSubmissionRequest) =>
+          Some(DesSubmissionRequestResponse(ttpArrangement = anonymousDesSubmissionRequest.ttpArrangement))
+      }
+    )
+  }
+}
+
+case class DesSubmissionRequestResponse(ttpArrangement: DesTTPArrangement)
+
+object DesSubmissionRequestResponse {
+  implicit val writes: Writes[DesSubmissionRequestResponse] = {
+    (o: DesSubmissionRequestResponse) =>
+      Json.obj(
+        "ttpArrangement" -> Json.toJson(o.ttpArrangement),
+        "letterAndControl" -> Json.obj()
+      )
+  }
 }

@@ -16,45 +16,43 @@
 
 package uk.gov.hmrc.timetopay.arrangement.repository
 
-import play.api.Logger
-import play.api.libs.json.Json
-import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangement
 import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
-import uk.gov.hmrc.timetopay.arrangement.repository.TestDataTtp.arrangement
+import uk.gov.hmrc.timetopay.arrangement.repository.TestDataTtp.{anonymisedArrangement, arrangement}
+
 class TTPArrangementRepositorySpec extends ITSpec {
-  private val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
+  private val arrangementRepo = fakeApplication().injector.instanceOf[TTPArrangementRepository]
 
   override def beforeEach(): Unit = {
-    arrangementRepo.collection.drop(false).futureValue
+    arrangementRepo.collection.drop().toFuture().futureValue
     ()
   }
 
   override def afterEach(): Unit = {
-    arrangementRepo.collection.drop(false).futureValue
+    arrangementRepo.collection.drop().toFuture().futureValue
     ()
   }
 
   "should add save a TTPArrangement" in {
 
-    val result = arrangementRepo.doInsert(arrangement).futureValue
-    result.get.taxpayer.selfAssessment.utr shouldBe arrangement.taxpayer.selfAssessment.utr
+    val result = arrangementRepo.doInsert(anonymisedArrangement).futureValue
+    result.get.taxpayer.selfAssessment.utr shouldBe anonymisedArrangement.taxpayer.selfAssessment.utr
 
   }
 
   "should get a TTPArrangement for given id" in {
 
     logger.warn(arrangement.toString)
-    arrangementRepo.doInsert(arrangement).futureValue
+    arrangementRepo.doInsert(anonymisedArrangement).futureValue
 
-    val loaded = arrangementRepo.findByIdLocal(arrangement.id.get).futureValue.get
-    assert(loaded.toString.contains("desArrangement"))
-    assert(loaded.toString.contains("XXX-XXX-XXX"))
+    val loaded = arrangementRepo.findById(anonymisedArrangement._id).futureValue.get
+    assert(loaded.desArrangement.get.ttpArrangement.firstPaymentAmount.equals(1248.95.toString))
+    assert(loaded._id.equals("XXX-XXX-XXX"))
   }
 
   "should not save any personal data in" in {
-    arrangementRepo.doInsert(arrangement).futureValue
+    arrangementRepo.doInsert(anonymisedArrangement).futureValue
 
-    val loaded = arrangementRepo.findByIdLocal(arrangement.id.get).futureValue.get
+    val loaded = arrangementRepo.findById(anonymisedArrangement._id).futureValue.get
     assert(!loaded.toString.contains("Customer Name"))
     assert(!loaded.toString.contains("addresses"))
   }

@@ -28,7 +28,7 @@ case class TTPArrangementWorkItem(
     auditTags:      String) {
 
   override def toString: String =
-    s"TTPArrangementWorkItem for Reference $reference ... {createdOn: $createdOn, availableUntil: $availableUntil,notification: ${ttpArrangement.toString}"
+    s"TTPArrangementWorkItem for Reference $reference ... {createdOn: $createdOn, availableUntil: $availableUntil,notification: $ttpArrangement"
 }
 
 object TTPArrangementWorkItem {
