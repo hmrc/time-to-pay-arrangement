@@ -3,13 +3,27 @@
 [![Build Status](https://travis-ci.org/hmrc/time-to-pay-arrangement.svg)](https://travis-ci.org/hmrc/time-to-pay-arrangement) [ ![Download](https://api.bintray.com/packages/hmrc/releases/time-to-pay-arrangement/images/download.svg) ](https://bintray.com/hmrc/releases/time-to-pay-arrangement/_latestVersion)
 
 ### About
-The Arrangement service is used in the SSTTP project for Pay What You Owe In Instalments. It takes a POST request and builds a DES submission request using the provided data.
+The Arrangement service is used in the Self-service Setup a Time To Pay payment plan (SSSTTP) project for Pay What You Owe In Instalments for self-assessment tax liabilities.
+
+It takes a POST request and builds a DES submission request using the provided data.
+
 Before sending to DES the arrangement is saved to a local mongo database and provides a GET request in the response header that can be used to retrieve the data.
+
+A re-try mechanism is implemented so that if DES responds with a server error, the arrangement will be resent repeatedly for up to 48 hours until it is accepted.
+
 Below is a diagram showing where the arrangement service fits into the SSTTP project.
 
 <a href="https://github.com/hmrc/time-to-pay-arrangement">
      <p align="center">
-       <img src="https://raw.githubusercontent.com/hmrc/time-to-pay-arrangement/master/public/arrangement.png" alt="ArrangementOverview">
+       <img src="public/arrangement.png" alt="ArrangementOverview">
+     </p>
+ </a>
+
+This is a diagram of the re-try mechanism
+
+<a href="https://github.com/hmrc/time-to-pay-arrangement">
+     <p align="center">
+       <img src="public/retry.png" alt="RetryMechanismOverview">
      </p>
  </a>
 
