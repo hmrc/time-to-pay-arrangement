@@ -18,11 +18,7 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import akka.actor.{ActorSystem, Cancellable}
 import com.google.inject.Singleton
-import play.api.Logger
-import play.api.libs.json.Format.GenericFormat
-import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.mongo.workitem.ProcessingStatus.{Failed, PermanentlyFailed, Succeeded}
+import uk.gov.hmrc.mongo.workitem.ProcessingStatus.{Failed, PermanentlyFailed}
 import uk.gov.hmrc.play.scheduling.ExclusiveScheduledJob
 import uk.gov.hmrc.timetopay.arrangement.config.{QueueConfig, QueueLogger}
 import uk.gov.hmrc.timetopay.arrangement.connectors.{DesArrangementApiServiceConnector, SubmissionError, SubmissionSuccess}
@@ -32,6 +28,7 @@ import uk.gov.hmrc.mongo.workitem.WorkItem
 
 import java.time.{Clock, LocalDateTime}
 import javax.inject.Inject
+import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -49,8 +46,8 @@ class PollerService @Inject() (
 ) extends ExclusiveScheduledJob {
 
   private val logger = QueueLogger(this.getClass)
-  val initialDelay = queueConfig.initialDelay
-  val interval = queueConfig.interval
+  val initialDelay: FiniteDuration = queueConfig.initialDelay
+  val interval: FiniteDuration = queueConfig.interval
 
   override def executeInMutex(implicit ec: ExecutionContext): Future[Result] = {
     ttpArrangementRepositoryWorkItem.findAll().map{ ls =>
@@ -130,7 +127,7 @@ class PollerService @Inject() (
   def process(): Future[Unit] = {
     try {
 
-      ttpArrangementRepositoryWorkItem.pullOutstanding
+      ttpArrangementRepositoryWorkItem.pullOutstanding()
         .flatMap {
           case None =>
             Future.successful(())

@@ -19,7 +19,6 @@ package uk.gov.hmrc.timetopay.arrangement.services
 import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.mongo.workitem.WorkItem
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.http.HeaderCarrierConverter

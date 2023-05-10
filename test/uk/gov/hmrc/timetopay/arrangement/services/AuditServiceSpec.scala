@@ -35,6 +35,42 @@ class AuditServiceSpec extends ITSpec with TestData {
     event.detail shouldEqual Json.toJson(details)
   }
 
+  private val expectedBase: String = {
+    s""""utr":"1234567890",
+       |  "bankDetails": {
+       |    "name": "Mr John Campbell",
+       |    "accountNumber": "12345678",
+       |    "sortCode": "12-34-56"
+       |  },
+       |  "schedule": {
+       |    "initialPaymentAmount":50,
+       |    "installments":[
+       |      {
+       |        "paymentDate":"2016-10-01",
+       |        "amount":1248.95
+       |      },
+       |      {
+       |        "paymentDate":"2016-11-01",
+       |        "amount":1248.95
+       |      },
+       |      {
+       |        "paymentDate":"2016-12-01",
+       |        "amount":1248.95
+       |      },
+       |      {
+       |        "paymentDate":"2017-01-01",
+       |        "amount":1248.95
+       |       }
+       |     ],
+       |     "numberOfInstallments":4,
+       |     "installmentLengthCalendarMonths":11,
+       |     "totalPaymentWithoutInterest":5000,
+       |     "totalInterestCharged":45.83,
+       |     "totalPayable":5045.83
+       |   }
+       |""".stripMargin
+  }
+
   "audit event for sendSubmissionSucceededEvent" in {
     val expected: JsValue =
       Json.parse(
@@ -42,38 +78,7 @@ class AuditServiceSpec extends ITSpec with TestData {
            |  "status":"successfully submitted direct debit and TTP Arrangement",
            |  "directDebitInstructionReference": "12345678901234567890",
            |  "paymentPlanReference": "12345678901234567890",
-           |  "utr":"1234567890",
-           |  "bankDetails": {
-           |    "name": "Mr John Campbell",
-           |    "accountNumber": "12345678",
-           |    "sortCode": "12-34-56"
-           |  },
-           |  "schedule": {
-           |    "initialPaymentAmount":50,
-           |    "installments":[
-           |      {
-           |        "paymentDate":"2016-10-01",
-           |        "amount":1248.95
-           |      },
-           |      {
-           |        "paymentDate":"2016-11-01",
-           |        "amount":1248.95
-           |      },
-           |      {
-           |        "paymentDate":"2016-12-01",
-           |        "amount":1248.95
-           |      },
-           |      {
-           |        "paymentDate":"2017-01-01",
-           |        "amount":1248.95
-           |       }
-           |     ],
-           |     "numberOfInstallments":4,
-           |     "installmentLengthCalendarMonths":11,
-           |     "totalPaymentWithoutInterest":5000,
-           |     "totalInterestCharged":45.83,
-           |     "totalPayable":5045.83
-           |   }
+           |  $expectedBase
            |}
            |""".stripMargin)
 
@@ -106,38 +111,7 @@ class AuditServiceSpec extends ITSpec with TestData {
            |    "createdOn":"$timeNow",
            |    "availableUntil":"${timeNow.plusDays(2)}"
            |  },
-           |  "utr":"1234567890",
-           |  "bankDetails": {
-           |    "name": "Mr John Campbell",
-           |    "accountNumber": "12345678",
-           |    "sortCode": "12-34-56"
-           |  },
-           |  "schedule": {
-           |    "initialPaymentAmount":50,
-           |    "installments":[
-           |      {
-           |        "paymentDate":"2016-10-01",
-           |        "amount":1248.95
-           |      },
-           |      {
-           |        "paymentDate":"2016-11-01",
-           |        "amount":1248.95
-           |      },
-           |      {
-           |        "paymentDate":"2016-12-01",
-           |        "amount":1248.95
-           |      },
-           |      {
-           |        "paymentDate":"2017-01-01",
-           |        "amount":1248.95
-           |       }
-           |     ],
-           |     "numberOfInstallments":4,
-           |     "installmentLengthCalendarMonths":11,
-           |     "totalPaymentWithoutInterest":5000,
-           |     "totalInterestCharged":45.83,
-           |     "totalPayable":5045.83
-           |   }
+           |  $expectedBase
            |}
            |""".stripMargin)
 
@@ -157,38 +131,7 @@ class AuditServiceSpec extends ITSpec with TestData {
            |  },
            |  "directDebitInstructionReference": "12345678901234567890",
            |  "paymentPlanReference": "12345678901234567890",
-           |  "utr":"1234567890",
-           |  "bankDetails": {
-           |    "name": "Mr John Campbell",
-           |    "accountNumber": "12345678",
-           |    "sortCode": "12-34-56"
-           |  },
-           |  "schedule": {
-           |    "initialPaymentAmount":50,
-           |    "installments":[
-           |      {
-           |        "paymentDate":"2016-10-01",
-           |        "amount":1248.95
-           |      },
-           |      {
-           |        "paymentDate":"2016-11-01",
-           |        "amount":1248.95
-           |      },
-           |      {
-           |        "paymentDate":"2016-12-01",
-           |        "amount":1248.95
-           |      },
-           |      {
-           |        "paymentDate":"2017-01-01",
-           |        "amount":1248.95
-           |       }
-           |     ],
-           |     "numberOfInstallments":4,
-           |     "installmentLengthCalendarMonths":11,
-           |     "totalPaymentWithoutInterest":5000,
-           |     "totalInterestCharged":45.83,
-           |     "totalPayable":5045.83
-           |   }
+           |  $expectedBase
            |}
            |""".stripMargin)
 
