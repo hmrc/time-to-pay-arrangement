@@ -71,7 +71,18 @@ class TTPArrangementService @Inject() (
             logger.trace(arrangement, "des failed: adding to queue ")
             sendToTTPArrangementWorkRepo(
               utr,
-              affixDesArrangement(arrangement, request)).flatMap { _ =>
+              affixDesArrangement(arrangement, request)
+            ).flatMap { workItem: WorkItem[TTPArrangementWorkItem] =>
+                auditService.sendArrangementQueuedEvent(
+                  arrangement.taxpayer,
+                  arrangement.bankDetails,
+                  arrangement.schedule,
+                  error,
+                  arrangement,
+                  workItem.item,
+                  AuditService.auditTags
+                )
+
                 returnedError
               }
           } else {

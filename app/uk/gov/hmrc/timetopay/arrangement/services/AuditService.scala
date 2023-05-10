@@ -19,11 +19,12 @@ package uk.gov.hmrc.timetopay.arrangement.services
 import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.mongo.workitem.WorkItem
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.timetopay.arrangement.connectors.SubmissionError
-import uk.gov.hmrc.timetopay.arrangement.model.{BankDetails, PaymentSchedule, Taxpayer}
+import uk.gov.hmrc.timetopay.arrangement.model.{BankDetails, PaymentSchedule, TTPArrangement, TTPArrangementWorkItem, Taxpayer}
 
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -46,6 +47,37 @@ class AuditService @Inject() (auditConnector: AuditConnector)(implicit ec: Execu
       Json.obj(
         "status" -> "successfully submitted direct debit and TTP Arrangement"
       ))
+    auditConnector.sendExtendedEvent(event)
+    ()
+  }
+
+  def sendArrangementQueuedEvent(
+                                  taxpayer: Taxpayer,
+                                  bankDetails: BankDetails,
+                                  schedule: PaymentSchedule,
+                                  submissionError: SubmissionError,
+                                  arrangement: TTPArrangement,
+                                  workItem: TTPArrangementWorkItem,
+                                  auditTags: Map[String, String]
+                                ): Unit = {
+    val event = makeEvent(
+      taxpayer,
+      bankDetails,
+      schedule,
+      auditTags,
+      Json.obj(
+        "status" -> "direct debit instruction success | TTP arrangement failed temporarily (DES server error) | Queued for retry",
+        "submissionError" -> submissionError,
+        "directDebitInstructionReference" -> arrangement.directDebitReference,
+        "paymentPlanReference" -> arrangement.paymentPlanReference,
+        "workItem" -> Json.obj(
+          "createdOn" -> workItem.createdOn.toString,
+          "availableUntil" -> workItem.availableUntil.toString
+        )
+
+
+      )
+    )
     auditConnector.sendExtendedEvent(event)
     ()
   }
