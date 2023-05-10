@@ -18,7 +18,7 @@ package uk.gov.hmrc.timetopay.arrangement.support
 
 import java.time.LocalDate
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.timetopay.arrangement.model.{Address, CommunicationPreferences, DesTTPArrangement, Instalment, LetterAndControl, PaymentSchedule, SelfAssessment, Taxpayer}
+import uk.gov.hmrc.timetopay.arrangement.model.{Address, BankDetails, CommunicationPreferences, DesTTPArrangement, Instalment, LetterAndControl, PaymentSchedule, SelfAssessment, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.model.modelFormat._
 
 trait TestData {
@@ -285,6 +285,44 @@ trait TestData {
          |  }
          |}""".stripMargin).as[Taxpayer]
 
+  val bankDetails: BankDetails =
+    Json.parse(
+      s"""{
+         |  "sortCode": "12-34-56",
+         |  "accountNumber": "12345678",
+         |  "accountName": "Mr John Campbell"
+         |}""".stripMargin).as[BankDetails]
+
+  val paymentSchedule: PaymentSchedule =
+    Json.parse(
+      s"""{
+         |    "startDate": "2016-09-01",
+         |    "endDate": "2017-08-01",
+         |    "initialPayment": 50.00,
+         |    "amountToPay": 5000,
+         |    "instalmentBalance": 4950,
+         |    "totalInterestCharged": 45.83,
+         |    "totalPayable": 5045.83,
+         |    "instalments": [
+         |      {
+         |        "paymentDate": "2016-10-01",
+         |        "amount": 1248.95
+         |      },
+         |      {
+         |        "paymentDate": "2016-11-01",
+         |        "amount": 1248.95
+         |      },
+         |      {
+         |        "paymentDate": "2016-12-01",
+         |        "amount": 1248.95
+         |      },
+         |      {
+         |        "paymentDate": "2017-01-01",
+         |        "amount": 1248.95
+         |      }
+         |    ]
+         |}""".stripMargin).as[PaymentSchedule]
+
   val schedule: PaymentSchedule = PaymentSchedule(LocalDate.now(), LocalDate.now(), 0.0, BigDecimal("2000.00"), 0.0, 0.0, 0.0, List(Instalment(LocalDate.now(), 0.0)))
   val happyCommsPref = CommunicationPreferences(welshLanguageIndicator = false, audioIndicator = false, largePrintIndicator = false, brailleIndicator = false)
   val selfAssessment = SelfAssessment("XXX", Some(happyCommsPref), List())
@@ -334,5 +372,18 @@ trait TestData {
     val taxPayerWithMultipleScottishAddresses = Taxpayer("CustomerName", List(scottishAddress1, scottishAddress2), selfAssessment)
     val taxPayerWithMultipleJurisdictions = Taxpayer("CustomerName", List(welshAddress, scottishAddress), selfAssessment)
 
+  }
+
+  object AuditTags {
+    val authToken = "authorization-value"
+    val akamaiReputationValue = "akamai-reputation-value"
+    val requestId = "request-id-value"
+    val sessionId = "TestSession-4b87460d-6f43-4c4c-b810-d6f87c774854"
+    val trueClientIp = "client-ip"
+    val trueClientPort = "client-port"
+    val deviceId = "device-id"
+    val rawSessionId: String = "TestSession-4b87460d-6f43-4c4c-b810-d6f87c774854"
+
+    val requestPath: String = "/fake-path"
   }
 }
