@@ -62,7 +62,7 @@ class AuditService @Inject() (auditConnector: AuditConnector)(implicit ec: Execu
       arrangement.schedule,
       auditTags,
       Json.obj(
-        "status" -> "direct debit instruction success | TTP arrangement failed temporarily (DES server error) | Queued for retry",
+        "status" -> "direct debit instruction success but TTP arrangement failed temporarily (DES server error) - Queued for retry",
         "submissionError" -> submissionError,
         "directDebitInstructionReference" -> arrangement.directDebitReference,
         "paymentPlanReference" -> arrangement.paymentPlanReference,

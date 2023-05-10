@@ -100,7 +100,7 @@ class AuditServiceSpec extends ITSpec with TestData {
     val expected: JsValue =
       Json.parse(
         s"""{
-           |  "status":"direct debit instruction success | TTP arrangement failed temporarily (DES server error) | Queued for retry",
+           |  "status":"direct debit instruction success but TTP arrangement failed temporarily (DES server error) - Queued for retry",
            |  "submissionError":{
            |    "code":999,
            |    "message":"error-message"
