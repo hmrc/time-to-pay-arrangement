@@ -33,37 +33,34 @@ import scala.concurrent.ExecutionContext
 class AuditService @Inject() (auditConnector: AuditConnector)(implicit ec: ExecutionContext) {
 
   def sendSubmissionSucceededEvent(
-      taxpayer:    Taxpayer,
-      bankDetails: BankDetails,
-      schedule:    PaymentSchedule,
+      arrangement: TTPArrangement,
       auditTags: Map[String, String]
   ): Unit = {
 
     val event = makeEvent(
-      taxpayer,
-      bankDetails,
-      schedule,
+      arrangement.taxpayer,
+      arrangement.bankDetails,
+      arrangement.schedule,
       auditTags,
       Json.obj(
-        "status" -> "successfully submitted direct debit and TTP Arrangement"
+        "status" -> "successfully submitted direct debit and TTP Arrangement",
+        "directDebitInstructionReference" -> arrangement.directDebitReference,
+        "paymentPlanReference" -> arrangement.paymentPlanReference
       ))
     auditConnector.sendExtendedEvent(event)
     ()
   }
 
   def sendArrangementQueuedEvent(
-                                  taxpayer: Taxpayer,
-                                  bankDetails: BankDetails,
-                                  schedule: PaymentSchedule,
-                                  submissionError: SubmissionError,
                                   arrangement: TTPArrangement,
+                                  submissionError: SubmissionError,
                                   workItem: TTPArrangementWorkItem,
                                   auditTags: Map[String, String]
                                 ): Unit = {
     val event = makeEvent(
-      taxpayer,
-      bankDetails,
-      schedule,
+      arrangement.taxpayer,
+      arrangement.bankDetails,
+      arrangement.schedule,
       auditTags,
       Json.obj(
         "status" -> "direct debit instruction success | TTP arrangement failed temporarily (DES server error) | Queued for retry",
@@ -74,8 +71,6 @@ class AuditService @Inject() (auditConnector: AuditConnector)(implicit ec: Execu
           "createdOn" -> workItem.createdOn.toString,
           "availableUntil" -> workItem.availableUntil.toString
         )
-
-
       )
     )
     auditConnector.sendExtendedEvent(event)
@@ -83,20 +78,20 @@ class AuditService @Inject() (auditConnector: AuditConnector)(implicit ec: Execu
   }
 
   def sendArrangementSubmissionFailedEvent(
-      taxpayer:        Taxpayer,
-      bankDetails:     BankDetails,
-      schedule:        PaymentSchedule,
-      submissionError: SubmissionError,
-      auditTags:   Map[String, String]
+                                            arrangement: TTPArrangement,
+                                            submissionError: SubmissionError,
+                                            auditTags:   Map[String, String]
   ): Unit = {
     val event = makeEvent(
-      taxpayer,
-      bankDetails,
-      schedule,
+      arrangement.taxpayer,
+      arrangement.bankDetails,
+      arrangement.schedule,
       auditTags,
       Json.obj(
         "status" -> "submitted direct debit but failed to submit TTP Arrangement",
-        "submissionError" -> submissionError
+        "submissionError" -> submissionError,
+        "directDebitInstructionReference" -> arrangement.directDebitReference,
+        "paymentPlanReference" -> arrangement.paymentPlanReference,
       ))
     auditConnector.sendExtendedEvent(event)
     ()

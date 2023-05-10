@@ -40,6 +40,8 @@ class AuditServiceSpec extends ITSpec with TestData {
       Json.parse(
         s"""{
            |  "status":"successfully submitted direct debit and TTP Arrangement",
+           |  "directDebitInstructionReference": "12345678901234567890",
+           |  "paymentPlanReference": "12345678901234567890",
            |  "utr":"1234567890",
            |  "bankDetails": {
            |    "name": "Mr John Campbell",
@@ -76,7 +78,7 @@ class AuditServiceSpec extends ITSpec with TestData {
            |""".stripMargin)
 
     val auditService = new AuditService(StubAuditConnector(expected)(testChecks))
-    auditService.sendSubmissionSucceededEvent(taxpayer, bankDetails, paymentSchedule, auditTags)
+    auditService.sendSubmissionSucceededEvent(ttpArrangement, auditTags)
   }
 
   "audit event for sendArrangementQueuedEvent" in {
@@ -140,7 +142,7 @@ class AuditServiceSpec extends ITSpec with TestData {
            |""".stripMargin)
 
     val auditService = new AuditService(StubAuditConnector(expected)(testChecks))
-    auditService.sendArrangementQueuedEvent(taxpayer, bankDetails, paymentSchedule, submissionError, ttpArrangement, workItem, auditTags)
+    auditService.sendArrangementQueuedEvent(ttpArrangement, submissionError, workItem, auditTags)
   }
 
   "audit event for sendArrangementSubmissionFailedEvent" in {
@@ -153,6 +155,8 @@ class AuditServiceSpec extends ITSpec with TestData {
            |    "code":999,
            |    "message":"error-message"
            |  },
+           |  "directDebitInstructionReference": "12345678901234567890",
+           |  "paymentPlanReference": "12345678901234567890",
            |  "utr":"1234567890",
            |  "bankDetails": {
            |    "name": "Mr John Campbell",
@@ -189,7 +193,7 @@ class AuditServiceSpec extends ITSpec with TestData {
            |""".stripMargin)
 
     val auditService = new AuditService(StubAuditConnector(expected)(testChecks))
-    auditService.sendArrangementSubmissionFailedEvent(taxpayer, bankDetails, paymentSchedule, submissionError, auditTags)
+    auditService.sendArrangementSubmissionFailedEvent(ttpArrangement, submissionError, auditTags)
   }
 
   case class StubAuditConnector(details: JsValue)(callback: JsValue => ExtendedDataEvent => Any) extends AuditConnector {

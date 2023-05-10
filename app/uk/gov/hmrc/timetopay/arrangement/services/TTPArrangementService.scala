@@ -74,11 +74,8 @@ class TTPArrangementService @Inject() (
               affixDesArrangement(arrangement, request)
             ).flatMap { workItem: WorkItem[TTPArrangementWorkItem] =>
                 auditService.sendArrangementQueuedEvent(
-                  arrangement.taxpayer,
-                  arrangement.bankDetails,
-                  arrangement.schedule,
-                  error,
                   arrangement,
+                  error,
                   workItem.item,
                   AuditService.auditTags
                 )
@@ -93,7 +90,7 @@ class TTPArrangementService @Inject() (
         case _: SubmissionSuccess =>
           Future.successful {
             logger.trace(arrangement, "successful sent to des")
-            auditService.sendSubmissionSucceededEvent(arrangement.taxpayer, arrangement.bankDetails, arrangement.schedule, AuditService.auditTags)
+            auditService.sendSubmissionSucceededEvent(arrangement, AuditService.auditTags)
             ttp
           }
       }
