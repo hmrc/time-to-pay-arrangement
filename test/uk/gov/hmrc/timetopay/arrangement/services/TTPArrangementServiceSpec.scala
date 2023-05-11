@@ -63,8 +63,6 @@ class TTPArrangementServiceSpec extends ITSpec with TestData {
     val response = tTPArrangementService.submit(arrangement).failed.futureValue
     val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.collection.find().headOption.futureValue
     workItem should not be None
-    println(s"RESPONSE GET MESSAGE: ${response.getMessage}")
-    println(s"GET CAUSE ${response.getCause}")
     response.getMessage should include("SERVICE_UNAVAILABLE")
   }
 
