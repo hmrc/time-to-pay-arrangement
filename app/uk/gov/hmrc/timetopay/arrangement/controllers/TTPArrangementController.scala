@@ -17,7 +17,7 @@
 package uk.gov.hmrc.timetopay.arrangement.controllers
 
 import javax.inject.Inject
-import play.api.{Logger, Logging}
+import play.api.Logging
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
 import play.api.mvc._
@@ -45,7 +45,7 @@ class TTPArrangementController @Inject() (arrangementService: TTPArrangementServ
           }.recover {
             case desApiException: DesApiException =>
               val desFailureMessage: String = s"Submission to DES failed, status code [${desApiException.code}] and response [${desApiException.message}]" +
-                s". Queued for retry: ${desApiException.message.contains("SERVICE_UNAVAILABLE")}"
+                s". Queued for retry: ${desApiException.queuedForRetry}"
               logger.error(desFailureMessage)
               InternalServerError(s"$desFailureMessage")
             case failure =>

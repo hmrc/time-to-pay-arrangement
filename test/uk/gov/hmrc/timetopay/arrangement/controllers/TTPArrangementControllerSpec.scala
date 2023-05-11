@@ -70,6 +70,7 @@ class TTPArrangementControllerSpec extends ITSpec with TestData {
 
     result.status shouldBe 500
     result.body should include("Submission to DES failed, status code [400]")
+    result.body should include("Queued for retry: false")
   }
   "POST /ttparrangements should return 500 if DES service unavailable" in {
 
