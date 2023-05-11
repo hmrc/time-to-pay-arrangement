@@ -70,7 +70,20 @@ class TTPArrangementControllerSpec extends ITSpec with TestData {
 
     result.status shouldBe 500
     result.body should include("Submission to DES failed, status code [400]")
+  }
+  "POST /ttparrangements should return 500 if DES service unavailable service fails" in {
 
+    WireMockResponses.desArrangementApiBadRequestServerError("1234567890")
+    val result = httpClient.POST[JsValue, HttpResponse](s"$baseUrl/ttparrangements", ttparrangementRequest)
+      .futureValue
+
+    result.status shouldBe 500
+    result.body should include(
+      """Submission to DES failed, status code [500] and response [{
+        |            "code": "SERVICE_UNAVAILABLE",
+        |            "reason": "Dependent systems are currently not responding."
+        |}]. Queued for retry: true""".stripMargin
+    )
   }
 
   "GET /ttparrangements should return 200 for arrangement" in {

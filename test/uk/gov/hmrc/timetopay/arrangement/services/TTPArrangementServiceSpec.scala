@@ -59,16 +59,18 @@ class TTPArrangementServiceSpec extends ITSpec with TestData {
 
   "TTPArrangementService should return failed future for DES Bad request in the 500's range and save to the work item db in" in {
 
-    WireMockResponses.desArrangementApiBadRequestSeverError(arrangement.taxpayer.selfAssessment.utr)
+    WireMockResponses.desArrangementApiBadRequestServerError(arrangement.taxpayer.selfAssessment.utr)
     val response = tTPArrangementService.submit(arrangement).failed.futureValue
     val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.collection.find().headOption.futureValue
     workItem should not be None
+    println(s"RESPONSE GET MESSAGE: ${response.getMessage}")
+    println(s"GET CAUSE ${response.getCause}")
     response.getMessage should include("SERVICE_UNAVAILABLE")
   }
 
   "TTPArrangementService should return failed future for nginx timeout (499) and save to the work item db in" in {
 
-    WireMockResponses.desArrangementApiBadRequestSeverError(arrangement.taxpayer.selfAssessment.utr)
+    WireMockResponses.desArrangementApiBadRequestServerError(arrangement.taxpayer.selfAssessment.utr)
     val response = tTPArrangementService.submit(arrangement).failed.futureValue
     val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.collection.find().headOption.futureValue
     workItem should not be None

@@ -44,7 +44,8 @@ class TTPArrangementController @Inject() (arrangementService: TTPArrangementServ
             x => x.fold(createdNoLocation)(a => createdWithLocation(a._id))
           }.recover {
             case desApiException: DesApiException =>
-              val desFailureMessage: String = s"Submission to DES failed, status code [${desApiException.code}] and response [${desApiException.message}]"
+              val desFailureMessage: String = s"Submission to DES failed, status code [${desApiException.code}] and response [${desApiException.message}]" +
+                s". Queued for retry: ${desApiException.message.contains("SERVICE_UNAVAILABLE")}"
               logger.error(desFailureMessage)
               InternalServerError(s"$desFailureMessage")
             case failure =>
