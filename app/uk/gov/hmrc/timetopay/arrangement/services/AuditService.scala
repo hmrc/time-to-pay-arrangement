@@ -23,7 +23,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.timetopay.arrangement.connectors.SubmissionError
-import uk.gov.hmrc.timetopay.arrangement.model.{BankDetails, PaymentSchedule, Taxpayer}
+import uk.gov.hmrc.timetopay.arrangement.model.{BankDetails, PaymentSchedule, TTPArrangement, TTPArrangementWorkItem, Taxpayer}
 
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -32,39 +32,65 @@ import scala.concurrent.ExecutionContext
 class AuditService @Inject() (auditConnector: AuditConnector)(implicit ec: ExecutionContext) {
 
   def sendSubmissionSucceededEvent(
-      taxpayer:    Taxpayer,
-      bankDetails: BankDetails,
-      schedule:    PaymentSchedule,
+      arrangement: TTPArrangement,
       auditTags: Map[String, String]
   ): Unit = {
 
     val event = makeEvent(
-      taxpayer,
-      bankDetails,
-      schedule,
+      arrangement.taxpayer,
+      arrangement.bankDetails,
+      arrangement.schedule,
       auditTags,
       Json.obj(
-        "status" -> "successfully submitted direct debit and TTP Arrangement"
+        "status" -> "successfully submitted direct debit and TTP Arrangement",
+        "directDebitInstructionReference" -> arrangement.directDebitReference,
+        "paymentPlanReference" -> arrangement.paymentPlanReference
       ))
     auditConnector.sendExtendedEvent(event)
     ()
   }
 
+  def sendArrangementQueuedEvent(
+                                  arrangement: TTPArrangement,
+                                  submissionError: SubmissionError,
+                                  workItem: TTPArrangementWorkItem,
+                                  auditTags: Map[String, String]
+                                ): Unit = {
+    val event = makeEvent(
+      arrangement.taxpayer,
+      arrangement.bankDetails,
+      arrangement.schedule,
+      auditTags,
+      Json.obj(
+        "status" -> "direct debit instruction success but TTP arrangement failed temporarily (DES server error) - Queued for retry",
+        "submissionError" -> submissionError,
+        "directDebitInstructionReference" -> arrangement.directDebitReference,
+        "paymentPlanReference" -> arrangement.paymentPlanReference,
+        "workItem" -> Json.obj(
+          "createdOn" -> workItem.createdOn.toString,
+          "availableUntil" -> workItem.availableUntil.toString
+        )
+      )
+    )
+    auditConnector.sendExtendedEvent(event)
+    ()
+  }
+
   def sendArrangementSubmissionFailedEvent(
-      taxpayer:        Taxpayer,
-      bankDetails:     BankDetails,
-      schedule:        PaymentSchedule,
-      submissionError: SubmissionError,
-      auditTags:   Map[String, String]
+                                            arrangement: TTPArrangement,
+                                            submissionError: SubmissionError,
+                                            auditTags:   Map[String, String]
   ): Unit = {
     val event = makeEvent(
-      taxpayer,
-      bankDetails,
-      schedule,
+      arrangement.taxpayer,
+      arrangement.bankDetails,
+      arrangement.schedule,
       auditTags,
       Json.obj(
         "status" -> "submitted direct debit but failed to submit TTP Arrangement",
-        "submissionError" -> submissionError
+        "submissionError" -> submissionError,
+        "directDebitInstructionReference" -> arrangement.directDebitReference,
+        "paymentPlanReference" -> arrangement.paymentPlanReference,
       ))
     auditConnector.sendExtendedEvent(event)
     ()

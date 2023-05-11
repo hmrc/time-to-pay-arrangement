@@ -18,11 +18,7 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import akka.actor.{ActorSystem, Cancellable}
 import com.google.inject.Singleton
-import play.api.Logger
-import play.api.libs.json.Format.GenericFormat
-import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.mongo.workitem.ProcessingStatus.{Failed, PermanentlyFailed, Succeeded}
+import uk.gov.hmrc.mongo.workitem.ProcessingStatus.{Failed, PermanentlyFailed}
 import uk.gov.hmrc.play.scheduling.ExclusiveScheduledJob
 import uk.gov.hmrc.timetopay.arrangement.config.{QueueConfig, QueueLogger}
 import uk.gov.hmrc.timetopay.arrangement.connectors.{DesArrangementApiServiceConnector, SubmissionError, SubmissionSuccess}
@@ -32,6 +28,7 @@ import uk.gov.hmrc.mongo.workitem.WorkItem
 
 import java.time.{Clock, LocalDateTime}
 import javax.inject.Inject
+import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -49,8 +46,8 @@ class PollerService @Inject() (
 ) extends ExclusiveScheduledJob {
 
   private val logger = QueueLogger(this.getClass)
-  val initialDelay = queueConfig.initialDelay
-  val interval = queueConfig.interval
+  val initialDelay: FiniteDuration = queueConfig.initialDelay
+  val interval: FiniteDuration = queueConfig.interval
 
   override def executeInMutex(implicit ec: ExecutionContext): Future[Result] = {
     ttpArrangementRepositoryWorkItem.findAll().map{ ls =>
@@ -87,21 +84,21 @@ class PollerService @Inject() (
 
   def tryDesCallAgain(wi: WorkItem[TTPArrangementWorkItem], finalAttempt: Boolean): Future[Unit] = {
     try {
-      val arrangment = crypto.decryptTtpa(wi.item.ttpArrangement)
+      val arrangement = crypto.decryptTtpa(wi.item.ttpArrangement)
         .getOrElse(throw new RuntimeException("Retry poller - Saved ttp in work item repo had invalid encrypted item " + wi.toString))
       val auditTags = crypto.decryptAuditTags(wi.item.auditTags)
         .getOrElse(throw new RuntimeException("Retry poller - Saved ttp in work item repo had invalid encrypted audit tags " + wi.toString))
 
-      val utr = arrangment.taxpayer.selfAssessment.utr
+      val utr = arrangement.taxpayer.selfAssessment.utr
       logger.trace(utr, "Retry poller - retry send to DES")
-      val desSubmissionRequest: DesSubmissionRequest = arrangment.desArrangement
+      val desSubmissionRequest: DesSubmissionRequest = arrangement.desArrangement
         .getOrElse(throw new RuntimeException("Retry poller - Saved ttp in work item repo had no desArrangement to send " + wi.toString))
 
       desArrangementApiServiceConnector.submitArrangement(utr, desSubmissionRequest).map {
         case _: SubmissionSuccess =>
           logger.trace(utr, "Retry poller - SUCCESSFULLY send to DES")
 
-          auditService.sendSubmissionSucceededEvent(arrangment.taxpayer, arrangment.bankDetails, arrangment.schedule, auditTags)
+          auditService.sendSubmissionSucceededEvent(arrangement, auditTags)
 
           ttpArrangementRepositoryWorkItem.completeAndDelete(wi.id).map(_ => process())
           ()
@@ -109,7 +106,7 @@ class PollerService @Inject() (
           if (finalAttempt) {
             logger.error("Retry poller - ZONK ERROR! Call failed and will not be tried again for " + wi.toString)
 
-            auditService.sendArrangementSubmissionFailedEvent(arrangment.taxpayer, arrangment.bankDetails, arrangment.schedule, error, auditTags)
+            auditService.sendArrangementSubmissionFailedEvent(arrangement, error, auditTags)
             ttpArrangementRepositoryWorkItem.markAs(wi.id, PermanentlyFailed, None).flatMap(_ => process())
           } else {
             logger.traceWorkItem(utr, wi, "Retry poller - Call failed. reason: " + error.toString)
@@ -130,7 +127,7 @@ class PollerService @Inject() (
   def process(): Future[Unit] = {
     try {
 
-      ttpArrangementRepositoryWorkItem.pullOutstanding
+      ttpArrangementRepositoryWorkItem.pullOutstanding()
         .flatMap {
           case None =>
             Future.successful(())
