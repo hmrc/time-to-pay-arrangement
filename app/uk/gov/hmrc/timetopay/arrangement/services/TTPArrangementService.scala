@@ -65,8 +65,11 @@ class TTPArrangementService @Inject() (
       response match {
         case error: SubmissionError =>
           logger.trace(arrangement, "des failed: code: " + error.code.toString + " msg: " + error.message)
-          val isSeverError = (error.code >= CLIENT_CLOSED_REQUEST) || (error.code == 408)
-          if (isSeverError) {
+          val isServerError = (error.code >= CLIENT_CLOSED_REQUEST) || (error.code == 408)
+            def returnedError(queuedForRetry: Boolean): Future[Nothing] = {
+              Future.failed(DesApiException(error.code, error.message, queuedForRetry))
+            }
+          if (isServerError) {
             logger.trace(arrangement, "des failed: adding to queue ")
             sendToTTPArrangementWorkRepo(
               utr,
@@ -79,11 +82,11 @@ class TTPArrangementService @Inject() (
                   AuditService.auditTags
                 )
 
-                Future.failed(DesApiException(error.code, error.message, queuedForRetry = true))
+                returnedError(queuedForRetry = true)
               }
           } else {
             logger.trace(arrangement, "des failed: NOT adding to queue ")
-            Future.failed(DesApiException(error.code, error.message, queuedForRetry = false))
+            returnedError(queuedForRetry = false)
           }
 
         case _: SubmissionSuccess =>
