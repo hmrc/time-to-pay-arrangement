@@ -40,7 +40,7 @@ object WireMockResponses {
             .withBody("Bad JSON")))
   }
 
-  def desArrangementApiBadRequestSeverError(utr: String): StubMapping = {
+  def desArrangementApiBadRequestServerError(utr: String): StubMapping = {
     stubFor(
       post(
         urlEqualTo(s"/time-to-pay/taxpayers/${utr}/arrangements")).willReturn(
