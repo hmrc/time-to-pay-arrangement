@@ -30,9 +30,9 @@ import uk.gov.hmrc.mongo.workitem.ProcessingStatus.{Failed, PermanentlyFailed, S
 
 class PollerServiceSpec extends ITSpec {
 
-  private val pollerService = fakeApplication.injector.instanceOf[PollerService]
-  private val arrangementWorkItemRepo = fakeApplication.injector.instanceOf[TTPArrangementWorkItemRepository]
-  private val crypto = fakeApplication.injector.instanceOf[CryptoService]
+  private val pollerService = fakeApplication().injector.instanceOf[PollerService]
+  private val arrangementWorkItemRepo = fakeApplication().injector.instanceOf[TTPArrangementWorkItemRepository]
+  private val crypto = fakeApplication().injector.instanceOf[CryptoService]
 
   override def beforeEach(): Unit = {
     arrangementWorkItemRepo.collection.drop().toFuture().futureValue

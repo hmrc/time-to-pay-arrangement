@@ -32,8 +32,8 @@ import uk.gov.hmrc.mongo.workitem.WorkItem
 
 class TTPArrangementWorkItemRepositorySpec extends ITSpec {
 
-  private lazy val repo = fakeApplication.injector.instanceOf[TTPArrangementWorkItemRepository]
-  private val crypto = fakeApplication.injector.instanceOf[CryptoService]
+  private lazy val repo = fakeApplication().injector.instanceOf[TTPArrangementWorkItemRepository]
+  private val crypto = fakeApplication().injector.instanceOf[CryptoService]
   private val javaInstantNow: Instant = Instant.now()
 
   private val clock: Clock = systemUTC()
@@ -55,7 +55,7 @@ class TTPArrangementWorkItemRepositorySpec extends ITSpec {
 
   "ensure indexes are created" in {
     repo.collection.drop().toFuture().futureValue
-    repo.ensureIndexes.futureValue
+    repo.ensureIndexes().futureValue
     repo.collection.listIndexes().toFuture().futureValue.length shouldBe 5
   }
 
@@ -73,7 +73,7 @@ class TTPArrangementWorkItemRepositorySpec extends ITSpec {
 
   "be able to pull a request" in {
     val _ = repo.pushNew(ttpArrangementWorkItem, javaInstantNow).futureValue
-    val outstanding: Option[WorkItem[TTPArrangementWorkItem]] = repo.pullOutstanding.futureValue
+    val outstanding: Option[WorkItem[TTPArrangementWorkItem]] = repo.pullOutstanding().futureValue
     outstanding match {
       case Some(x) =>
         x.status shouldBe uk.gov.hmrc.mongo.workitem.ProcessingStatus.InProgress
@@ -81,7 +81,7 @@ class TTPArrangementWorkItemRepositorySpec extends ITSpec {
       case None => "failed" shouldBe "to find a value"
     }
 
-    val outstanding2: Option[WorkItem[TTPArrangementWorkItem]] = repo.pullOutstanding.futureValue
+    val outstanding2: Option[WorkItem[TTPArrangementWorkItem]] = repo.pullOutstanding().futureValue
     outstanding2 match {
       case Some(_) =>
         "found" shouldBe "a value when we should not"
@@ -92,7 +92,7 @@ class TTPArrangementWorkItemRepositorySpec extends ITSpec {
     s"Pull a request with a status of ${status.toString} should not find anything if we have not waited" in {
       val workItem = repo.pushNew(ttpArrangementWorkItem, javaInstantNow).futureValue
       repo.markAs(workItem.id, status).futureValue should be(true)
-      val outstanding: Option[WorkItem[TTPArrangementWorkItem]] = repo.pullOutstanding.futureValue
+      val outstanding: Option[WorkItem[TTPArrangementWorkItem]] = repo.pullOutstanding().futureValue
       outstanding match {
         case Some(_) =>
           "found" shouldBe "a value when we should not"
@@ -108,7 +108,7 @@ class TTPArrangementWorkItemRepositorySpec extends ITSpec {
       repo.markAs(workItem.id, status).futureValue should be(true)
 
       eventually {
-        val outstanding: Option[WorkItem[TTPArrangementWorkItem]] = repo.pullOutstanding.futureValue
+        val outstanding: Option[WorkItem[TTPArrangementWorkItem]] = repo.pullOutstanding().futureValue
         outstanding match {
           case Some(_) => "found" shouldBe "a value when we should not"
           case None    =>

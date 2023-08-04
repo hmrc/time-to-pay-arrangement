@@ -23,14 +23,11 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 final case class DesArrangementApiServiceConnectorConfig(desArrangementUrl: String, serviceEnvironment: String, authorisationToken: String) {
 
   @Inject()
-  def this(sConfig: ServicesConfig, configuration: Configuration) {
-
+  def this(sConfig: ServicesConfig, configuration: Configuration) =
     this(
-
       desArrangementUrl  = sConfig.baseUrl("des-arrangement-api"),
       serviceEnvironment = configuration.get[String]("microservice.services.des-arrangement-api.environment"),
       authorisationToken = configuration.get[String]("microservice.services.des-arrangement-api.authorization-token"))
-  }
 
   val desHeaders: Seq[(String, String)] = Seq(
     "Authorization" -> s"Bearer $authorisationToken",

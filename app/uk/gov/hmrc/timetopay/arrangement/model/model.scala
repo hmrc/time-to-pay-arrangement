@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.timetopay.arrangement.model
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.{Instant, LocalDate, LocalDateTime, ZoneOffset}
 import play.api.libs.json._
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+
 import java.util.UUID
 import scala.language.implicitConversions
 
@@ -196,7 +197,17 @@ case class AnonymousTTPArrangement(
     desArrangement:       Option[AnonymousDesSubmissionRequest])
 
 object AnonymousTTPArrangement {
-  implicit val localDateTimeFormat: Format[LocalDateTime] = MongoJavatimeFormats.localDateTimeFormat
+  implicit val localDateTimeFormat: Format[LocalDateTime] = {
+    val localDateTimeReads: Reads[LocalDateTime] =
+      Reads.at[String](__ \ "$date" \ "$numberLong")
+        .map(dateTime => Instant.ofEpochMilli(dateTime.toLong).atZone(ZoneOffset.UTC).toLocalDateTime)
+
+    val localDateTimeWrites: Writes[LocalDateTime] =
+      Writes.at[String](__ \ "$date" \ "$numberLong")
+        .contramap(_.toInstant(ZoneOffset.UTC).toEpochMilli.toString)
+
+    Format(localDateTimeReads, localDateTimeWrites)
+  }
 
   implicit val format: OFormat[AnonymousTTPArrangement] = Json.format[AnonymousTTPArrangement]
 

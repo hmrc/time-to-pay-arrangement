@@ -21,7 +21,7 @@ import com.google.inject.Singleton
 import uk.gov.hmrc.mongo.workitem.ProcessingStatus.{Failed, PermanentlyFailed}
 import uk.gov.hmrc.play.scheduling.ExclusiveScheduledJob
 import uk.gov.hmrc.timetopay.arrangement.config.{QueueConfig, QueueLogger}
-import uk.gov.hmrc.timetopay.arrangement.connectors.{DesArrangementApiServiceConnector, SubmissionError, SubmissionSuccess}
+import uk.gov.hmrc.timetopay.arrangement.connectors.{DesArrangementApiServiceConnector, SubmissionError, SubmissionResult, SubmissionSuccess}
 import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, TTPArrangementWorkItem}
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementWorkItemRepository
 import uk.gov.hmrc.mongo.workitem.WorkItem
@@ -51,7 +51,7 @@ class PollerService @Inject() (
 
   override def executeInMutex(implicit ec: ExecutionContext): Future[Result] = {
     ttpArrangementRepositoryWorkItem.findAll().map{ ls =>
-      val txt = ls.map(x => x.status).groupBy(x => x).map{ x => s"${x._1}: ${x._2.size}" }.mkString(", ")
+      val txt = ls.map(x => x.status).groupBy(x => x).map{ x => s"${x._1.toString}: ${x._2.size.toString}" }.mkString(", ")
       logger.track("Retry poller - WorkItem counts- " + txt)
     }
 

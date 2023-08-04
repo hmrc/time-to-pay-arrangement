@@ -28,34 +28,34 @@ import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangementWorkItem
 import java.time.{Clock, Instant, Duration}
 import scala.concurrent.{ExecutionContext, Future}
 
-class TTPArrangementWorkItemRepository @Inject() (configuration:          Configuration,
-                                                  queueConfig:            QueueConfig,
-                                                  mongo:                  MongoComponent,
-                                                  val clock:              Clock,
-                                                 )(implicit ec: ExecutionContext)
+class TTPArrangementWorkItemRepository @Inject() (configuration: Configuration,
+                                                  queueConfig:   QueueConfig,
+                                                  mongo:         MongoComponent,
+                                                  val clock:     Clock
+)(implicit ec: ExecutionContext)
   extends WorkItemRepository[TTPArrangementWorkItem](
     collectionName = "TTPArrangementsWorkItem",
     mongoComponent = mongo,
     itemFormat     = TTPArrangementWorkItem.format,
     workItemFields = WorkItemFields(
-                                id            = "_id",
-                                item          = "item",
-                                availableAt   = "availableAt",
-                                receivedAt    = "receivedAt",
-                                failureCount  = "failureCount",
-                                updatedAt     = "updatedAt",
-                                status        = "status"
+      id           = "_id",
+      item         = "item",
+      availableAt  = "availableAt",
+      receivedAt   = "receivedAt",
+      failureCount = "failureCount",
+      updatedAt    = "updatedAt",
+      status       = "status"
     )
   ) {
 
-  override def now: Instant = Instant.now()
+  override def now(): Instant = Instant.now()
 
   def inProgressRetryAfterProperty: String = queueConfig.retryAfter
   lazy val retryIntervalMillis: Long = configuration.getMillis(inProgressRetryAfterProperty)
   override lazy val inProgressRetryAfter: Duration = Duration.ofMillis(retryIntervalMillis)
   private lazy val ttlInSeconds = queueConfig.ttl.toSeconds
 
-  override def ensureIndexes: Future[Seq[String]] =
+  override def ensureIndexes(): Future[Seq[String]] =
     MongoUtils.ensureIndexes(
       collection,
       indexes ++ additionalIndexes,
@@ -64,13 +64,13 @@ class TTPArrangementWorkItemRepository @Inject() (configuration:          Config
 
   def additionalIndexes: Seq[IndexModel] = Seq(
     IndexModel(
-      keys = Indexes.ascending("receivedAt"),
+      keys         = Indexes.ascending("receivedAt"),
       indexOptions = IndexOptions().expireAfter(ttlInSeconds, TimeUnit.SECONDS)
     )
   )
 
   def pullOutstanding(): Future[Option[WorkItem[TTPArrangementWorkItem]]] =
-    super.pullOutstanding(now.minusMillis(retryIntervalMillis.toInt), now)
+    super.pullOutstanding(now().minusMillis(retryIntervalMillis.toInt), now())
 
   def findAll(): Future[Seq[WorkItem[TTPArrangementWorkItem]]] =
     collection.find().toFuture()

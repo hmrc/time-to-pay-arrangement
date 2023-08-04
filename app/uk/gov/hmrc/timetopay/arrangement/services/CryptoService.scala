@@ -19,14 +19,14 @@ package uk.gov.hmrc.timetopay.arrangement.services
 import play.api.Configuration
 import play.api.libs.json.Json
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangement
-import uk.gov.hmrc.crypto.{Crypted, CryptoWithKeysFromConfig, PlainText}
+import uk.gov.hmrc.crypto.{Crypted, PlainText, SymmetricCryptoFactory}
 
 import javax.inject.{Inject, Singleton}
 
 @Singleton
 class CryptoService @Inject() (configuration: Configuration) {
 
-  private lazy val crypto = new CryptoWithKeysFromConfig("mongodb.encryption", configuration.underlying)
+  private lazy val crypto = SymmetricCryptoFactory.aesGcmCryptoFromConfig("mongodb.encryption", configuration.underlying)
 
   def encryptTtpa(desSubmissionRequest: TTPArrangement): String = {
     crypto.encrypt(PlainText(Json.stringify(Json.toJson(desSubmissionRequest)))).value

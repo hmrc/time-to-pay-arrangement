@@ -25,7 +25,7 @@ import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestData, WireMockResp
 
 class TTPArrangementControllerSpec extends ITSpec with TestData {
 
-  private val arrangementRepo = fakeApplication.injector.instanceOf[TTPArrangementRepository]
+  private val arrangementRepo = fakeApplication().injector.instanceOf[TTPArrangementRepository]
 
   override def beforeEach(): Unit = {
     arrangementRepo.collection.drop().toFuture().futureValue
@@ -100,7 +100,7 @@ class TTPArrangementControllerSpec extends ITSpec with TestData {
 
   "GET /ttparrangements should return 404 for non existent arrangement" in {
     val result = httpClient
-      .GET[HttpResponse]("http://localhost:19001/ttparrangements/22f9d802-3a34-45a9-bbb4-f5d6433bf3ff")
+      .GET[HttpResponse](s"$baseUrl/ttparrangements/22f9d802-3a34-45a9-bbb4-f5d6433bf3ff")
       .futureValue
 
     result.status shouldBe 404

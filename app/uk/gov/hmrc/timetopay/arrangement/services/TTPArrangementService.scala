@@ -120,7 +120,7 @@ class TTPArrangementService @Inject() (
     val time: LocalDateTime = LocalDateTime.now(clock)
     val availableUntil = time.plus(Duration.ofMillis(queueConfig.availableFor.toMillis))
 
-    val instantNow: Instant = ttpArrangementRepositoryWorkItem.now
+    val instantNow: Instant = ttpArrangementRepositoryWorkItem.now()
 
     logger.trace(utr, "Item to add to workItem")
 
@@ -139,4 +139,4 @@ class TTPArrangementService @Inject() (
   }
 }
 
-case class DesApiException(code: Int, message: String, queuedForRetry: Boolean) extends RuntimeException(s"DES httpCode: $code, reason: $message") {}
+case class DesApiException(code: Int, message: String, queuedForRetry: Boolean) extends RuntimeException(s"DES httpCode: ${code.toString}, reason: $message") {}

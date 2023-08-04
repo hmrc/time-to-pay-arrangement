@@ -61,7 +61,7 @@ class TTPArrangementServiceSpec extends ITSpec with TestData {
 
     WireMockResponses.desArrangementApiBadRequestServerError(arrangement.taxpayer.selfAssessment.utr)
     val response = tTPArrangementService.submit(arrangement).failed.futureValue
-    val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.collection.find().headOption.futureValue
+    val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.collection.find().headOption().futureValue
     workItem should not be None
     response.getMessage should include("SERVICE_UNAVAILABLE")
   }
@@ -70,7 +70,7 @@ class TTPArrangementServiceSpec extends ITSpec with TestData {
 
     WireMockResponses.desArrangementApiBadRequestServerError(arrangement.taxpayer.selfAssessment.utr)
     val response = tTPArrangementService.submit(arrangement).failed.futureValue
-    val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.collection.find().headOption.futureValue
+    val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.collection.find().headOption().futureValue
     workItem should not be None
     response.getMessage should include("SERVICE_UNAVAILABLE")
   }
@@ -79,7 +79,7 @@ class TTPArrangementServiceSpec extends ITSpec with TestData {
 
     WireMockResponses.desArrangementApiBadRequestClientError(arrangement.taxpayer.selfAssessment.utr)
     val response = tTPArrangementService.submit(arrangement).failed.futureValue
-    val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.collection.find().headOption.futureValue
+    val workItem: Option[WorkItem[TTPArrangementWorkItem]] = arrangementWorkItemRepo.collection.find().headOption().futureValue
     workItem shouldBe None
     response.getMessage should include("DES httpCode: 400")
   }
