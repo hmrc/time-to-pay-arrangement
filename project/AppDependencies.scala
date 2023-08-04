@@ -5,7 +5,6 @@ object AppDependencies {
 
   val hmrcMongoVersion = "1.3.0"
   val bootstrapVersion = "7.21.0"
-  val cryptoVersion = "7.3.0"
 
   val jacksonVersion         = "2.13.2"
   val jacksonDatabindVersion = "2.13.2.2"
@@ -35,10 +34,8 @@ object AppDependencies {
     // format: OFF
     ws,
     "uk.gov.hmrc"       %% "bootstrap-backend-play-28"         % bootstrapVersion,
-    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"                % hmrcMongoVersion,
     "com.beachape"      %% "enumeratum"                        % "1.7.0",
     "uk.gov.hmrc"       %% "play-scheduling-play-28"           % "8.3.0",
-    "uk.gov.hmrc"       %% "crypto"                            % cryptoVersion,
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-work-item-repo-play-28" % hmrcMongoVersion
     // format: ON
   ) ++ jacksonDatabindOverrides ++ jacksonOverrides ++ akkaSerializationJacksonOverrides

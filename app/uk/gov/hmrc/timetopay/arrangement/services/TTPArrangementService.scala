@@ -25,8 +25,7 @@ import uk.gov.hmrc.timetopay.arrangement.model.{AnonymousTTPArrangement, DesSubm
 import uk.gov.hmrc.timetopay.arrangement.repository.{TTPArrangementRepository, TTPArrangementWorkItemRepository}
 import uk.gov.hmrc.mongo.workitem.WorkItem
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 class TTPArrangementService @Inject() (
@@ -38,7 +37,10 @@ class TTPArrangementService @Inject() (
     val clock:                        Clock,
     letterAndControlBuilder:          LetterAndControlBuilder,
     crypto:                           CryptoService,
-    queueConfig:                      QueueConfig) {
+    queueConfig:                      QueueConfig)(
+    implicit
+    ec: ExecutionContext
+) {
   val logger: QueueLogger = QueueLogger(getClass)
 
   val CLIENT_CLOSED_REQUEST = 499 // Client closes the connection while nginx is processing the request.
