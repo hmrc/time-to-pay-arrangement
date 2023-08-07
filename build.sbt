@@ -130,3 +130,4 @@ lazy val microservice = Project(appName, file("."))
       "-feature"
     )
   )
+  .settings(Compile / doc / scalacOptions := Seq())
