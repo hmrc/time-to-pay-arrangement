@@ -41,8 +41,8 @@ case class QueueLogger(log: Class[_]) {
     logger.warn(s"$prefixTrace utr: $utr $message")
 
   def traceWorkItem(utr: String, wi: WorkItem[TTPArrangementWorkItem], message: => String): Unit = {
-    val txt = s"receivedAt: ${wi.receivedAt}, updatedAt: ${wi.updatedAt}, availableAt: ${wi.availableAt}, status: ${wi.status}, failureCount: ${wi.failureCount}"
-    val msg = s"TTPArrangementWorkItem for Reference ${wi.item.reference} ... {createdOn: ${wi.item.createdOn}, availableUntil: ${wi.item.availableUntil}"
+    val txt = s"receivedAt: ${wi.receivedAt.toString}, updatedAt: ${wi.updatedAt.toString}, availableAt: ${wi.availableAt.toString}, status: ${wi.status.toString}, failureCount: ${wi.failureCount.toString}"
+    val msg = s"TTPArrangementWorkItem for Reference ${wi.item.reference} ... {createdOn: ${wi.item.createdOn.toString}, availableUntil: ${wi.item.availableUntil.toString}"
     logger.warn(s"$prefixTrace utr: $utr $message workItem: $txt TTPArrangementWorkItem: $msg")
   }
 

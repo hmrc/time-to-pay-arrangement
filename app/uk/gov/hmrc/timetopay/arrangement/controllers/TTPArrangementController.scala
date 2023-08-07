@@ -35,7 +35,7 @@ class TTPArrangementController @Inject() (arrangementService: TTPArrangementServ
    * Turns the json into our representation of a TTPArrangement
    * It calls the submit method and applys a location to the returning result.
    */
-  def create(): Action[JsValue] = Action.async(parse.json) {
+  val create: Action[JsValue] = Action.async(parse.json) {
     implicit request =>
 
       withJsonBody[TTPArrangement] {
@@ -44,12 +44,12 @@ class TTPArrangementController @Inject() (arrangementService: TTPArrangementServ
             x => x.fold(createdNoLocation)(a => createdWithLocation(a._id))
           }.recover {
             case desApiException: DesApiException =>
-              val desFailureMessage: String = s"Submission to DES failed, status code [${desApiException.code}] and response [${desApiException.message}]" +
-                s". Queued for retry: ${desApiException.queuedForRetry}"
+              val desFailureMessage: String = s"Submission to DES failed, status code [${desApiException.code.toString}] and response [${desApiException.message}]" +
+                s". Queued for retry: ${desApiException.queuedForRetry.toString}"
               logger.error(desFailureMessage)
               InternalServerError(s"$desFailureMessage")
             case failure =>
-              logger.error(s"Failed to submit arrangement $failure")
+              logger.error("Failed to submit arrangement", failure)
               InternalServerError(failure.getMessage)
           }
       }

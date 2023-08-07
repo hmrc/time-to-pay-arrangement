@@ -66,17 +66,17 @@ trait ITSpec
   lazy val overridingsModule = new AbstractModule {
     override def configure(): Unit = ()
   }
-  lazy val servicesConfig = fakeApplication.injector.instanceOf[ServicesConfig]
-  lazy val config = fakeApplication.injector.instanceOf[Configuration]
-  val baseUrl: String = s"http://localhost:$port"
+  lazy val servicesConfig = fakeApplication().injector.instanceOf[ServicesConfig]
+  lazy val config = fakeApplication().injector.instanceOf[Configuration]
+  def baseUrl: String = s"http://localhost:$port"
 
   implicit def fakeRequest: FakeRequest[_] = FakeRequest("", "").withCSRFToken.asInstanceOf[FakeRequest[_]]
 
-  override implicit val patienceConfig = PatienceConfig(
+  override implicit val patienceConfig: PatienceConfig = PatienceConfig(
     timeout  = scaled(Span(3, Seconds)),
     interval = scaled(Span(300, Millis)))
 
-  implicit def emptyHC = HeaderCarrier()
+  implicit def emptyHC: HeaderCarrier = HeaderCarrier()
 
   def httpClient = fakeApplication().injector.instanceOf[HttpClient]
 
@@ -86,7 +86,6 @@ trait ITSpec
       "mongodb.uri" -> mongoUri,
       "metrics.enabled" -> false,
       "metrics.jvm" -> false,
-      //      "microservice.metrics.graphite.enabled" -> false,
       "microservice.services.des-arrangement-api.host" -> "localhost",
       "microservice.services.des-arrangement-api.environment" -> "localhost",
       "microservice.services.des-arrangement-api.port" -> WireMockSupport.port)).build()

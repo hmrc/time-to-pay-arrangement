@@ -30,8 +30,7 @@ final case class QueueConfig(retryAfter:   String,
                              interval:     FiniteDuration) {
 
   @Inject()
-  def this(configuration: Configuration) {
-
+  def this(configuration: Configuration) =
     this(
       retryAfter   = "queue.retryAfter",
       availableFor = configuration.get[Duration]("queue.available.for"),
@@ -39,5 +38,5 @@ final case class QueueConfig(retryAfter:   String,
       initialDelay = FiniteDuration(configuration.get[Duration]("poller.initialDelay").toNanos, TimeUnit.NANOSECONDS),
       interval     = FiniteDuration(configuration.get[Duration]("poller.interval").toNanos, TimeUnit.NANOSECONDS)
     )
-  }
+
 }

@@ -16,21 +16,19 @@
 
 package uk.gov.hmrc.timetopay.arrangement.connectors
 
-import jdk.nashorn.api.scripting.JSObject
-
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.http.Status
-import play.api.libs.json.{JsObject, JsString, Json, OFormat}
+import play.api.libs.json.{JsObject, Json, OFormat}
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{Authorization, HttpClient, _}
+import uk.gov.hmrc.http.{HttpClient, _}
 import uk.gov.hmrc.timetopay.arrangement.config.{DesArrangementApiServiceConnectorConfig, QueueLogger}
 import uk.gov.hmrc.timetopay.arrangement.model.DesSubmissionRequest
 import uk.gov.hmrc.timetopay.arrangement.model.modelFormat._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SubmissionResult
+sealed trait SubmissionResult extends Product with Serializable
 
 case class SubmissionSuccess() extends SubmissionResult
 
@@ -64,7 +62,7 @@ class DesArrangementApiServiceConnector @Inject() (
     httpClient.POST[DesSubmissionRequest, HttpResponse](
       s"${config.desArrangementUrl}/$serviceUrl",
       desSubmissionRequest, headers = headers)
-      .map {
+      .map[SubmissionResult] {
         case res if res.status == Status.ACCEPTED =>
           logger.info(s"Submission successful for '${utr}'")
           zonkLogger.trace(utr, "DES POST OK " + res.toString())

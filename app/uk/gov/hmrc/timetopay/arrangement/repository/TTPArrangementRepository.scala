@@ -16,15 +16,19 @@
 
 package uk.gov.hmrc.timetopay.arrangement.repository
 
+import com.google.inject.Singleton
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes}
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
 import javax.inject.Inject
 import uk.gov.hmrc.timetopay.arrangement.model.AnonymousTTPArrangement
+
 import java.util.concurrent.TimeUnit
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class TTPArrangementRepository @Inject() (
     mongo:  MongoComponent,
     config: ServicesConfig

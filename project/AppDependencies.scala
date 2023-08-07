@@ -3,26 +3,52 @@ import sbt._
 
 object AppDependencies {
 
-  val hmrcMongoVersion = "0.73.0"
+  val hmrcMongoVersion = "1.3.0"
+  val bootstrapVersion = "7.21.0"
+
+  val jacksonVersion         = "2.13.2"
+  val jacksonDatabindVersion = "2.13.2.2"
+
+  val jacksonOverrides = Seq(
+    // format: OFF
+    "com.fasterxml.jackson.core"     % "jackson-core",
+    "com.fasterxml.jackson.core"     % "jackson-annotations",
+    "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8",
+    "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310"
+    // format: ON
+  ).map(_ % jacksonVersion)
+
+  val jacksonDatabindOverrides = Seq(
+    "com.fasterxml.jackson.core" % "jackson-databind" % jacksonDatabindVersion
+  )
+
+  val akkaSerializationJacksonOverrides = Seq(
+    // format: OFF
+    "com.fasterxml.jackson.dataformat" % "jackson-dataformat-cbor",
+    "com.fasterxml.jackson.module"     % "jackson-module-parameter-names",
+    "com.fasterxml.jackson.module"     %% "jackson-module-scala"
+    // format: ON
+  ).map(_ % jacksonVersion)
 
   val compile = Seq(
+    // format: OFF
     ws,
-    "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "5.12.0",
-    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28" % hmrcMongoVersion,
-    "com.beachape" %% "enumeratum" % "1.5.13",
-    "uk.gov.hmrc"  %% "play-scheduling-play-28"   % "8.1.0",
-    "uk.gov.hmrc"  %% "crypto"     % "6.0.0",
+    "uk.gov.hmrc"       %% "bootstrap-backend-play-28"         % bootstrapVersion,
+    "com.beachape"      %% "enumeratum"                        % "1.7.0",
+    "uk.gov.hmrc"       %% "play-scheduling-play-28"           % "8.3.0",
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-work-item-repo-play-28" % hmrcMongoVersion
-  )
+    // format: ON
+  ) ++ jacksonDatabindOverrides ++ jacksonOverrides ++ akkaSerializationJacksonOverrides
 
   val test = Seq(
-    "com.vladsch.flexmark" % "flexmark-all" % "0.35.10" % Test,
-    "uk.gov.hmrc.mongo" %% "hmrc-mongo-test-play-28" % hmrcMongoVersion,
-    "org.scalatest" %% "scalatest" % "3.0.9" % Test,
-    "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
-    "org.pegdown" % "pegdown" % "1.6.0",
-    "com.github.tomakehurst" % "wiremock-jre8" % "2.21.0",
-    "org.mockito" % "mockito-core" % "2.23.0"
-  )
+    // format: OFF
+    "uk.gov.hmrc"            %% "bootstrap-test-play-28"  % bootstrapVersion,
+    "com.vladsch.flexmark"   % "flexmark-all"             % "0.36.8",
+    "uk.gov.hmrc.mongo"      %% "hmrc-mongo-test-play-28" % hmrcMongoVersion,
+    "org.scalatestplus.play" %% "scalatestplus-play"      % "5.1.0",
+    "org.pegdown"            % "pegdown"                  % "1.6.0",
+    "com.github.tomakehurst" % "wiremock-jre8"            % "2.35.0"
+    // format: ON
+  ).map(_ % Test)
 
 }

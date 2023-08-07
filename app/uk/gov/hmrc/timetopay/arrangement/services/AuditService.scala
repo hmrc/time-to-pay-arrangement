@@ -33,7 +33,7 @@ class AuditService @Inject() (auditConnector: AuditConnector)(implicit ec: Execu
 
   def sendSubmissionSucceededEvent(
       arrangement: TTPArrangement,
-      auditTags: Map[String, String]
+      auditTags:   Map[String, String]
   ): Unit = {
 
     val event = makeEvent(
@@ -51,11 +51,11 @@ class AuditService @Inject() (auditConnector: AuditConnector)(implicit ec: Execu
   }
 
   def sendArrangementQueuedEvent(
-                                  arrangement: TTPArrangement,
-                                  submissionError: SubmissionError,
-                                  workItem: TTPArrangementWorkItem,
-                                  auditTags: Map[String, String]
-                                ): Unit = {
+      arrangement:     TTPArrangement,
+      submissionError: SubmissionError,
+      workItem:        TTPArrangementWorkItem,
+      auditTags:       Map[String, String]
+  ): Unit = {
     val event = makeEvent(
       arrangement.taxpayer,
       arrangement.bankDetails,
@@ -77,9 +77,9 @@ class AuditService @Inject() (auditConnector: AuditConnector)(implicit ec: Execu
   }
 
   def sendArrangementSubmissionFailedEvent(
-                                            arrangement: TTPArrangement,
-                                            submissionError: SubmissionError,
-                                            auditTags:   Map[String, String]
+      arrangement:     TTPArrangement,
+      submissionError: SubmissionError,
+      auditTags:       Map[String, String]
   ): Unit = {
     val event = makeEvent(
       arrangement.taxpayer,
@@ -101,7 +101,7 @@ class AuditService @Inject() (auditConnector: AuditConnector)(implicit ec: Execu
       bankDetails: BankDetails,
       schedule:    PaymentSchedule,
       auditTags:   Map[String, String],
-      extraInfo:   JsObject,
+      extraInfo:   JsObject
   ) = ExtendedDataEvent(
     auditSource = "pay-what-you-owe",
     //`directDebitSetup` was provided at the beginning.

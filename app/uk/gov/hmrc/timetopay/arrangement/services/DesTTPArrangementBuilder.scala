@@ -66,7 +66,7 @@ class DesTTPArrangementBuilder @Inject() (configuration: Configuration) {
         case _        => "Distraint"
       }
       case _ =>
-        logger.info(s"Unable to determine enforcement flag as multiple mixed or no jurisdictions detected $addressTypes")
+        logger.info(s"Unable to determine enforcement flag as multiple mixed or no jurisdictions detected ${addressTypes.toString}")
         "Other"
     }
   }
@@ -85,9 +85,9 @@ class DesTTPArrangementBuilder @Inject() (configuration: Configuration) {
 
     val saNotes =
       s"DDI $directDebitReference, PP $paymentPlanReference, " +
-        s"${if (initialPayment > exact(0)) s"initial payment of £$initialPayment on $startDate, " else ""}" +
-        s"first regular payment of £$regularPaymentAmount " +
-        s"from $initialPaymentDate, frequency monthly, final payment of £$finalPayment on $endDate, " +
+        s"${if (initialPayment > exact(0)) s"initial payment of £${initialPayment.toString} on $startDate, " else ""}" +
+        s"first regular payment of £${regularPaymentAmount.toString} " +
+        s"from $initialPaymentDate, frequency monthly, final payment of £${finalPayment.toString} on $endDate, " +
         s"review date $reviewDate"
 
     saNotes.take(250)
