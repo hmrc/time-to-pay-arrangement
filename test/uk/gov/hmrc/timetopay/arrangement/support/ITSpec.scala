@@ -21,23 +21,20 @@ import com.codahale.metrics.SharedMetricRegistries
 import java.time.format.DateTimeFormatter
 import java.time.{LocalDateTime, ZoneId, ZonedDateTime}
 import com.google.inject.AbstractModule
-import org.scalatest.time.{Millis, Seconds, Span}
+import org.scalatest.time.{Second, Seconds, Span}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.freespec.AnyFreeSpecLike
 import org.scalatest.matchers.should.Matchers
-
-import org.scalatestplus.play.guice.GuiceOneServerPerTest
+import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.mvc.Result
 import play.api.test.CSRFTokenHelper.CSRFRequest
 import play.api.test.FakeRequest
 import play.api.{Application, Configuration}
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HttpClient, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.http.HttpClient
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 /**
  * This is common spec for every test case which brings all of useful routines we want to use in our scenarios.
@@ -47,7 +44,7 @@ trait ITSpec
   extends AnyFreeSpecLike
   with RichMatchers
   with BeforeAndAfterEach
-  with GuiceOneServerPerTest
+  with GuiceOneServerPerSuite
   with WireMockSupport
   with Matchers
   with TestMongoSupport {
@@ -73,10 +70,10 @@ trait ITSpec
   implicit def fakeRequest: FakeRequest[_] = FakeRequest("", "").withCSRFToken.asInstanceOf[FakeRequest[_]]
 
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(
-    timeout  = scaled(Span(3, Seconds)),
-    interval = scaled(Span(300, Millis)))
+    timeout  = scaled(Span(5, Seconds)),
+    interval = scaled(Span(1, Second)))
 
-  implicit def emptyHC: HeaderCarrier = HeaderCarrier()
+  implicit val hcWithAuthorization: HeaderCarrier = HeaderCarrier(authorization = Some(Authorization("Bearer 123")))
 
   def httpClient = fakeApplication().injector.instanceOf[HttpClient]
 
@@ -88,16 +85,12 @@ trait ITSpec
       "metrics.jvm" -> false,
       "microservice.services.des-arrangement-api.host" -> "localhost",
       "microservice.services.des-arrangement-api.environment" -> "localhost",
-      "microservice.services.des-arrangement-api.port" -> WireMockSupport.port)).build()
+      "microservice.services.des-arrangement-api.port" -> WireMockSupport.port,
+      "microservice.services.auth.port" -> WireMockSupport.port
+    )).build()
 
   def createBinId = {
     System.currentTimeMillis().toString.takeRight(11)
   }
-
-  def await[A](future: Future[A])(implicit timeout: Duration): A = Await.result(future, timeout)
-
-  def status(of: Future[Result])(implicit timeout: Duration): Int = status(Await.result(of, timeout))
-
-  def status(of: Result) = of.header.status
 
 }

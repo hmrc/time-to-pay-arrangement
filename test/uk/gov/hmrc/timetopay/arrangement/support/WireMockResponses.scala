@@ -18,6 +18,8 @@ package uk.gov.hmrc.timetopay.arrangement.support
 
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
+import uk.gov.hmrc.auth.core.AuthProviders
 
 object WireMockResponses {
 
@@ -52,5 +54,29 @@ object WireMockResponses {
             "reason": "Dependent systems are currently not responding."
 }""".stripMargin)))
   }
+
+  private val authoriseUrl: String = "/auth/authorise"
+
+  def authorise(): StubMapping =
+    stubFor(
+      post(urlPathEqualTo(authoriseUrl))
+        .willReturn(aResponse().withStatus(200).withBody("{}"))
+    )
+
+  def ensureAuthoriseCalled() =
+    verify(
+      postRequestedFor(urlPathEqualTo(authoriseUrl))
+        .withRequestBody(
+          equalToJson(
+            s"""{
+               |  "authorise": [
+               |    ${AuthProviders(GovernmentGateway).toJson.toString()}
+               |  ],
+               |  "retrieve": [ ]
+               |}
+               |""".stripMargin
+          )
+        )
+    )
 
 }

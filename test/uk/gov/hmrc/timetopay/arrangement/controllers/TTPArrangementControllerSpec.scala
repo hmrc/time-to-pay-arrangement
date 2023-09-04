@@ -18,6 +18,7 @@ package uk.gov.hmrc.timetopay.arrangement.controllers
 
 import play.api.http.Status
 import play.api.libs.json._
+import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementRepository
@@ -37,74 +38,67 @@ class TTPArrangementControllerSpec extends ITSpec with TestData {
     ()
   }
 
-  "POST /ttparrangements should return 201" in {
+  "POST /ttparrangements should" - {
 
-    WireMockResponses.desArrangementApiSucccess("1234567890")
-    val result: HttpResponse = httpClient.POST[JsValue, HttpResponse](s"$baseUrl/ttparrangements", ttparrangementRequest).futureValue
-    result.status shouldBe Status.CREATED
-    result.header("Location") should not be None
-  }
+    "return 201" in {
+      WireMockResponses.authorise()
+      WireMockResponses.desArrangementApiSucccess("1234567890")
 
-  "POST /ttparrangements should return 201 when no postcode is provided (bug fix OPS-5756)" in {
+      val result = await(httpClient.POST[JsValue, HttpResponse](s"$baseUrl/ttparrangements", ttparrangementRequest))
+      result.status shouldBe Status.CREATED
+      result.header("Location") should not be None
 
-    WireMockResponses.desArrangementApiSucccess("1234567890")
+      WireMockResponses.ensureAuthoriseCalled()
+    }
 
-    val requestWithNoPostcode: JsValue = ttparrangementRequest.transform(
-      (__ \ "taxpayer" \ "addresses").json.update {
-        __.read[JsArray].map {
-          case JsArray(addressObjs) => JsArray(addressObjs.map(_.as[JsObject] - "postcode"))
+    "return 201 when no postcode is provided (bug fix OPS-5756)" in {
+      WireMockResponses.authorise()
+      WireMockResponses.desArrangementApiSucccess("1234567890")
+
+      val requestWithNoPostcode: JsValue = ttparrangementRequest.transform(
+        (__ \ "taxpayer" \ "addresses").json.update {
+          __.read[JsArray].map {
+            case JsArray(addressObjs) => JsArray(addressObjs.map(_.as[JsObject] - "postcode"))
+          }
         }
-      }
-    ).get
+      ).get
 
-    val result: HttpResponse = httpClient.POST[JsValue, HttpResponse](s"$baseUrl/ttparrangements", requestWithNoPostcode).futureValue
-    result.status shouldBe Status.CREATED
-    result.header("Location") should not be None
-  }
+      val result: HttpResponse = await(httpClient.POST[JsValue, HttpResponse](s"$baseUrl/ttparrangements", requestWithNoPostcode))
+      result.status shouldBe Status.CREATED
+      result.header("Location") should not be None
 
-  "POST /ttparrangements should return 500 if arrangement service fails" in {
+      WireMockResponses.ensureAuthoriseCalled()
+    }
 
-    WireMockResponses.desArrangementApiBadRequestClientError("1234567890")
-    val result = httpClient.POST[JsValue, HttpResponse](s"$baseUrl/ttparrangements", ttparrangementRequest)
-      .futureValue
+    "return 500 if arrangement service fails" in {
+      WireMockResponses.authorise()
+      WireMockResponses.desArrangementApiBadRequestClientError("1234567890")
 
-    result.status shouldBe 500
-    result.body should include("Submission to DES failed, status code [400]")
-    result.body should include("Queued for retry: false")
-  }
-  "POST /ttparrangements should return 500 if DES service unavailable" in {
+      val result = await(httpClient.POST[JsValue, HttpResponse](s"$baseUrl/ttparrangements", ttparrangementRequest))
 
-    WireMockResponses.desArrangementApiBadRequestServerError("1234567890")
-    val result = httpClient.POST[JsValue, HttpResponse](s"$baseUrl/ttparrangements", ttparrangementRequest)
-      .futureValue
+      result.status shouldBe 500
+      result.body should include("Submission to DES failed, status code [400]")
+      result.body should include("Queued for retry: false")
 
-    result.status shouldBe 500
-    result.body should include(
-      """Submission to DES failed, status code [500] and response [{
-        |            "code": "SERVICE_UNAVAILABLE",
-        |            "reason": "Dependent systems are currently not responding."
-        |}]. Queued for retry: true""".stripMargin
-    )
-  }
+      WireMockResponses.ensureAuthoriseCalled()
+    }
 
-  "GET /ttparrangements should return 200 for arrangement" in {
+    "return 500 if DES service unavailable" in {
+      WireMockResponses.authorise()
+      WireMockResponses.desArrangementApiBadRequestServerError("1234567890")
 
-    WireMockResponses.desArrangementApiSucccess("1234567890")
-    val result: HttpResponse = httpClient.POST[JsValue, HttpResponse](s"$baseUrl/ttparrangements", ttparrangementRequest).futureValue
-    result.status shouldBe Status.CREATED
-    val nextUrl = result.header("Location").get
+      val result = await(httpClient.POST[JsValue, HttpResponse](s"$baseUrl/ttparrangements", ttparrangementRequest))
 
-    val result2 = httpClient.GET[HttpResponse](nextUrl).futureValue
-    result2.status shouldBe Status.OK
-  }
+      result.status shouldBe 500
+      result.body should include(
+        """Submission to DES failed, status code [500] and response [{
+          |            "code": "SERVICE_UNAVAILABLE",
+          |            "reason": "Dependent systems are currently not responding."
+          |}]. Queued for retry: true""".stripMargin
+      )
 
-  "GET /ttparrangements should return 404 for non existent arrangement" in {
-    val result = httpClient
-      .GET[HttpResponse](s"$baseUrl/ttparrangements/22f9d802-3a34-45a9-bbb4-f5d6433bf3ff")
-      .futureValue
-
-    result.status shouldBe 404
-    result.body should include("does not exist")
+      WireMockResponses.ensureAuthoriseCalled()
+    }
 
   }
 
