@@ -47,7 +47,7 @@ object AppDependencies {
     "uk.gov.hmrc.mongo"      %% "hmrc-mongo-test-play-28" % hmrcMongoVersion,
     "org.scalatestplus.play" %% "scalatestplus-play"      % "5.1.0",
     "org.pegdown"            % "pegdown"                  % "1.6.0",
-    "com.github.tomakehurst" % "wiremock-standalone"      % "3.0.1"
+    "org.wiremock"           % "wiremock-standalone"      % "3.0.1"
     // format: ON
   ).map(_ % Test)
 
