@@ -22,20 +22,25 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
 import play.api.mvc._
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import uk.gov.hmrc.timetopay.arrangement.actions.Actions
 import uk.gov.hmrc.timetopay.arrangement.model.{TTPArrangement, TTPArrangementResponse}
 import uk.gov.hmrc.timetopay.arrangement.services.{DesApiException, TTPArrangementService}
 
 import scala.concurrent.Future._
 import scala.concurrent.{ExecutionContext, Future}
 
-class TTPArrangementController @Inject() (arrangementService: TTPArrangementService, cc: ControllerComponents)(implicit ec: ExecutionContext)
+class TTPArrangementController @Inject() (
+    actions:            Actions,
+    arrangementService: TTPArrangementService,
+    cc:                 ControllerComponents
+)(implicit ec: ExecutionContext)
   extends BackendController(cc) with Logging {
 
   /**
    * Turns the json into our representation of a TTPArrangement
    * It calls the submit method and applys a location to the returning result.
    */
-  val create: Action[JsValue] = Action.async(parse.json) {
+  val create: Action[JsValue] = actions.authenticatedAction.async(parse.json) {
     implicit request =>
 
       withJsonBody[TTPArrangement] {
@@ -63,15 +68,4 @@ class TTPArrangementController @Inject() (arrangementService: TTPArrangementServ
 
   def protocol(implicit reqHead: RequestHeader): String = if (reqHead.secure) "https" else "http"
 
-  def arrangement(id: String): Action[AnyContent] = Action.async {
-    _ =>
-      // implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
-
-      logger.debug(s"Requested arrangement $id")
-      arrangementService.byId(id).flatMap {
-        _.fold(
-          successful(NotFound(s"arrangement with $id does not exist"))
-        )(r => successful(Ok(toJson(TTPArrangementResponse(r)))))
-      }
-  }
 }
