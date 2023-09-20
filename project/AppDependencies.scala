@@ -4,7 +4,7 @@ import sbt._
 object AppDependencies {
 
   val hmrcMongoVersion = "1.3.0"
-  val bootstrapVersion = "7.21.0"
+  val bootstrapVersion = "7.22.0"
 
   val jacksonVersion         = "2.13.2"
   val jacksonDatabindVersion = "2.13.2.2"
@@ -47,7 +47,7 @@ object AppDependencies {
     "uk.gov.hmrc.mongo"      %% "hmrc-mongo-test-play-28" % hmrcMongoVersion,
     "org.scalatestplus.play" %% "scalatestplus-play"      % "5.1.0",
     "org.pegdown"            % "pegdown"                  % "1.6.0",
-    "org.wiremock"           % "wiremock-standalone"      % "3.0.1"
+    "org.wiremock"           % "wiremock-standalone"      % "3.1.0"
     // format: ON
   ).map(_ % Test)
 
