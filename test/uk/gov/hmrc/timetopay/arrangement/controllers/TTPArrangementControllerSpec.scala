@@ -19,24 +19,11 @@ package uk.gov.hmrc.timetopay.arrangement.controllers
 import play.api.http.Status
 import play.api.libs.json._
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementRepository
+import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestData, WireMockResponses}
 
 class TTPArrangementControllerSpec extends ITSpec with TestData {
-
-  private val arrangementRepo = fakeApplication().injector.instanceOf[TTPArrangementRepository]
-
-  override def beforeEach(): Unit = {
-    arrangementRepo.collection.drop().toFuture().futureValue
-    ()
-  }
-
-  override def afterEach(): Unit = {
-    arrangementRepo.collection.drop().toFuture().futureValue
-    ()
-  }
 
   "POST /ttparrangements should" - {
 

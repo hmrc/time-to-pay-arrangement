@@ -16,29 +16,26 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import uk.gov.hmrc.timetopay.arrangement.model.{TTPArrangement, TTPArrangementWorkItem}
-import uk.gov.hmrc.timetopay.arrangement.repository.{TTPArrangementRepository, TTPArrangementWorkItemRepository}
-import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestData, WireMockResponses}
 import uk.gov.hmrc.mongo.workitem.WorkItem
+import uk.gov.hmrc.timetopay.arrangement.model.{TTPArrangement, TTPArrangementWorkItem}
+import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementWorkItemRepository
+import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestData, WireMockResponses}
 
 class TTPArrangementServiceSpec extends ITSpec with TestData {
 
   import Taxpayers._
 
-  private val arrangementRepo = fakeApplication().injector.instanceOf[TTPArrangementRepository]
   private val arrangementWorkItemRepo = fakeApplication().injector.instanceOf[TTPArrangementWorkItemRepository]
   private val tTPArrangementService = fakeApplication().injector.instanceOf[TTPArrangementService]
   private val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement].copy(taxpayer = taxPayerWithEnglishAddress)
 
   override def beforeEach(): Unit = {
     arrangementWorkItemRepo.collection.drop().toFuture().futureValue
-    arrangementRepo.collection.drop().toFuture().futureValue
     ()
   }
 
   override def afterEach(): Unit = {
     arrangementWorkItemRepo.collection.drop().toFuture().futureValue
-    arrangementRepo.collection.drop().toFuture().futureValue
     ()
   }
 
