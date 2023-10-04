@@ -43,12 +43,13 @@ class TTPArrangementController @Inject() (
 
       withJsonBody[TTPArrangement] {
         arrangement =>
-          arrangementService.submit(arrangement).flatMap {
-            x => x.fold(createdNoLocation)(a => createdWithLocation(a._id))
+          arrangementService.submit(arrangement).flatMap { x =>
+            createdWithLocation(x._id)
           }.recover {
             case desApiException: DesApiException =>
-              val desFailureMessage: String = s"Submission to DES failed, status code [${desApiException.code.toString}] and response [${desApiException.message}]" +
-                s". Queued for retry: ${desApiException.queuedForRetry.toString}"
+              val desFailureMessage: String =
+                s"Submission to DES failed, status code [${desApiException.code.toString}] and response [${desApiException.message}]" +
+                  s". Queued for retry: ${desApiException.queuedForRetry.toString}"
               logger.error(desFailureMessage)
               InternalServerError(s"$desFailureMessage")
             case failure =>
@@ -58,7 +59,7 @@ class TTPArrangementController @Inject() (
       }
   }
 
-  private def createdNoLocation = Future.successful[Result](Created)
+  //  private def createdNoLocation = Future.successful[Result](Created)
 
   private def createdWithLocation(id: String)(implicit reqHead: RequestHeader) = {
     Future.successful[Result](Created.withHeaders(LOCATION -> s"$protocol://${reqHead.host}/ttparrangements/$id"))

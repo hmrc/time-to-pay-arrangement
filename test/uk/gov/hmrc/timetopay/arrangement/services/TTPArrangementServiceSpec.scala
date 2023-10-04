@@ -45,7 +45,7 @@ class TTPArrangementServiceSpec extends ITSpec with TestData {
 
     val response = tTPArrangementService.submit(arrangement).futureValue
 
-    val desSubmissionRequest = response.get.desArrangement.get
+    val desSubmissionRequest = response.desArrangement.get
 
     logger.warn(desSubmissionRequest.toString)
 
