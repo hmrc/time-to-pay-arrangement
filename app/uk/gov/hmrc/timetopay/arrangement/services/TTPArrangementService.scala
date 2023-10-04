@@ -58,7 +58,7 @@ class TTPArrangementService @Inject() (
 
     (for {
       response <- desArrangementApiService.submitArrangement(utr, request)
-      ttp <- anonymizeArrangement(arrangement, request)
+      ttp <- buildArrangement(arrangement, request)
     } yield {
       response match {
         case error: SubmissionError =>
@@ -98,13 +98,11 @@ class TTPArrangementService @Inject() (
   }
 
   /**
-   * Anonymizes and adds an Id to TTPArrangement
+   * Affixes desSubmissionRequest to arrangement and adds Id to TTPArrangement
    */
-  private def anonymizeArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[TTPArrangement] = {
+  private def buildArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[TTPArrangement] = {
     val arrangementWithDesSubmissionRequest = affixDesArrangement(arrangement, desSubmissionRequest)
     Future.successful(arrangementWithDesSubmissionRequest)
-
-    //    Future(Some(anonymizeTTPArrangement))
   }
 
   def affixDesArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): TTPArrangement = {

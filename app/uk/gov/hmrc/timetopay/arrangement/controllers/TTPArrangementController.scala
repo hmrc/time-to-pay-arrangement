@@ -59,8 +59,6 @@ class TTPArrangementController @Inject() (
       }
   }
 
-  //  private def createdNoLocation = Future.successful[Result](Created)
-
   private def createdWithLocation(id: String)(implicit reqHead: RequestHeader) = {
     Future.successful[Result](Created.withHeaders(LOCATION -> s"$protocol://${reqHead.host}/ttparrangements/$id"))
   }
