@@ -16,10 +16,9 @@
 
 package uk.gov.hmrc.timetopay.arrangement.model
 
-import java.time.{Instant, LocalDate, LocalDateTime, ZoneOffset}
 import play.api.libs.json._
-import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
+import java.time.{LocalDate, LocalDateTime}
 import java.util.UUID
 import scala.language.implicitConversions
 
