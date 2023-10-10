@@ -16,22 +16,20 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import java.time.{Clock, Duration, Instant, LocalDateTime}
-import javax.inject.Inject
 import play.api.mvc.Request
+import uk.gov.hmrc.mongo.workitem.WorkItem
 import uk.gov.hmrc.timetopay.arrangement.config.{QueueConfig, QueueLogger}
 import uk.gov.hmrc.timetopay.arrangement.connectors.{DesArrangementApiServiceConnector, SubmissionError, SubmissionSuccess}
-import uk.gov.hmrc.timetopay.arrangement.model.{AnonymousTTPArrangement, DesSubmissionRequest, TTPArrangement, TTPArrangementWorkItem}
-import uk.gov.hmrc.timetopay.arrangement.repository.{TTPArrangementRepository, TTPArrangementWorkItemRepository}
-import uk.gov.hmrc.mongo.workitem.WorkItem
+import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, TTPArrangement, TTPArrangementWorkItem}
+import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementWorkItemRepository
 
+import java.time.{Clock, Duration, Instant, LocalDateTime}
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
 
 class TTPArrangementService @Inject() (
     desTTPArrangementBuilder:         DesTTPArrangementBuilder,
     desArrangementApiService:         DesArrangementApiServiceConnector,
-    ttpArrangementRepository:         TTPArrangementRepository,
     ttpArrangementRepositoryWorkItem: TTPArrangementWorkItemRepository,
     auditService:                     AuditService,
     val clock:                        Clock,
@@ -45,12 +43,10 @@ class TTPArrangementService @Inject() (
 
   val CLIENT_CLOSED_REQUEST = 499 // Client closes the connection while nginx is processing the request.
 
-  def byId(id: String): Future[Option[AnonymousTTPArrangement]] = ttpArrangementRepository.findById(id)
-
   /**
-   * Builds and submits the TTPArrangement to Des. Also saves to Mongo
+   * Builds and submits the TTPArrangement to Des
    */
-  def submit(arrangement: TTPArrangement)(implicit r: Request[_]): Future[Option[AnonymousTTPArrangement]] = {
+  def submit(arrangement: TTPArrangement)(implicit r: Request[_]): Future[TTPArrangement] = {
     logger.trace(arrangement, s"Submitting ttp arrangement for DD '${arrangement.directDebitReference}' " +
       s"and PP '${arrangement.paymentPlanReference}'")
 
@@ -62,7 +58,7 @@ class TTPArrangementService @Inject() (
 
     (for {
       response <- desArrangementApiService.submitArrangement(utr, request)
-      ttp <- saveArrangement(arrangement, request)
+      ttp <- buildArrangement(arrangement, request)
     } yield {
       response match {
         case error: SubmissionError =>
@@ -102,13 +98,11 @@ class TTPArrangementService @Inject() (
   }
 
   /**
-   * Saves the TTPArrangement to our mongoDB and adds in a Id
+   * Affixes desSubmissionRequest to arrangement and adds Id to TTPArrangement
    */
-  private def saveArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[Option[AnonymousTTPArrangement]] = {
+  private def buildArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): Future[TTPArrangement] = {
     val arrangementWithDesSubmissionRequest = affixDesArrangement(arrangement, desSubmissionRequest)
-    val toSave = AnonymousTTPArrangement(arrangementWithDesSubmissionRequest)
-
-    Try(ttpArrangementRepository.doInsert(toSave)).getOrElse(Future.successful(None))
+    Future.successful(arrangementWithDesSubmissionRequest)
   }
 
   def affixDesArrangement(arrangement: TTPArrangement, desSubmissionRequest: DesSubmissionRequest): TTPArrangement = {

@@ -17,7 +17,7 @@
 package uk.gov.hmrc.timetopay.arrangement.repository
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.timetopay.arrangement.model.{AnonymousTTPArrangement, TTPArrangement}
+import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangement
 
 object TestDataTtp {
 
@@ -29,8 +29,7 @@ object TestDataTtp {
   val arrangement: TTPArrangement = Json.parse(
     s"""
        |{
-       |  "id" : "XXX-XXX-XXX",
-       |  "createdOn" : "2016-11-07T18:15:57.581",
+       |  "_id" : "XXX-XXX-XXX",
        |  "paymentPlanReference": "1234567890",
        |  "directDebitReference": "1234567890",
        |  "taxpayer": {
@@ -138,76 +137,5 @@ object TestDataTtp {
        |    }
        |  }
        |}""".stripMargin).as[TTPArrangement]
-
-  val anonymisedArrangement: AnonymousTTPArrangement = Json.parse(
-    """
-       |{
-       |  "_id" : "XXX-XXX-XXX",
-       |  "createdOn" : {
-       |    "$date" : {
-       |      "$numberLong" : "1667304404080"
-       |    }
-       |  },
-       |  "paymentPlanReference": "1234567890",
-       |  "directDebitReference": "1234567890",
-       |  "taxpayer": {
-       |    "selfAssessment": {
-       |      "utr": "1234567890"
-       |    }
-       |  },
-       |  "bankDetails": {
-       |    "sortCode": "12-34-56",
-       |    "accountNumber": "12345678",
-       |    "accountName": "Mr John Campbell"
-       |  },
-       |  "schedule": {
-       |    "startDate": "2016-09-01",
-       |    "endDate": "2017-08-01",
-       |    "initialPayment": 50,
-       |    "amountToPay": 5000,
-       |    "instalmentBalance": 4950,
-       |    "totalInterestCharged": 45.83,
-       |    "totalPayable": 5045.83,
-       |    "instalments": [
-       |      {
-       |        "paymentDate": "2016-10-01",
-       |        "amount": 1248.95
-       |      },
-       |      {
-       |        "paymentDate": "2016-11-01",
-       |        "amount": 1248.95
-       |      },
-       |      {
-       |        "paymentDate": "2016-12-01",
-       |        "amount": 1248.95
-       |      },
-       |      {
-       |        "paymentDate": "2017-01-01",
-       |        "amount": 1248.95
-       |      }
-       |    ]
-       |  },
-       |  "desArrangement": {
-       |    "ttpArrangement": {
-       |      "startDate": "2016-08-09",
-       |      "endDate": "2016-09-16",
-       |      "firstPaymentDate": "2016-08-09",
-       |      "firstPaymentAmount": "1248.95",
-       |      "regularPaymentAmount": "1248.95",
-       |      "regularPaymentFrequency": "Monthly",
-       |      "reviewDate": "2016-08-09",
-       |      "initials": "DOM",
-       |      "enforcementAction": "Distraint",
-       |      "directDebit": true,
-       |      "debitDetails": [
-       |        {
-       |          "debitType": "IN2",
-       |          "dueDate": "2004-07-31"
-       |        }
-       |      ],
-       |      "saNote": "SA Note Text Here"
-       |    }
-       |  }
-       |}""".stripMargin).as[AnonymousTTPArrangement]
 
 }

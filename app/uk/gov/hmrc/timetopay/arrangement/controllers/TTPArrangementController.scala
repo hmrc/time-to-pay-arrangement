@@ -16,17 +16,15 @@
 
 package uk.gov.hmrc.timetopay.arrangement.controllers
 
-import javax.inject.Inject
 import play.api.Logging
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json.toJson
 import play.api.mvc._
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.timetopay.arrangement.actions.Actions
-import uk.gov.hmrc.timetopay.arrangement.model.{TTPArrangement, TTPArrangementResponse}
+import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangement
 import uk.gov.hmrc.timetopay.arrangement.services.{DesApiException, TTPArrangementService}
 
-import scala.concurrent.Future._
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class TTPArrangementController @Inject() (
@@ -45,12 +43,13 @@ class TTPArrangementController @Inject() (
 
       withJsonBody[TTPArrangement] {
         arrangement =>
-          arrangementService.submit(arrangement).flatMap {
-            x => x.fold(createdNoLocation)(a => createdWithLocation(a._id))
+          arrangementService.submit(arrangement).flatMap { x =>
+            createdWithLocation(x._id)
           }.recover {
             case desApiException: DesApiException =>
-              val desFailureMessage: String = s"Submission to DES failed, status code [${desApiException.code.toString}] and response [${desApiException.message}]" +
-                s". Queued for retry: ${desApiException.queuedForRetry.toString}"
+              val desFailureMessage: String =
+                s"Submission to DES failed, status code [${desApiException.code.toString}] and response [${desApiException.message}]" +
+                  s". Queued for retry: ${desApiException.queuedForRetry.toString}"
               logger.error(desFailureMessage)
               InternalServerError(s"$desFailureMessage")
             case failure =>
@@ -59,8 +58,6 @@ class TTPArrangementController @Inject() (
           }
       }
   }
-
-  private def createdNoLocation = Future.successful[Result](Created)
 
   private def createdWithLocation(id: String)(implicit reqHead: RequestHeader) = {
     Future.successful[Result](Created.withHeaders(LOCATION -> s"$protocol://${reqHead.host}/ttparrangements/$id"))

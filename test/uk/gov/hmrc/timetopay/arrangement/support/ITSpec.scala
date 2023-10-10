@@ -89,7 +89,7 @@ trait ITSpec
       "microservice.services.auth.port" -> WireMockSupport.port
     )).build()
 
-  def createBinId = {
+  def createBinId: String = {
     System.currentTimeMillis().toString.takeRight(11)
   }
 
