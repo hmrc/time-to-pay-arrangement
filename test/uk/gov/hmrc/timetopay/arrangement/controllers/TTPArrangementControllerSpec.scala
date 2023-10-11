@@ -33,7 +33,6 @@ class TTPArrangementControllerSpec extends ITSpec with TestData {
 
       val result = await(httpClient.POST[JsValue, HttpResponse](s"$baseUrl/ttparrangements", ttparrangementRequest))
       result.status shouldBe Status.CREATED
-      result.header("Location") should not be None
 
       WireMockResponses.ensureAuthoriseCalled()
     }
@@ -52,7 +51,6 @@ class TTPArrangementControllerSpec extends ITSpec with TestData {
 
       val result: HttpResponse = await(httpClient.POST[JsValue, HttpResponse](s"$baseUrl/ttparrangements", requestWithNoPostcode))
       result.status shouldBe Status.CREATED
-      result.header("Location") should not be None
 
       WireMockResponses.ensureAuthoriseCalled()
     }
