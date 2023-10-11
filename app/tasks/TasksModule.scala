@@ -26,8 +26,8 @@ import scala.concurrent.ExecutionContext
 class TasksModule extends SimpleModule(bind[DropCollectionsTask].toSelf.eagerly())
 
 @Singleton
-class DropCollectionsTask @Inject()(mongoComponent: MongoComponent)
-                                   (implicit ex: ExecutionContext) extends Logging {
+class DropCollectionsTask @Inject() (mongoComponent: MongoComponent)
+  (implicit ex: ExecutionContext) extends Logging {
   logger.info("**************** Start cleanup task: drop alerts_received mongodb collections...")
 
   mongoComponent.client

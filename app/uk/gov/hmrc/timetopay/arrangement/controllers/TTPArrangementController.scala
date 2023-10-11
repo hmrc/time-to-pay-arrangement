@@ -43,8 +43,8 @@ class TTPArrangementController @Inject() (
 
       withJsonBody[TTPArrangement] {
         arrangement =>
-          arrangementService.submit(arrangement).flatMap { x =>
-            createdWithLocation(x._id)
+          arrangementService.submit(arrangement).flatMap { ttpArrangement =>
+            createdWithLocation(ttpArrangement.paymentPlanReference)
           }.recover {
             case desApiException: DesApiException =>
               val desFailureMessage: String =
@@ -59,8 +59,8 @@ class TTPArrangementController @Inject() (
       }
   }
 
-  private def createdWithLocation(id: String)(implicit reqHead: RequestHeader) = {
-    Future.successful[Result](Created.withHeaders(LOCATION -> s"$protocol://${reqHead.host}/ttparrangements/$id"))
+  private def createdWithLocation(ppRef: String)(implicit reqHead: RequestHeader) = {
+    Future.successful[Result](Created.withHeaders(LOCATION -> s"$protocol://${reqHead.host}/ttparrangements/$ppRef"))
   }
 
   def protocol(implicit reqHead: RequestHeader): String = if (reqHead.secure) "https" else "http"
