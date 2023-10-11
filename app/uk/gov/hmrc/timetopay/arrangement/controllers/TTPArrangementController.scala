@@ -36,15 +36,15 @@ class TTPArrangementController @Inject() (
 
   /**
    * Turns the json into our representation of a TTPArrangement
-   * It calls the submit method and applys a location to the returning result.
+   * and calls the submit method
    */
   val create: Action[JsValue] = actions.authenticatedAction.async(parse.json) {
     implicit request =>
 
       withJsonBody[TTPArrangement] {
         arrangement =>
-          arrangementService.submit(arrangement).flatMap { x =>
-            createdWithLocation(x._id)
+          arrangementService.submit(arrangement).flatMap { _ =>
+            Future.successful(Created)
           }.recover {
             case desApiException: DesApiException =>
               val desFailureMessage: String =
@@ -58,11 +58,5 @@ class TTPArrangementController @Inject() (
           }
       }
   }
-
-  private def createdWithLocation(id: String)(implicit reqHead: RequestHeader) = {
-    Future.successful[Result](Created.withHeaders(LOCATION -> s"$protocol://${reqHead.host}/ttparrangements/$id"))
-  }
-
-  def protocol(implicit reqHead: RequestHeader): String = if (reqHead.secure) "https" else "http"
 
 }

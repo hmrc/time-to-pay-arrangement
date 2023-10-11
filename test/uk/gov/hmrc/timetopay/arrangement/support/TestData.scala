@@ -26,7 +26,6 @@ trait TestData {
   val ttpArrangement: TTPArrangement = Json.parse(
     s"""
        |{
-       |  "_id" : "XXX-XXX-XXX",
        |  "paymentPlanReference": "12345678901234567890",
        |  "directDebitReference": "12345678901234567890",
        |  "taxpayer": {
@@ -138,7 +137,6 @@ trait TestData {
   val ttparrangementRequest: JsValue = Json.parse(
     s"""
        |{
-       |  "_id" : "XXX-XXX-XXX",
        |  "paymentPlanReference": "12345678901234567890",
        |  "directDebitReference": "12345678901234567890",
        |  "taxpayer": {
@@ -206,7 +204,6 @@ trait TestData {
   val ttparrangementResponse: JsValue = Json.parse(
     s"""
        |{
-       |  "id" : "XXX-XXX-XXX",
        |  "paymentPlanReference": "1234567890",
        |  "directDebitReference": "1234567890",
        |  "taxpayer": {

@@ -95,7 +95,6 @@ object DesDebit {
 }
 
 case class TTPArrangement(
-    _id:                  String                       = UUID.randomUUID().toString,
     paymentPlanReference: String,
     directDebitReference: String,
     taxpayer:             Taxpayer,
@@ -187,7 +186,6 @@ object modelFormat {
 }
 
 case class TTPArrangementResponse(
-    _id:                  String,
     paymentPlanReference: String,
     directDebitReference: String,
     taxpayer:             Taxpayer,

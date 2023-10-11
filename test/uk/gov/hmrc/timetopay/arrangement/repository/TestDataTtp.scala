@@ -29,7 +29,6 @@ object TestDataTtp {
   val arrangement: TTPArrangement = Json.parse(
     s"""
        |{
-       |  "_id" : "XXX-XXX-XXX",
        |  "paymentPlanReference": "1234567890",
        |  "directDebitReference": "1234567890",
        |  "taxpayer": {
