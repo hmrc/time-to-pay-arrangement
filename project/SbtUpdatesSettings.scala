@@ -24,12 +24,8 @@ object SbtUpdatesSettings {
     // error on 1.7.2
     dependencyUpdatesFilter -= moduleFilter("com.beachape", "enumeratum"),
     dependencyUpdatesFilter -= moduleFilter("com.beachape", "enumeratum-play"),
-    dependencyUpdatesFilter -= moduleFilter("uk.gov.hmrc", "auth-client"),
-    // newer versions are needed of the jackson libraries below than those provided by play
-    dependencyUpdatesFilter -= moduleFilter("com.fasterxml.jackson.core"),
-    dependencyUpdatesFilter -= moduleFilter("com.fasterxml.jackson.datatype"),
-    dependencyUpdatesFilter -= moduleFilter("com.fasterxml.jackson.dataformat"),
-    dependencyUpdatesFilter -= moduleFilter("com.fasterxml.jackson.module")
+    // locked by version of play
+    dependencyUpdatesFilter -= moduleFilter("org.scalatestplus.play", "scalatestplus-play")
   )
 
 }

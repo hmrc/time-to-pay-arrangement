@@ -18,7 +18,6 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import javax.inject.Inject
 import play.api.{Configuration, Logger}
-import uk.gov.hmrc.timetopay.arrangement._
 import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig, LetterAndControlAndJurisdictionChecker}
 import uk.gov.hmrc.timetopay.arrangement.model.{Address, CommunicationPreferences, LetterAndControl, PaymentSchedule, TTPArrangement, Taxpayer}
 

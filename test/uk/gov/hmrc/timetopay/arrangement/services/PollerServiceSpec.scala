@@ -19,14 +19,11 @@ package uk.gov.hmrc.timetopay.arrangement.services
 import java.time.{Clock, Instant}
 import java.time.Clock.systemUTC
 import java.time.LocalDateTime.now
-import org.joda.time.DateTime
-import play.api.Logger
-import play.api.libs.json.Json
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangementWorkItem
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementWorkItemRepository
 import uk.gov.hmrc.timetopay.arrangement.repository.TestDataTtp.{arrangement, auditTags}
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, WireMockResponses}
-import uk.gov.hmrc.mongo.workitem.ProcessingStatus.{Failed, PermanentlyFailed, Succeeded}
+import uk.gov.hmrc.mongo.workitem.ProcessingStatus.{Failed, PermanentlyFailed}
 
 class PollerServiceSpec extends ITSpec {
 

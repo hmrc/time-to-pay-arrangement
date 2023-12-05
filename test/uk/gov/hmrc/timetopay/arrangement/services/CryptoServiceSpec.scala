@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import uk.gov.hmrc.timetopay.arrangement.model.{BankDetails, DesSubmissionRequest, PaymentSchedule, SelfAssessment, TTPArrangement, Taxpayer}
+import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, PaymentSchedule, SelfAssessment, TTPArrangement, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestData}
 
 import java.time.LocalDate

@@ -30,9 +30,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 sealed trait SubmissionResult extends Product with Serializable
 
-case class SubmissionSuccess() extends SubmissionResult
+final case class SubmissionSuccess() extends SubmissionResult
 
-case class SubmissionError(code: Int, message: String) extends SubmissionResult
+final case class SubmissionError(code: Int, message: String) extends SubmissionResult
 
 object SubmissionError {
   implicit val format: OFormat[SubmissionError] = Json.format[SubmissionError]
