@@ -25,7 +25,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import java.nio.charset.Charset
 import scala.concurrent.ExecutionContext
-import scala.language.{implicitConversions, postfixOps}
+import scala.language.postfixOps
 
 trait UnitSpec extends AnyWordSpecLike with Matchers with OptionValues {
 

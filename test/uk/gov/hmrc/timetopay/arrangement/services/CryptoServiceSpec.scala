@@ -16,14 +16,14 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import uk.gov.hmrc.timetopay.arrangement.model.{BankDetails, DesSubmissionRequest, PaymentSchedule, SelfAssessment, TTPArrangement, Taxpayer}
+import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, PaymentSchedule, SelfAssessment, TTPArrangement, Taxpayer}
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestData}
 
 import java.time.LocalDate
 
 class CryptoServiceSpec extends ITSpec with TestData {
 
-  val cryptoService: CryptoService = fakeApplication().injector.instanceOf[CryptoService]
+  val cryptoService: CryptoService = app.injector.instanceOf[CryptoService]
 
   "check encrypted -> decripted match" in {
     val des: DesSubmissionRequest = DesSubmissionRequest(submitArrangementTTPArrangement, submitArrangementLetterAndControl)

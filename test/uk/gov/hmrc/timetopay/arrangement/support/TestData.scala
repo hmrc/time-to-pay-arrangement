@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.timetopay.arrangement.support
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.LocalDate
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.timetopay.arrangement.model.{Address, BankDetails, CommunicationPreferences, DesTTPArrangement, Instalment, LetterAndControl, PaymentSchedule, SelfAssessment, TTPArrangement, TTPArrangementWorkItem, Taxpayer}
+import uk.gov.hmrc.timetopay.arrangement.model._
 import uk.gov.hmrc.timetopay.arrangement.model.modelFormat._
 
 trait TestData {

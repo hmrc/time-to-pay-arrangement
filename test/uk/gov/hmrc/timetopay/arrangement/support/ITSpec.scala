@@ -16,23 +16,25 @@
 
 package uk.gov.hmrc.timetopay.arrangement.support
 
+import akka.actor.Scheduler
 import com.codahale.metrics.SharedMetricRegistries
 
 import java.time.format.DateTimeFormatter
 import java.time.{LocalDateTime, ZoneId, ZonedDateTime}
-import com.google.inject.AbstractModule
+import com.google.inject.{AbstractModule, Provides, Singleton}
+import com.miguno.akka.testing.VirtualTime
 import org.scalatest.time.{Second, Seconds, Span}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.freespec.AnyFreeSpecLike
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
-import play.api.mvc.Result
 import play.api.test.CSRFTokenHelper.CSRFRequest
 import play.api.test.FakeRequest
 import play.api.{Application, Configuration}
-import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HttpClient}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import uk.gov.hmrc.timetopay.arrangement.services.PollerService.OnCompleteAction
 
 import scala.concurrent.ExecutionContext
 
@@ -60,11 +62,38 @@ trait ITSpec
   }
 
   implicit lazy val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+
+  val virtualTime = new VirtualTime()
+
+  class PollerServiceOnCompleteListener {
+    private var _hasCompleted = false
+
+    val onCompleteAction = OnCompleteAction(() => _hasCompleted = true)
+
+    def hasCompleted(): Boolean = _hasCompleted
+
+    def reset(): Unit = _hasCompleted = false
+
+  }
+
+  val pollerServiceOnCompleteListener = new PollerServiceOnCompleteListener
+
   lazy val overridingsModule = new AbstractModule {
+    @Provides
+    @Singleton
+    def scheduler(): Scheduler = virtualTime.scheduler
+
+    @Provides
+    @Singleton
+    def pollerServiceOnCompleteAction: OnCompleteAction = pollerServiceOnCompleteListener.onCompleteAction
+
     override def configure(): Unit = ()
   }
-  lazy val servicesConfig = fakeApplication().injector.instanceOf[ServicesConfig]
-  lazy val config = fakeApplication().injector.instanceOf[Configuration]
+
+  lazy val servicesConfig = app.injector.instanceOf[ServicesConfig]
+
+  lazy val config = app.injector.instanceOf[Configuration]
+
   def baseUrl: String = s"http://localhost:$port"
 
   implicit def fakeRequest: FakeRequest[_] = FakeRequest("", "").withCSRFToken.asInstanceOf[FakeRequest[_]]
@@ -75,7 +104,7 @@ trait ITSpec
 
   implicit val hcWithAuthorization: HeaderCarrier = HeaderCarrier(authorization = Some(Authorization("Bearer 123")))
 
-  def httpClient = fakeApplication().injector.instanceOf[HttpClient]
+  def httpClient = app.injector.instanceOf[HttpClient]
 
   override def fakeApplication(): Application = new GuiceApplicationBuilder()
     .overrides(GuiceableModule.fromGuiceModules(Seq(overridingsModule)))
@@ -89,8 +118,6 @@ trait ITSpec
       "microservice.services.auth.port" -> WireMockSupport.port
     )).build()
 
-  def createBinId: String = {
-    System.currentTimeMillis().toString.takeRight(11)
-  }
+  def createBinId: String = System.currentTimeMillis().toString.takeRight(11)
 
 }

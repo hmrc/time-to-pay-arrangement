@@ -16,10 +16,7 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import org.scalatest.{FreeSpecLike, Matchers}
 import org.scalatest.prop.TableDrivenPropertyChecks._
-import org.scalatestplus.play.guice.GuiceOneServerPerTest
-import play.api.Configuration
 
 import java.time.LocalDate
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangement

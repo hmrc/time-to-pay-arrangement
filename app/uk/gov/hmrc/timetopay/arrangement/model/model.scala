@@ -19,8 +19,6 @@ package uk.gov.hmrc.timetopay.arrangement.model
 import play.api.libs.json._
 
 import java.time.{LocalDate, LocalDateTime}
-import java.util.UUID
-import scala.language.implicitConversions
 
 case class PaymentSchedule(
     startDate:            LocalDate,

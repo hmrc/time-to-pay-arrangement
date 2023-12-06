@@ -32,8 +32,8 @@ import uk.gov.hmrc.mongo.workitem.WorkItem
 
 class TTPArrangementWorkItemRepositorySpec extends ITSpec {
 
-  private lazy val repo = fakeApplication().injector.instanceOf[TTPArrangementWorkItemRepository]
-  private val crypto = fakeApplication().injector.instanceOf[CryptoService]
+  private lazy val repo = app.injector.instanceOf[TTPArrangementWorkItemRepository]
+  private val crypto = app.injector.instanceOf[CryptoService]
   private val javaInstantNow: Instant = Instant.now()
 
   private val clock: Clock = systemUTC()

@@ -20,10 +20,10 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestData}
 
 import java.time.LocalDate.now
-import uk.gov.hmrc.timetopay.arrangement.model.{BankDetails, Instalment, PaymentSchedule, TTPArrangement}
+import uk.gov.hmrc.timetopay.arrangement.model.{Instalment, PaymentSchedule, TTPArrangement}
 
 class LetterAndControlBuilderSpec extends ITSpec with TestData {
-  private val letterAndControlBuilder = fakeApplication().injector.instanceOf[LetterAndControlBuilder]
+  private val letterAndControlBuilder = app.injector.instanceOf[LetterAndControlBuilder]
 
   import Taxpayers._
 

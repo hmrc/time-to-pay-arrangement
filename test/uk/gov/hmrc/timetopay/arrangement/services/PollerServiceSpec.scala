@@ -16,61 +16,135 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
+import com.github.tomakehurst.wiremock.client.WireMock
+import org.scalatest.exceptions.TestFailedDueToTimeoutException
+
 import java.time.{Clock, Instant}
 import java.time.Clock.systemUTC
 import java.time.LocalDateTime.now
-import org.joda.time.DateTime
-import play.api.Logger
-import play.api.libs.json.Json
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangementWorkItem
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementWorkItemRepository
 import uk.gov.hmrc.timetopay.arrangement.repository.TestDataTtp.{arrangement, auditTags}
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, WireMockResponses}
-import uk.gov.hmrc.mongo.workitem.ProcessingStatus.{Failed, PermanentlyFailed, Succeeded}
+import uk.gov.hmrc.mongo.workitem.ProcessingStatus.{Failed, PermanentlyFailed}
+
+import scala.concurrent.duration._
 
 class PollerServiceSpec extends ITSpec {
 
-  private val pollerService = fakeApplication().injector.instanceOf[PollerService]
-  private val arrangementWorkItemRepo = fakeApplication().injector.instanceOf[TTPArrangementWorkItemRepository]
-  private val crypto = fakeApplication().injector.instanceOf[CryptoService]
+  private val pollerService = app.injector.instanceOf[PollerService]
+  private val arrangementWorkItemRepo = app.injector.instanceOf[TTPArrangementWorkItemRepository]
+  private val crypto = app.injector.instanceOf[CryptoService]
 
   override def beforeEach(): Unit = {
+    super.beforeEach()
     arrangementWorkItemRepo.collection.drop().toFuture().futureValue
     ()
   }
 
   override def afterEach(): Unit = {
+    super.afterEach()
     arrangementWorkItemRepo.collection.drop().toFuture().futureValue
     ()
   }
+
   private val clock: Clock = systemUTC()
+
   private val javaInstantNow: Instant = Instant.now()
-  val ttpArrangementWorkItem = TTPArrangementWorkItem(now(clock), now(clock), "", crypto.encryptTtpa(arrangement), crypto.encryptAuditTags(auditTags))
-  protected def numberOfQueuedNotifications: Integer = arrangementWorkItemRepo.collection.countDocuments().toFuture().futureValue.toInt
 
-  "pollerService should set it to PermanentlyFailed failed if availableUntil is passed" in {
-    arrangementWorkItemRepo.pushNew(ttpArrangementWorkItem.copy(availableUntil = now(clock).minusYears(1)), javaInstantNow).futureValue
-    pollerService.process().futureValue
-    eventually {
-      arrangementWorkItemRepo.collection.find().head().futureValue.status shouldBe PermanentlyFailed
+  val ttpArrangementWorkItem =
+    TTPArrangementWorkItem(
+      now(clock),
+      now(clock),
+      "",
+      crypto.encryptTtpa(arrangement),
+      crypto.encryptAuditTags(auditTags)
+    )
+
+  protected def numberOfQueuedNotifications: Integer =
+    arrangementWorkItemRepo.collection.countDocuments().toFuture().futureValue.toInt
+
+  "PollerService when" - {
+
+    "process() is called should" - {
+
+      "set it the job status to PermanentlyFailed failed if availableUntil is passed" in {
+        arrangementWorkItemRepo.pushNew(ttpArrangementWorkItem.copy(availableUntil = now(clock).minusYears(1)), javaInstantNow).futureValue
+        pollerService.process().futureValue
+        eventually {
+          arrangementWorkItemRepo.collection.find().head().futureValue.status shouldBe PermanentlyFailed
+        }
+      }
+
+      "set the job status to Failed if des call fails " in {
+        arrangementWorkItemRepo.pushNew(ttpArrangementWorkItem.copy(availableUntil = now(clock).plusMinutes(10)), javaInstantNow).futureValue
+        pollerService.process().futureValue
+        eventually {
+          arrangementWorkItemRepo.collection.find().head().futureValue.status shouldBe Failed
+        }
+      }
+
+      "set the job status to complete if des call is successful and remove from repo " in {
+        WireMockResponses.desArrangementApiSucccess(arrangement.taxpayer.selfAssessment.utr)
+        arrangementWorkItemRepo.pushNew(ttpArrangementWorkItem.copy(availableUntil = now(clock).plusMinutes(10)), javaInstantNow).futureValue
+        pollerService.process().futureValue
+        eventually {
+          arrangementWorkItemRepo.collection.countDocuments().toFuture().futureValue.toInt shouldBe 0
+        }
+      }
+    }
+
+    "handling it's own scheduled calls should" - {
+
+      "reattempt calls to DES at the configured times" in {
+        WireMockResponses.desArrangementApiSucccess(arrangement.taxpayer.selfAssessment.utr)
+
+        // put some jobs on the queue
+        arrangementWorkItemRepo.pushNew(ttpArrangementWorkItem.copy(availableUntil = now(clock).plusDays(1)), javaInstantNow).futureValue
+        arrangementWorkItemRepo.pushNew(ttpArrangementWorkItem.copy(availableUntil = now(clock).plusDays(2)), javaInstantNow).futureValue
+
+        // bring the time to just before the initial scheduled run and check nothing happens
+        virtualTime.advance(14.seconds - 1.millisecond)
+
+        a[TestFailedDueToTimeoutException] shouldBe thrownBy(eventually {
+          WireMockResponses.ensureDesArrangementcalled(2, arrangement.taxpayer.selfAssessment.utr)
+        })
+
+        // bring the time to the initial scheduled run and check queue is handled
+        virtualTime.advance(1.millisecond)
+
+        eventually {
+          WireMockResponses.ensureDesArrangementcalled(2, arrangement.taxpayer.selfAssessment.utr)
+          arrangementWorkItemRepo.collection.countDocuments().toFuture().futureValue.toInt shouldBe 0
+          pollerServiceOnCompleteListener.hasCompleted() shouldBe true
+        }
+
+        pollerServiceOnCompleteListener.reset()
+        WireMock.resetAllRequests()
+
+        // add something else to the next batch
+        arrangementWorkItemRepo.pushNew(ttpArrangementWorkItem.copy(availableUntil = now(clock).plusDays(3)), javaInstantNow).futureValue
+
+        // bring the time to just before the next scheduled run and check nothing happens
+        virtualTime.advance(2.minutes - 1.millisecond)
+
+        a[TestFailedDueToTimeoutException] shouldBe thrownBy(eventually {
+          WireMockResponses.ensureDesArrangementcalled(1, arrangement.taxpayer.selfAssessment.utr)
+        })
+
+        // bring the time to the next scheduled run and check queue is handled
+        virtualTime.advance(1.millisecond)
+
+        eventually {
+          WireMockResponses.ensureDesArrangementcalled(1, arrangement.taxpayer.selfAssessment.utr)
+          arrangementWorkItemRepo.collection.countDocuments().toFuture().futureValue.toInt shouldBe 0
+          pollerServiceOnCompleteListener.hasCompleted() shouldBe true
+        }
+
+        pollerServiceOnCompleteListener.reset()
+      }
 
     }
-  }
 
-  "pollerService should set it to failed if des call fails " in {
-    arrangementWorkItemRepo.pushNew(ttpArrangementWorkItem.copy(availableUntil = now(clock).plusMinutes(10)), javaInstantNow).futureValue
-    pollerService.process().futureValue
-    eventually {
-      arrangementWorkItemRepo.collection.find().head().futureValue.status shouldBe Failed
-    }
-  }
-
-  "pollerService should set it to complete if des call is successful and remove from repo " in {
-    WireMockResponses.desArrangementApiSucccess(arrangement.taxpayer.selfAssessment.utr)
-    arrangementWorkItemRepo.pushNew(ttpArrangementWorkItem.copy(availableUntil = now(clock).plusMinutes(10)), javaInstantNow).futureValue
-    pollerService.process().futureValue
-    eventually {
-      arrangementWorkItemRepo.collection.countDocuments().toFuture().futureValue.toInt shouldBe 0
-    }
   }
 }

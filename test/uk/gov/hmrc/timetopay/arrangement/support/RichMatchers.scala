@@ -22,8 +22,6 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import play.api.libs.json.{JsValue, Json}
 import org.scalatest.matchers.should.Matchers
 
-import scala.language.implicitConversions
-
 trait RichMatchers
   extends Matchers
   with TryValues

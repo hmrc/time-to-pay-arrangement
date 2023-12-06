@@ -79,4 +79,10 @@ object WireMockResponses {
         )
     )
 
+  def ensureDesArrangementcalled(numberOfTimes: Int, utr: String) =
+    verify(
+      exactly(numberOfTimes),
+      postRequestedFor(urlEqualTo(s"/time-to-pay/taxpayers/$utr/arrangements"))
+    )
+
 }
