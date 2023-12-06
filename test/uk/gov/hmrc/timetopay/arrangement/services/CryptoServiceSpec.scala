@@ -23,7 +23,7 @@ import java.time.LocalDate
 
 class CryptoServiceSpec extends ITSpec with TestData {
 
-  val cryptoService: CryptoService = fakeApplication().injector.instanceOf[CryptoService]
+  val cryptoService: CryptoService = app.injector.instanceOf[CryptoService]
 
   "check encrypted -> decripted match" in {
     val des: DesSubmissionRequest = DesSubmissionRequest(submitArrangementTTPArrangement, submitArrangementLetterAndControl)

@@ -21,7 +21,7 @@ import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestData, WireMockResp
 
 class DesArrangementApiServiceConnectorSpec extends ITSpec with TestData {
 
-  private val connector = fakeApplication().injector.instanceOf[DesArrangementApiServiceConnector]
+  private val connector = app.injector.instanceOf[DesArrangementApiServiceConnector]
 
   private val request: DesSubmissionRequest = DesSubmissionRequest(submitArrangementTTPArrangement, submitArrangementLetterAndControl)
 

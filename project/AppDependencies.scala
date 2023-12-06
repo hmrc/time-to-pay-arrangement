@@ -12,7 +12,6 @@ object AppDependencies {
     ws,
     "uk.gov.hmrc"       %% "bootstrap-backend-play-28"         % bootstrapVersion,
     "com.beachape"      %% "enumeratum"                        % "1.7.0",
-    "uk.gov.hmrc"       %% "play-scheduling-play-28"           % "8.3.0",
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-work-item-repo-play-28" % hmrcMongoVersion
     // format: ON
   )
@@ -24,7 +23,8 @@ object AppDependencies {
     "uk.gov.hmrc.mongo"      %% "hmrc-mongo-test-play-28" % hmrcMongoVersion,
     "org.scalatestplus.play" %% "scalatestplus-play"      % "5.1.0",
     "org.pegdown"            % "pegdown"                  % "1.6.0",
-    "org.wiremock"           % "wiremock-standalone"      % "3.3.1"
+    "org.wiremock"           % "wiremock-standalone"      % "3.3.1",
+    "com.miguno.akka"        %% "akka-mock-scheduler"     % "0.5.5"
     // format: ON
   ).map(_ % Test)
 

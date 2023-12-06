@@ -14,16 +14,26 @@
  * limitations under the License.
  */
 
-import java.time.{Clock, ZoneOffset}
+import akka.actor.{ActorSystem, Scheduler}
 
+import java.time.{Clock, ZoneOffset}
 import com.google.inject.{AbstractModule, Provides, Singleton}
 import uk.gov.hmrc.timetopay.arrangement.services.PollerService
+import uk.gov.hmrc.timetopay.arrangement.services.PollerService.OnCompleteAction
 
 class Module extends AbstractModule {
 
   @Provides
   @Singleton
   def clock(): Clock = Clock.systemDefaultZone.withZone(ZoneOffset.UTC)
+
+  @Provides
+  @Singleton
+  def scheduler(actorSystem: ActorSystem): Scheduler = actorSystem.scheduler
+
+  @Provides
+  @Singleton
+  def pollerServiceOnCompleteAction: OnCompleteAction = OnCompleteAction(() => ())
 
   override def configure(): Unit = {
     bind(classOf[PollerService]).asEagerSingleton()

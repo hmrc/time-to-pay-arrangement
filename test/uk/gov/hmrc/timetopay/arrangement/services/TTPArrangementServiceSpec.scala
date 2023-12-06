@@ -25,8 +25,8 @@ class TTPArrangementServiceSpec extends ITSpec with TestData {
 
   import Taxpayers._
 
-  private val arrangementWorkItemRepo = fakeApplication().injector.instanceOf[TTPArrangementWorkItemRepository]
-  private val tTPArrangementService = fakeApplication().injector.instanceOf[TTPArrangementService]
+  private val arrangementWorkItemRepo = app.injector.instanceOf[TTPArrangementWorkItemRepository]
+  private val tTPArrangementService = app.injector.instanceOf[TTPArrangementService]
   private val arrangement: TTPArrangement = ttparrangementRequest.as[TTPArrangement].copy(taxpayer = taxPayerWithEnglishAddress)
 
   override def beforeEach(): Unit = {
