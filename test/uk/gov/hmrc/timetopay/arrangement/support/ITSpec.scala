@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.timetopay.arrangement.support
 
-import akka.actor.Scheduler
+import org.apache.pekko.actor.Scheduler
 import com.codahale.metrics.SharedMetricRegistries
 
 import java.time.format.DateTimeFormatter
 import java.time.{LocalDateTime, ZoneId, ZonedDateTime}
 import com.google.inject.{AbstractModule, Provides, Singleton}
-import com.miguno.akka.testing.VirtualTime
+import com.github.pjfanning.pekko.scheduler.mock.VirtualTime
 import org.scalatest.time.{Second, Seconds, Span}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.freespec.AnyFreeSpecLike
