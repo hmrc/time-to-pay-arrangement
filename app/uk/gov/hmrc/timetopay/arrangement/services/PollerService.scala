@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import akka.actor.Scheduler
+import org.apache.pekko.actor.Scheduler
 import com.google.inject.Singleton
 import uk.gov.hmrc.mongo.workitem.ProcessingStatus.{Failed, PermanentlyFailed}
 import uk.gov.hmrc.timetopay.arrangement.config.{QueueConfig, QueueLogger}

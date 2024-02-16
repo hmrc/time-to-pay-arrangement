@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import akka.actor.{ActorSystem, Scheduler}
+import org.apache.pekko.actor.{ActorSystem, Scheduler}
 
 import java.time.{Clock, ZoneOffset}
 import com.google.inject.{AbstractModule, Provides, Singleton}

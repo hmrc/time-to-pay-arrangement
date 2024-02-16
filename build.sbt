@@ -1,5 +1,4 @@
-import TestPhases.oneForkedJvmPerTest
-import uk.gov.hmrc.DefaultBuildSettings.{defaultSettings, integrationTestSettings, scalaSettings}
+import uk.gov.hmrc.DefaultBuildSettings.{defaultSettings, scalaSettings}
 
 val scalaV = "2.13.12"
 
@@ -25,14 +24,6 @@ lazy val microservice = Project(appName, file("."))
   .settings(scalaSettings)
   .settings(defaultSettings())
   .settings(scalaVersion := scalaV)
-  .settings(integrationTestSettings())
-  .configs(IntegrationTest)
-  .settings(inConfig(IntegrationTest)(Defaults.itSettings))
-  .settings(
-    (IntegrationTest / Keys.fork) := false,
-    (IntegrationTest / unmanagedSourceDirectories) := (IntegrationTest / baseDirectory) (base => Seq(base / "it")).value,
-    (IntegrationTest / testGrouping) := oneForkedJvmPerTest((IntegrationTest / definedTests).value),
-    (IntegrationTest / parallelExecution) := false)
   .settings(
     scalacOptions ++= Seq(
       "-Xfatal-warnings",
