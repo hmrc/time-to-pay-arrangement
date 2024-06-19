@@ -60,9 +60,7 @@ class DesArrangementApiServiceConnector @Inject() (
     //we put sessionId and requestId into hc so auditor can populate these fields when auditing
     //request to DES
 
-    val serviceUrl = s"time-to-pay/taxpayers/$utr/arrangements"
-
-    httpClient.post(url"${config.desArrangementUrl}/$serviceUrl")
+    httpClient.post(url"${config.desArrangementUrl}/time-to-pay/taxpayers/$utr/arrangements")
       .withBody(Json.toJson(desSubmissionRequest))
       .setHeader(headers: _*).execute[HttpResponse].map[SubmissionResult] {
         case res if res.status == Status.ACCEPTED =>
