@@ -16,26 +16,26 @@
 
 package uk.gov.hmrc.timetopay.arrangement.support
 
-import org.apache.pekko.actor.Scheduler
 import com.codahale.metrics.SharedMetricRegistries
-
-import java.time.format.DateTimeFormatter
-import java.time.{LocalDateTime, ZoneId, ZonedDateTime}
-import com.google.inject.{AbstractModule, Provides, Singleton}
 import com.github.pjfanning.pekko.scheduler.mock.VirtualTime
-import org.scalatest.time.{Second, Seconds, Span}
+import com.google.inject.{AbstractModule, Provides, Singleton}
+import org.apache.pekko.actor.Scheduler
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.freespec.AnyFreeSpecLike
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.time.{Second, Seconds, Span}
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.test.CSRFTokenHelper.CSRFRequest
 import play.api.test.FakeRequest
 import play.api.{Application, Configuration}
-import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{Authorization, HeaderCarrier}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.timetopay.arrangement.services.PollerService.OnCompleteAction
 
+import java.time.format.DateTimeFormatter
+import java.time.{LocalDateTime, ZoneId, ZonedDateTime}
 import scala.concurrent.ExecutionContext
 
 /**
@@ -104,7 +104,7 @@ trait ITSpec
 
   implicit val hcWithAuthorization: HeaderCarrier = HeaderCarrier(authorization = Some(Authorization("Bearer 123")))
 
-  def httpClient = app.injector.instanceOf[HttpClient]
+  def httpClient = app.injector.instanceOf[HttpClientV2]
 
   override def fakeApplication(): Application = new GuiceApplicationBuilder()
     .overrides(GuiceableModule.fromGuiceModules(Seq(overridingsModule)))
