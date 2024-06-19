@@ -20,7 +20,7 @@ import play.api.http.Status
 import play.api.libs.json._
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.http.{HttpResponse, StringContextOps}
 import uk.gov.hmrc.timetopay.arrangement.support.{ITSpec, TestData, WireMockResponses}
 
 class TTPArrangementControllerSpec extends ITSpec with TestData {
@@ -31,7 +31,9 @@ class TTPArrangementControllerSpec extends ITSpec with TestData {
       WireMockResponses.authorise()
       WireMockResponses.desArrangementApiSucccess("1234567890")
 
-      val result = await(httpClient.POST[JsValue, HttpResponse](s"$baseUrl/ttparrangements", ttparrangementRequest))
+      val result = await(httpClient.post(url"$baseUrl/ttparrangements")
+        .withBody(ttparrangementRequest)
+        .execute[HttpResponse])
       result.status shouldBe Status.CREATED
 
       WireMockResponses.ensureAuthoriseCalled()
@@ -49,7 +51,10 @@ class TTPArrangementControllerSpec extends ITSpec with TestData {
         }
       ).get
 
-      val result: HttpResponse = await(httpClient.POST[JsValue, HttpResponse](s"$baseUrl/ttparrangements", requestWithNoPostcode))
+      val result: HttpResponse = await(httpClient.post(url"$baseUrl/ttparrangements")
+        .withBody(requestWithNoPostcode)
+        .execute[HttpResponse])
+
       result.status shouldBe Status.CREATED
 
       WireMockResponses.ensureAuthoriseCalled()
@@ -59,7 +64,9 @@ class TTPArrangementControllerSpec extends ITSpec with TestData {
       WireMockResponses.authorise()
       WireMockResponses.desArrangementApiBadRequestClientError("1234567890")
 
-      val result = await(httpClient.POST[JsValue, HttpResponse](s"$baseUrl/ttparrangements", ttparrangementRequest))
+      val result = await(httpClient.post(url"$baseUrl/ttparrangements")
+        .withBody(ttparrangementRequest)
+        .execute[HttpResponse])
 
       result.status shouldBe 500
       result.body should include("Submission to DES failed, status code [400]")
@@ -72,14 +79,18 @@ class TTPArrangementControllerSpec extends ITSpec with TestData {
       WireMockResponses.authorise()
       WireMockResponses.desArrangementApiBadRequestServerError("1234567890")
 
-      val result = await(httpClient.POST[JsValue, HttpResponse](s"$baseUrl/ttparrangements", ttparrangementRequest))
+      //      val result = await(httpClient.POST[JsValue, HttpResponse](s"$baseUrl/ttparrangements", ttparrangementRequest))
+
+      val result = await(httpClient.post(url"$baseUrl/ttparrangements")
+        .withBody(ttparrangementRequest)
+        .execute[HttpResponse])
 
       result.status shouldBe 500
       result.body should include(
         """Submission to DES failed, status code [500] and response [{
-          |            "code": "SERVICE_UNAVAILABLE",
-          |            "reason": "Dependent systems are currently not responding."
-          |}]. Queued for retry: true""".stripMargin
+                |            "code": "SERVICE_UNAVAILABLE",
+                |            "reason": "Dependent systems are currently not responding."
+                |}]. Queued for retry: true""".stripMargin
       )
 
       WireMockResponses.ensureAuthoriseCalled()

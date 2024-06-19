@@ -16,16 +16,19 @@
 
 package uk.gov.hmrc.timetopay.arrangement.connectors
 
-import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.http.Status
+import play.api.libs.json.Format.GenericFormat
+import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.libs.json.{JsObject, Json, OFormat}
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HttpClient, _}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.timetopay.arrangement.config.{DesArrangementApiServiceConnectorConfig, QueueLogger}
 import uk.gov.hmrc.timetopay.arrangement.model.DesSubmissionRequest
 import uk.gov.hmrc.timetopay.arrangement.model.modelFormat._
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 sealed trait SubmissionResult extends Product with Serializable
@@ -40,7 +43,7 @@ object SubmissionError {
 
 @Singleton
 class DesArrangementApiServiceConnector @Inject() (
-    httpClient: HttpClient,
+    httpClient: HttpClientV2,
     config:     DesArrangementApiServiceConnectorConfig
 ) {
   val logger: Logger = Logger(getClass)
@@ -57,14 +60,11 @@ class DesArrangementApiServiceConnector @Inject() (
     //we put sessionId and requestId into hc so auditor can populate these fields when auditing
     //request to DES
 
-    val serviceUrl = s"time-to-pay/taxpayers/${utr}/arrangements"
-
-    httpClient.POST[DesSubmissionRequest, HttpResponse](
-      s"${config.desArrangementUrl}/$serviceUrl",
-      desSubmissionRequest, headers = headers)
-      .map[SubmissionResult] {
+    httpClient.post(url"${config.desArrangementUrl}/time-to-pay/taxpayers/$utr/arrangements")
+      .withBody(Json.toJson(desSubmissionRequest))
+      .setHeader(headers: _*).execute[HttpResponse].map[SubmissionResult] {
         case res if res.status == Status.ACCEPTED =>
-          logger.info(s"Submission successful for '${utr}'")
+          logger.info(s"Submission successful for '$utr'")
           zonkLogger.trace(utr, "DES POST OK " + res.toString())
           SubmissionSuccess()
 
