@@ -5,7 +5,7 @@ val scalaV = "2.13.12"
 val appName = "time-to-pay-arrangement"
 
 lazy val microservice = Project(appName, file("."))
-  .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
+  .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .settings(
     scalaVersion := scalaV,
     resolvers ++= Seq(Resolver.jcenterRepo),
