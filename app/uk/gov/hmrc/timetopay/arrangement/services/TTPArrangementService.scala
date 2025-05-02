@@ -24,9 +24,10 @@ import uk.gov.hmrc.timetopay.arrangement.model.{DesSubmissionRequest, TTPArrange
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementWorkItemRepository
 
 import java.time.{Clock, Duration, Instant, LocalDateTime}
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class TTPArrangementService @Inject() (
     desTTPArrangementBuilder:         DesTTPArrangementBuilder,
     desArrangementApiService:         DesArrangementApiServiceConnector,
