@@ -24,9 +24,10 @@ import uk.gov.hmrc.timetopay.arrangement.actions.Actions
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangement
 import uk.gov.hmrc.timetopay.arrangement.services.{DesApiException, TTPArrangementService}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class TTPArrangementController @Inject() (
     actions:            Actions,
     arrangementService: TTPArrangementService,

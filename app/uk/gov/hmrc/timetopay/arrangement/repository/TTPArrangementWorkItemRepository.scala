@@ -16,18 +16,21 @@
 
 package uk.gov.hmrc.timetopay.arrangement.repository
 
-import com.google.inject.Inject
+import com.google.inject.{Inject, Singleton}
 import org.mongodb.scala.model.{IndexModel, IndexOptions, Indexes}
 import uk.gov.hmrc.mongo.MongoUtils
+
 import java.util.concurrent.TimeUnit
 import play.api.Configuration
 import uk.gov.hmrc.mongo.workitem.{WorkItem, WorkItemFields, WorkItemRepository}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.timetopay.arrangement.config.QueueConfig
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangementWorkItem
-import java.time.{Clock, Instant, Duration}
+
+import java.time.{Clock, Duration, Instant}
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class TTPArrangementWorkItemRepository @Inject() (configuration: Configuration,
                                                   queueConfig:   QueueConfig,
                                                   mongo:         MongoComponent,

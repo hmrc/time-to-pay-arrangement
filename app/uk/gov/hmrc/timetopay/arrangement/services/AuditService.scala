@@ -26,9 +26,10 @@ import uk.gov.hmrc.timetopay.arrangement.connectors.SubmissionError
 import uk.gov.hmrc.timetopay.arrangement.model.{BankDetails, PaymentSchedule, TTPArrangement, TTPArrangementWorkItem, Taxpayer}
 
 import java.time.temporal.ChronoUnit
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
+@Singleton
 class AuditService @Inject() (auditConnector: AuditConnector)(implicit ec: ExecutionContext) {
 
   def sendSubmissionSucceededEvent(

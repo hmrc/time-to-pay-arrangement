@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.timetopay.arrangement.services
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import play.api.{Configuration, Logger}
 import uk.gov.hmrc.timetopay.arrangement.config.{JurisdictionCheckerConfig, LetterAndControlAndJurisdictionChecker}
 import uk.gov.hmrc.timetopay.arrangement.model.{Address, CommunicationPreferences, LetterAndControl, PaymentSchedule, TTPArrangement, Taxpayer}
@@ -24,6 +24,7 @@ import uk.gov.hmrc.timetopay.arrangement.model.{Address, CommunicationPreference
 import scala.math.BigDecimal.exact
 import scala.util.Try
 
+@Singleton
 class LetterAndControlBuilder @Inject() (letterAndControlAndJurisdictionChecker: LetterAndControlAndJurisdictionChecker, configuration: Configuration) {
   val logger: Logger = Logger(getClass)
 
