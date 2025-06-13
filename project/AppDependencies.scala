@@ -5,7 +5,7 @@ import sbt.*
 object AppDependencies {
 
   val hmrcMongoVersion = "2.6.0"
-  val bootstrapVersion = "9.11.0"
+  val bootstrapVersion = "9.13.0"
 
 
   val compile = Seq(
@@ -22,7 +22,7 @@ object AppDependencies {
     "uk.gov.hmrc"            %% "bootstrap-test-play-30"  % bootstrapVersion,
     "uk.gov.hmrc.mongo"      %% "hmrc-mongo-test-play-30" % hmrcMongoVersion,
     "org.scalatestplus.play" %% "scalatestplus-play"      % "7.0.1",
-    "org.wiremock"           %  "wiremock-standalone"     % "3.13.0",
+    "org.wiremock"           %  "wiremock-standalone"     % "3.13.1",
     "com.github.pjfanning"   %% "pekko-mock-scheduler"    % "0.6.0"
     // format: ON
   ).map(_ % Test)
