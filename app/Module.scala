@@ -18,7 +18,7 @@ import org.apache.pekko.actor.{ActorSystem, Scheduler}
 
 import java.time.{Clock, ZoneOffset}
 import com.google.inject.{AbstractModule, Provides, Singleton}
-import uk.gov.hmrc.timetopay.arrangement.services.PollerService
+import uk.gov.hmrc.timetopay.arrangement.services.{PollerService, TTPArrangementJobExtender}
 import uk.gov.hmrc.timetopay.arrangement.services.PollerService.OnCompleteAction
 
 class Module extends AbstractModule {
@@ -37,5 +37,6 @@ class Module extends AbstractModule {
 
   override def configure(): Unit = {
     bind(classOf[PollerService]).asEagerSingleton()
+    bind(classOf[TTPArrangementJobExtender]).asEagerSingleton()
   }
 }
