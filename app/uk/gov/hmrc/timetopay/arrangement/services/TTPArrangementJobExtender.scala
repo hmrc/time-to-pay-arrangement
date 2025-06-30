@@ -18,6 +18,7 @@ package uk.gov.hmrc.timetopay.arrangement.services
 
 import org.mongodb.scala.model.Filters.equal
 import play.api.{Configuration, Logging}
+import uk.gov.hmrc.mongo.workitem.ProcessingStatus
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementWorkItemRepository
 
 import javax.inject.{Inject, Singleton}
@@ -44,8 +45,10 @@ class TTPArrangementJobExtender @Inject() (
           Future.sequence(currentItems.map(workItem =>
             ttpArrangementWorkItemRepo.collection.replaceOne(
               equal("_id", workItem.id),
-              workItem.copy(item = workItem.item.copy(
-                availableUntil = workItem.item.availableUntil.plusMinutes(extendByMinutes))
+              workItem.copy(
+                item         = workItem.item.copy(availableUntil = workItem.item.availableUntil.plusMinutes(extendByMinutes)),
+                status       = ProcessingStatus.ToDo,
+                failureCount = 0
               )
             ).toFuture()
           ))

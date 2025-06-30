@@ -19,7 +19,7 @@ package uk.gov.hmrc.timetopay.arrangement.services
 import org.scalatest.exceptions.TestFailedDueToTimeoutException
 import play.api.Configuration
 import play.api.test.Helpers._
-import uk.gov.hmrc.mongo.workitem.WorkItem
+import uk.gov.hmrc.mongo.workitem.{ProcessingStatus, WorkItem}
 import uk.gov.hmrc.timetopay.arrangement.model.TTPArrangementWorkItem
 import uk.gov.hmrc.timetopay.arrangement.repository.TTPArrangementWorkItemRepository
 import uk.gov.hmrc.timetopay.arrangement.support.ITSpec
@@ -68,10 +68,24 @@ class TTPArrangementJobExtenderSpec extends ITSpec {
       "auditTags"
     )
 
-    val workItem = adjustTimePrecision(await(
-      workItemRepo.pushNew(originalWorkItem)
+    // insert a new work item
+    val newWorkItem = adjustTimePrecision(await(workItemRepo.pushNew(originalWorkItem)))
+
+    eventually{
+      await(workItemRepo.findById(newWorkItem.id)) shouldBe Some(newWorkItem)
+    }
+
+    // update the work item with a new status
+    val workItem = newWorkItem.copy(
+      status       = ProcessingStatus.PermanentlyFailed,
+      failureCount = 5
     )
-    )
+
+    // mark it as permanently failed
+    await(workItemRepo.collection.replaceOne(
+      org.mongodb.scala.model.Filters.equal("_id", newWorkItem.id),
+      workItem
+    ).toFuture())
 
     eventually{
       await(workItemRepo.findById(workItem.id)) shouldBe Some(workItem)
@@ -92,7 +106,9 @@ class TTPArrangementJobExtenderSpec extends ITSpec {
         eventually{
           await(workItemRepo.findById(workItem.id)) shouldBe Some(
             workItem.copy(
-              item = originalWorkItem.copy(availableUntil = LocalDateTime.of(2000, 5, 26, 2, 0))
+              item         = originalWorkItem.copy(availableUntil = LocalDateTime.of(2000, 5, 26, 2, 0)),
+              status       = ProcessingStatus.ToDo,
+              failureCount = 0
             )
           )
         }
@@ -108,7 +124,9 @@ class TTPArrangementJobExtenderSpec extends ITSpec {
         eventually{
           await(workItemRepo.findById(workItem.id)) shouldBe Some(
             workItem.copy(
-              item = originalWorkItem.copy(availableUntil = LocalDateTime.of(2000, 5, 19, 1, 0))
+              item         = originalWorkItem.copy(availableUntil = LocalDateTime.of(2000, 5, 19, 1, 0)),
+              status       = ProcessingStatus.ToDo,
+              failureCount = 0
             )
           )
         }
@@ -124,7 +142,9 @@ class TTPArrangementJobExtenderSpec extends ITSpec {
         eventually{
           await(workItemRepo.findById(workItem.id)) shouldBe Some(
             workItem.copy(
-              item = originalWorkItem.copy(availableUntil = LocalDateTime.of(2000, 5, 19, 1, 0))
+              item         = originalWorkItem.copy(availableUntil = LocalDateTime.of(2000, 5, 19, 1, 0)),
+              status       = ProcessingStatus.ToDo,
+              failureCount = 0
             )
           )
         }
