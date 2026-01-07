@@ -23,7 +23,7 @@ import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.libs.json.{JsObject, Json, OFormat}
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpException, HttpResponse, StringContextOps}
 import uk.gov.hmrc.timetopay.arrangement.config.{DesArrangementApiServiceConnectorConfig, QueueLogger}
 import uk.gov.hmrc.timetopay.arrangement.model.DesSubmissionRequest
 import uk.gov.hmrc.timetopay.arrangement.model.modelFormat._
@@ -76,10 +76,17 @@ class DesArrangementApiServiceConnector @Inject() (
           }
           SubmissionError(res.status, res.body)
       }.recover {
-        case _ =>
-          zonkLogger.trace(utr, "DES POST Failed TIMEOUT")
-          logger.info(s"Submission FAILED for '${utr}'")
-          SubmissionError(599, "network timeout exception")
+        case error =>
+          zonkLogger.trace(utr, "DES POST Failed EXCEPTION")
+          logger.error(s"Submission FAILED for '$utr'", error)
+          SubmissionError(
+            error match {
+              case e: HttpException => e.responseCode
+              // large enough http code value ensures retries are done
+              case _                => 1000
+            },
+            error.getMessage
+          )
       }
   }
 
