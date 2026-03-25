@@ -36,6 +36,7 @@ import uk.gov.hmrc.timetopay.arrangement.services.PollerService.OnCompleteAction
 
 import java.time.format.DateTimeFormatter
 import java.time.{LocalDateTime, ZoneId, ZonedDateTime}
+import scala.annotation.unused
 import scala.concurrent.ExecutionContext
 
 /**
@@ -78,14 +79,14 @@ trait ITSpec
 
   val pollerServiceOnCompleteListener = new PollerServiceOnCompleteListener
 
-  lazy val overridingsModule = new AbstractModule {
+  lazy val overridingsModule: AbstractModule = new AbstractModule {
     @Provides
     @Singleton
-    def scheduler(): Scheduler = virtualTime.scheduler
+    @unused def scheduler(): Scheduler = virtualTime.scheduler
 
     @Provides
     @Singleton
-    def pollerServiceOnCompleteAction: OnCompleteAction = pollerServiceOnCompleteListener.onCompleteAction
+    @unused def pollerServiceOnCompleteAction: OnCompleteAction = pollerServiceOnCompleteListener.onCompleteAction
 
     override def configure(): Unit = ()
   }
