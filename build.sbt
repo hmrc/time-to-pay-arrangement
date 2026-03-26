@@ -1,6 +1,6 @@
 import uk.gov.hmrc.DefaultBuildSettings.{defaultSettings, scalaSettings}
 
-val scalaV = "2.13.16"
+val scalaV = "2.13.18"
 
 val appName = "time-to-pay-arrangement"
 
